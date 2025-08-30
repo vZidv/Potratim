@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Potratim", "Potratim.csproj", "{D3FB50FF-8BA2-DA49-673E-83FF24E91F49}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3FB50FF-8BA2-DA49-673E-83FF24E91F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3FB50FF-8BA2-DA49-673E-83FF24E91F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3FB50FF-8BA2-DA49-673E-83FF24E91F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3FB50FF-8BA2-DA49-673E-83FF24E91F49}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0060ABC3-208E-47CA-99FD-55922639D098}
+	EndGlobalSection
+EndGlobal
