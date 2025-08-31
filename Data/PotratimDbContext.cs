@@ -22,6 +22,7 @@ namespace Potratim.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // User
             modelBuilder.Entity<User>()
             .HasMany(u => u.Games)
             .WithMany(g => g.Users)
@@ -37,8 +38,23 @@ namespace Potratim.Data
             .WithMany(r => r.Users)
             .HasForeignKey(u => u.RoleId);
 
-            
+            //Game
+            modelBuilder.Entity<Game>()
+            .HasMany(r => r.Reviews)
+            .WithOne(g => g.Game)
+            .HasForeignKey(g => g.GameId);
 
+            modelBuilder.Entity<Game>()
+            .HasMany(g => g.Categories)
+            .WithMany(c => c.Games)
+            .UsingEntity(e => e.ToTable("CategoryToGame"));
+
+            modelBuilder.Entity<Game>()
+            .HasMany(g => g.Carts)
+            .WithMany(c => c.Games)
+            .UsingEntity(e => e.ToTable("CartToGame"));
+
+            
 
             base.OnModelCreating(modelBuilder);
         }

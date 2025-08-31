@@ -1,7 +1,15 @@
+using Potratim.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<PotratimDbContext>(options =>
+{
+    options.UseNpgsql(configuration.GetConnectionString(nameof(PotratimDbContext)));
+});
 
 var app = builder.Build();
 
