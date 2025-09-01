@@ -1,0 +1,41 @@
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@{
+    ViewData["Title"] = "Game Page";
+}
+
+<div class="game-container">
+    @* Верхняя часть *@
+    <div class="game-top-section">
+        <div class="game-image">
+            <img src="https://digiseller.mycdn.ink/imgwebp.ashx?idp=9026925&dc=808516086">
+        </div>
+        <div class="game-info">
+            <h1>@ViewBag.Game?.Title</h1>
+            <div class="game-sold-review-result">
+                <p>Продано: 256</p>
+                <p>●</p>
+                <p>Отзывы: 128</p>
+            </div>
+            <div class="game-purchase">
+                <div class="game-price">
+                    @($"{ViewBag.Game?.Price} ₽")
+                </div>
+                <button class="game-buy-button">Купить сейчас</button>
+                <button class="game-add-to-cart-button">Добавить в корзину</button>
+            </div>
+        </div>
+    </div>
+
+    @* Нижняя часть *@
+    <div class="game-details">
+        <div class="game-details-buttons">
+            <button class="game-description-button">Описание</button>
+            <button class="game-reviews-button">Отзывы</button>
+        </div>
+        <div class="game-description">
+            <p>@ViewBag.Game?.Description</p>
+        </div>
+
+    </div>
+
+</div>

@@ -8,7 +8,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -19,13 +23,105 @@ html {
 
 body {
   margin-bottom: 60px;
+  font: #ffffff;
+  background: linear-gradient(135deg, #232526 0%, #414345 100%);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating>.form-control-plaintext::placeholder,
+.form-floating>.form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating>.form-control-plaintext:focus::placeholder,
+.form-floating>.form-control:focus::placeholder {
   text-align: start;
+}
+
+/* Страница игры */
+
+.game-top-section {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 20px;
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 20px;
+  color: white;
+}
+
+.game-image {
+  flex: 1;
+  width: 100%;
+}
+
+.game-image img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 15px;
+}
+.game-sold-review-result {
+  display: flex;
+  flex-direction: row;
+  color: #646464;
+  gap: 5px;
+}
+
+.game-info {
+  flex: 3.5;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.game-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #f0f0f0;
+}
+
+/* background: linear-gradient(45deg, #258cfb, #ffffff); */
+
+.game-purchase button {
+  border-radius: 6px;
+  font-size: 1.4rem;
+  color: #1e1e1e;
+  font-weight: bold;
+  border-style: none;
+  margin-right: 14px;
+}
+
+.game-buy-button {
+  background: linear-gradient(135deg, #18ff78, #95ffc1);
+}
+
+.game-add-to-cart-button {
+    background: linear-gradient(135deg, #1780f9, #71b0f7);
+}
+
+/* Детали игры и отзывы */
+.game-details {
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.game-details-buttons button {
+  background: #BEE4D0;
+  color: #1e1e1e;
+  border-radius: 6px;
+  border-style: none;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.game-description {
+  background: #252525;
+  color: #f0f0f0;
+  font-size: 1.2rem;
+  padding: 10px;
+  border-radius: 10px;
 }
