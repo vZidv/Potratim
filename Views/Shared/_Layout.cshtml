@@ -11,23 +11,24 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Potratim</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 ">
+            <div class="container justify-content-center">
+                <a class="navbar-brand me-2" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/Logo.png" alt="Potratim Logo" style="height: 85px;">
+                </a>
+                <a class="btn me-2" 
+                style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none;"
+                asp-area="" asp-controller="" asp-action="">Каталог</a>
+                <form class="d-flex me-2" asp-controller="Game" asp-action="Search" method="get">
+                    <input class="form-control me-2" 
+                    style="width: 400px; border-width: 2px; border-color: #258cfb; font-size: 0.75rem;"  
+                    type="search" name="query" placeholder="ПОИСК ПО МАГАЗИНУ" aria-label="Поиск">
+                    <button class="btn btn-outline-success" type="submit">Поиск</button>
+                </form>
+                <a class="btn me-2"
+                style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none; margin-left: 10px;">Корзина</a>
+                <a class="btn me-2"
+                style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none;">Профиль</a>
             </div>
         </nav>
     </header>

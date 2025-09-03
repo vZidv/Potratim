@@ -24,9 +24,9 @@ namespace Potratim.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? gameTitle = "The Witcher 3: Wild Hunt")
         {
-            _game = _context.Games.FirstOrDefault();
+            _game = _context.Games.Where(g => g.Title == gameTitle).FirstOrDefault();
             ViewBag.Game = _game;
 
             return View();
