@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Potratim.Models
 {
-    public class UserRole
+    public class UserRole : IdentityRole<Guid>
     {
-        [Key]
-        public int Id { get; set; }
+        // [Key]
+        // public Guid Id { get; set; }
 
         public string Name { get; set; } = null!;
 

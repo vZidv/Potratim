@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Potratim.Data;
@@ -11,9 +12,11 @@ using Potratim.Data;
 namespace Potratim.Migrations
 {
     [DbContext(typeof(PotratimDbContext))]
-    partial class PotratimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250903175525_AddIdentityAndCustomModels")]
+    partial class AddIdentityAndCustomModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -327,6 +330,9 @@ namespace Potratim.Migrations
                     b.Property<string>("ProfileImageUrl")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -337,9 +343,6 @@ namespace Potratim.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<Guid?>("UserRoleId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -349,7 +352,7 @@ namespace Potratim.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.HasIndex("UserRoleId");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -514,9 +517,13 @@ namespace Potratim.Migrations
 
             modelBuilder.Entity("Potratim.Models.User", b =>
                 {
-                    b.HasOne("Potratim.Models.UserRole", null)
+                    b.HasOne("Potratim.Models.UserRole", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("UserRoleId");
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Potratim.Models.Game", b =>

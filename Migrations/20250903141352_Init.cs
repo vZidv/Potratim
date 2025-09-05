@@ -47,8 +47,7 @@ namespace Potratim.Migrations
                 name: "UserRole",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Color = table.Column<string>(type: "text", nullable: false)
                 },
@@ -92,7 +91,7 @@ namespace Potratim.Migrations
                     Balance = table.Column<decimal>(type: "money", nullable: false),
                     ProfileImageUrl = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "date", nullable: false),
-                    RoleId = table.Column<int>(type: "integer", nullable: false)
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {

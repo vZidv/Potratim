@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Potratim.Models;
 
 namespace Potratim.Data
 {
-    public class PotratimDbContext : DbContext
+    public class PotratimDbContext : IdentityDbContext<User, UserRole, Guid>
     {
         public DbSet<Cart> Carts { get; set; } = null!;
         public DbSet<Game> Games { get; set; } = null!;
@@ -33,10 +34,10 @@ namespace Potratim.Data
             .WithOne(r => r.User)
             .HasForeignKey(r => r.UserId);
 
-            modelBuilder.Entity<User>()
-            .HasOne(u => u.Role)
-            .WithMany(r => r.Users)
-            .HasForeignKey(u => u.RoleId);
+            // modelBuilder.Entity<User>()
+            // .HasOne(u => u.Role)
+            // .WithMany(r => r.Users)
+            // .HasForeignKey(u => u.RoleId);
 
             //Game
             modelBuilder.Entity<Game>()

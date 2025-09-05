@@ -1,0 +1,40 @@
+@model Potratim.ViewModel.LoginViewModel
+
+<div class="text-center md-4 mx-auto">
+    <img src="~/images/Logo_full.png" alt="Логотип"
+        style="max-width: 200px; height: auto; border-radius: 24px; margin-bottom: 20px;" />
+</div>
+<div class="row">
+    <div class="col-md-5 my-custom-column mx-auto">
+        <section>
+            <form asp-controller="Account" asp-action="Login" method="post">
+                <h4>Авторизация</h4>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group log-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group log-group">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" type="password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group form-check log-group">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
+                <div class="form-group">
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary" style="min-width: 110px; height: auto;">Войти</button>
+                    </div>
+                </div>
+            </form>
+            <hr />
+            <div>
+                <a asp-controller="Account" asp-action="Register">Нет аккаунта? Зарегистрируйтесь</a>
+            </div>
+        </section>
+    </div>
+</div>

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Potratim.Data;
@@ -11,9 +12,11 @@ using Potratim.Data;
 namespace Potratim.Migrations
 {
     [DbContext(typeof(PotratimDbContext))]
-    partial class PotratimDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250905104859_UpdateUserModelRemoveRoleId")]
+    partial class UpdateUserModelRemoveRoleId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

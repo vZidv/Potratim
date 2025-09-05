@@ -12,7 +12,7 @@ using Potratim.Data;
 namespace Potratim.Migrations
 {
     [DbContext(typeof(PotratimDbContext))]
-    [Migration("20250831174550_Init")]
+    [Migration("20250903141352_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -199,8 +199,8 @@ namespace Potratim.Migrations
                     b.Property<string>("ProfileImageUrl")
                         .HasColumnType("text");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -211,11 +211,9 @@ namespace Potratim.Migrations
 
             modelBuilder.Entity("Potratim.Models.UserRole", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Color")
                         .IsRequired()

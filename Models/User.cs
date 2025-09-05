@@ -4,20 +4,20 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Potratim.Models
 {
-    public class User
+    public class User : IdentityUser<Guid>
     {
-        [Key]
-        public Guid Id { get; set; }
+        // [Key]
+        // public Guid Id { get; set; }
 
         [StringLength(40)]
         public string? Nickname { get; set; } = null;
 
-        [Required]
-        [StringLength(50)]
-        public string Email { get; set; } = null!;
+        // [Required]
+        // [StringLength(50)]
+        // public string Email { get; set; } = null!;
 
-        [StringLength(255)]
-        public string? PasswordHash { get; set; } = null;
+        // [StringLength(255)]
+        // public string? PasswordHash { get; set; } = null;
 
         [Required]
         [Column(TypeName = "money")]
@@ -29,9 +29,9 @@ namespace Potratim.Models
         [Column(TypeName = "date")]
         public DateTime CreatedAt { get; set; }
 
-        public int RoleId { get; set; }
+        // public Guid RoleId { get; set; }
 
-        public UserRole Role { get; set; } = null!;
+        // public UserRole Role { get; set; } = null!;
 
         public List<Review> Reviews { get; set; } = new List<Review>();
 

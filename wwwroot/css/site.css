@@ -39,6 +39,7 @@ body {
 }
 
 
+
 /* Страница игры */
 
 .game-top-section {
@@ -125,4 +126,17 @@ body {
   font-size: 1.2rem;
   padding: 10px;
   border-radius: 10px;
+}
+
+/* Account/Login.cshtml */
+
+.my-custom-column {
+  background-color: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+}
+
+.log-group {
+  margin-bottom: 15px;
 }
