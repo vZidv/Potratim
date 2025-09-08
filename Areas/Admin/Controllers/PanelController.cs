@@ -7,18 +7,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Potratim.Controllers
+namespace Potratim.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class AdminController : Controller
+    public class PanelController : Controller
     {
 
-        public AdminController()
+        public PanelController()
         {
-
         }
-
-        public IActionResult Panel()
+        public IActionResult Index()
         {
             return View();
         }

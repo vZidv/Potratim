@@ -163,6 +163,11 @@ body {
   font-size: 25px;
   padding: 10px 20px;
   font-weight: 500;
+  transition: all 0.3s ease;
+}
+.admin-but:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 .btn-icon{
   margin-right: 5px;
