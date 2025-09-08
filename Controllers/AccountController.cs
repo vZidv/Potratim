@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,8 +25,13 @@ namespace Potratim.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
+            var user = await _userManager.GetUserAsync(User);
+            if(user != null)
+            {
+                return RedirectToAction("Profile", "Account");
+            }
             return View();
         }
 
@@ -36,10 +42,18 @@ namespace Potratim.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "Account");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Неверный логин или пароль.");
+                }
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid login or password attempt.");
+                ModelState.AddModelError(string.Empty, "Неверный логин или пароль.");
             }
 
             return View(model);
@@ -76,7 +90,7 @@ namespace Potratim.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Login", "Account");
                 }
                 else
                 {
@@ -88,6 +102,17 @@ namespace Potratim.Controllers
             }
 
             return View(model);
+        }
+    
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound("Не удалось найти пользователя.");
+            }
+            return View(user);
         }
 
     }
