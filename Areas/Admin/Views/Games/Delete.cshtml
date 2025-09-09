@@ -1,0 +1,14 @@
+@model Potratim.Models.Game
+
+<h1 class="text-center text-white mb-4">Удалить игру</h1>
+<div class="game-delete-confirmation">
+    <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid mb-3" />
+    <p class="text-white">Вы уверены, что хотите удалить игру <strong>@Model.Title</strong>?</p>
+    <form asp-area="Admin" asp-controller="Games" asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-danger">Удалить игру</button>
+            <a class="btn btn-secondary" asp-area="Admin" asp-controller="Games" asp-action="Index">Отмена</a>
+        </div>
+    </form>
+</div>

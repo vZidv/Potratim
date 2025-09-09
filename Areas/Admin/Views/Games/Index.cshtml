@@ -1,0 +1,55 @@
+@model IEnumerable<Potratim.Models.Game>
+
+<h1 class="text-white text-center md-6 games-header">Управление играми</h1>
+
+<div class="games-content mt-4">
+    <div >
+        <a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="btn btn-secondary mb-3">Назад к панели</a>
+    </div>
+    <form asp-area="Admin" asp-controller="Games" asp-action="Search">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Поиск по категориям" name="searchString" />
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+    </form>
+    <div class="text-end md-3">
+        <a asp-area="Admin" asp-controller="Games" asp-action="Create" class="btn btn-success mb-3">+ Добавить
+            игру</a>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Релиз дата</th>
+                <th>Разработчик</th>
+                <th>Издатель</th>
+                <th>Цена</th>
+                <th>Описание</th>
+                <th class="text-center">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var game in Model)
+            {
+                <tr>
+                    <td>@game.Id</td>
+                    <td>@game.Title</td>
+                    <td>@game.ReleaseDate.ToShortDateString()</td>
+                    <td>@game.Developer</td>
+                    <td>@game.Publisher</td>
+                    <td style="min-width: 100px;">@game.Price.ToString("C")</td>
+                    <td>@game.Description</td>
+                    <td>
+                        <div style="text-align: center;">
+                            <a asp-area="Admin" asp-controller="Games" asp-action="Edit" asp-route-id="@game.Id"
+                                class="btn btn-primary">Редактировать</a>
+                            <a asp-area="Admin" asp-controller="Games" asp-action="Delete" asp-route-id="@game.Id"
+                                class="btn btn-danger">Удалить</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

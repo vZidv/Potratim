@@ -18,7 +18,7 @@
             </div>
             <div class="game-purchase">
                 <div class="game-price">
-                    @($"{ViewBag.Game?.Price} ₽")
+                    @ViewBag.Game?.Price.ToString("C")
                 </div>
                 <button class="game-buy-button">Купить сейчас</button>
                 <button class="game-add-to-cart-button">Добавить в корзину</button>

@@ -213,3 +213,39 @@ body {
    padding: 20px;
    color: white;
 }
+
+ /* Admin/Games */
+
+ .games-content {
+  background: linear-gradient(135deg, #2c3e50, #4b6584);
+  padding: 20px 30px;
+  border-radius: 20px;
+}
+
+.game-create-form {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+}
+
+ /* Admin/Games/Delete */
+
+.game-delete-confirmation {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.game-delete-confirmation img {
+  max-width: 100px;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+}
