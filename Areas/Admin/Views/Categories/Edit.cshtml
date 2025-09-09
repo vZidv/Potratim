@@ -1,0 +1,19 @@
+@model Potratim.Models.Category
+
+<h1 class="text-center text-white mb-4">Редактирование категории</h1>
+<div class="category-add-form">
+    <form asp-action="EditConfirmed">
+        <input type="hidden" asp-for="Id" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label">Название</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger">Введите название категории</span>
+        </div>
+        <div class="form-group mt-3">
+            <a class="btn btn-secondary" asp-action="Index">Назад к списку</a>
+            <button type="submit" class="btn btn-primary">Изменить</button>
+        </div>
+    </form>
+</div>

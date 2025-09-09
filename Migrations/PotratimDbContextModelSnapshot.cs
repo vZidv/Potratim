@@ -183,7 +183,7 @@ namespace Potratim.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Potratim.Models.Category", b =>
@@ -201,7 +201,7 @@ namespace Potratim.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Potratim.Models.Game", b =>
@@ -241,7 +241,7 @@ namespace Potratim.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Games");
+                    b.ToTable("Games", (string)null);
                 });
 
             modelBuilder.Entity("Potratim.Models.Review", b =>
@@ -268,7 +268,7 @@ namespace Potratim.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Potratim.Models.User", b =>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ namespace Potratim.Models
     public class Category
     {
         [Key]
+        [Column(TypeName = "serial")]
         public int Id { get; set; }
 
         [StringLength(50)]
