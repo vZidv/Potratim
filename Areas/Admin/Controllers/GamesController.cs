@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Scaffolding;
@@ -43,7 +44,7 @@ namespace Potratim.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var imageUrl = await SaveFile(model.ImageFile, model.Title);
+                var imageUrl = await SaveFile(model.ImageFile, FormatFileName(model.Title));
 
                 Game game = new()
                 {
@@ -91,13 +92,66 @@ namespace Potratim.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> Edit(Guid Id)
+        {
+            var game = await _context.Games.FindAsync(Id);
+            if (game == null)
+            {
+                return NotFound();
+            }
+            EditGameViewModel editGame = new()
+            {
+                Id = game.Id,
+                Title = game.Title,
+                Description = game.Description,
+                ReleaseDate = game.ReleaseDate,
+                Developer = game.Developer,
+                Publisher = game.Publisher,
+                Price = game.Price,
+                CurrentImageUrl = game.ImageUrl
+            };
+            return View(editGame);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditConfirmed(EditGameViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var game = await _context.Games.FindAsync(model.Id);
+                if (game == null)
+                {
+                    return NotFound();
+                }
+
+                game.Title = model.Title;
+                game.Description = model.Description;
+                game.ReleaseDate = model.ReleaseDate;
+                game.Developer = model.Developer;
+                game.Publisher = model.Publisher;
+                game.Price = model.Price;
+
+                if (model.ImageFile != null)
+                {
+                    var imageUrl = await SaveFile(model.ImageFile, FormatFileName(model.Title));
+                    game.ImageUrl = imageUrl;
+                }
+
+                _context.Games.Update(game);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Index");
+            }
+            return View(model);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View("Error!");
         }
 
-        public async Task<string?> SaveFile(IFormFile file, string fileName)
+        private async Task<string?> SaveFile(IFormFile file, string fileName)
         {
             string fileUrl = null;
 
@@ -120,6 +174,14 @@ namespace Potratim.Areas.Admin.Controllers
             }
 
             return fileUrl;
+        }
+
+        private string FormatFileName(string fileName)
+        {
+            fileName = fileName.Trim().ToLower();
+            fileName = fileName.Replace(" ", "_");
+            fileName = Regex.Replace(fileName, @"[^a-z0-9_-]", "");
+            return fileName;
         }
     }
 }

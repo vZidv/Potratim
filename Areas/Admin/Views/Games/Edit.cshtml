@@ -1,0 +1,49 @@
+@model Potratim.ViewModel.EditGameViewModel
+
+<h1 class="text-center text-white mb-4">Редактировать игру</h1>
+<div class="game-create-form">
+    <a asp-area="Admin" asp-controller="Games" asp-action="Index" class="btn btn-secondary mb-4">Назад к списку игр</a>
+    <form asp-area="Admin" asp-controller="Games" asp-action="EditConfirmed" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label text-white">Название</label>
+            <input asp-for="Title" class="form-control" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ReleaseDate" class="form-label text-white">Дата релиза</label>
+            <input asp-for="ReleaseDate" class="form-control" />
+            <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Developer" class="form-label text-white">Разработчик</label>
+            <input asp-for="Developer" class="form-control" />
+            <span asp-validation-for="Developer" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Publisher" class="form-label text-white">Издатель</label>
+            <input asp-for="Publisher" class="form-control" />
+            <span asp-validation-for="Publisher" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Price" class="form-label text-white">Цена</label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label text-white">Описание</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <img src="@Model.CurrentImageUrl" alt="Текущая обложка игры" class="img-fluid mb-2 img-game-edit" />
+            <label asp-for="ImageFile" class="form-label text-white">Обложка игры</label>
+            <input asp-for="ImageFile" type="file" class="form-control" />
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
+        </div>
+        <div class="text-end mt-4">
+            <a class="btn btn-secondary" asp-area="Admin" asp-controller="Games" asp-action="Index">Отмена</a>
+            <button type="submit" class="btn btn-success">Сохранить</button>
+        </div>
+    </form>
+</div>

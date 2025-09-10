@@ -249,3 +249,12 @@ body {
   display: block;
   border-radius: 18px;
 }
+
+ /* Admin/Games/Edit */
+
+ .img-game-edit {
+  max-width: 300px;
+  height: auto;
+  display: block;
+  border-radius: 15px;
+ }
