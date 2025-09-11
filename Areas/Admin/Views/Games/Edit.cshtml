@@ -41,6 +41,27 @@
             <input asp-for="ImageFile" type="file" class="form-control" />
             <span asp-validation-for="ImageFile" class="text-danger"></span>
         </div>
+        <div class="form-group">
+            <label asp-for="SelectedCategoryIds" class="form-label">Категории</label>
+            @if (Model.AllCategories != null && Model.AllCategories.Any())
+            {
+                <div class="category-checkboxes">
+                    @for (int i = 0; i < Model.AllCategories.Count; i++)
+                    {
+                        <div class="form-check">
+                            <input type="checkbox" name="SelectedCategoryIds" value="@Model.AllCategories[i].Id" @(Model.CurrentCategoryIds.Contains(Model.AllCategories[i].Id) ? "checked" : "") class="form-check-input" />
+                            <label class="form-check-label">@Model.AllCategories[i].Name</label>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">Нет доступных категорий. <a asp-area="Admin" asp-controller="Categories"
+                        asp-action="Index">Создайте категории</a>.</div>
+            }
+
+        </div>
         <div class="text-end mt-4">
             <a class="btn btn-secondary" asp-area="Admin" asp-controller="Games" asp-action="Index">Отмена</a>
             <button type="submit" class="btn btn-success">Сохранить</button>

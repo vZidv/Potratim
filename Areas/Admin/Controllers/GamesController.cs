@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -33,9 +34,12 @@ namespace Potratim.Areas.Admin.Controllers
         }
         /////////////////////////////////////////////////////////
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var model = new CreateGameViewModel();
+
+            model.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+            return View(model);
         }
 
         [HttpPost]
@@ -56,6 +60,13 @@ namespace Potratim.Areas.Admin.Controllers
                     Price = model.Price,
                     ImageUrl = imageUrl
                 };
+
+                if (model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
+                {
+                    var selectedCategories = await _context.Categories.Where(c => model.SelectedCategoryIds.Contains(c.Id)).ToListAsync();
+                    game.Categories = selectedCategories;
+                }
+
                 _context.Games.Add(game);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
@@ -94,7 +105,7 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> Edit(Guid Id)
         {
-            var game = await _context.Games.FindAsync(Id);
+            var game = await _context.Games.Include(g => g.Categories).FirstOrDefaultAsync(g => g.Id == Id);
             if (game == null)
             {
                 return NotFound();
@@ -108,8 +119,12 @@ namespace Potratim.Areas.Admin.Controllers
                 Developer = game.Developer,
                 Publisher = game.Publisher,
                 Price = game.Price,
-                CurrentImageUrl = game.ImageUrl
+                CurrentImageUrl = game.ImageUrl,
+
             };
+
+            editGame.AllCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+            editGame.CurrentCategoryIds = game.Categories.Select(c => c.Id).ToList();
             return View(editGame);
         }
         [HttpPost]
@@ -118,7 +133,7 @@ namespace Potratim.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var game = await _context.Games.FindAsync(model.Id);
+                var game = await _context.Games.Include(g => g.Categories).FirstOrDefaultAsync(g => g.Id == model.Id);
                 if (game == null)
                 {
                     return NotFound();
@@ -135,6 +150,25 @@ namespace Potratim.Areas.Admin.Controllers
                 {
                     var imageUrl = await SaveFile(model.ImageFile, FormatFileName(model.Title));
                     game.ImageUrl = imageUrl;
+                }
+
+                var selectedCategory = await _context.Categories.Where(c => model.SelectedCategoryIds.Contains(c.Id)).ToListAsync();
+                for (int i = 0; i < game.Categories.Count; i++)
+                {
+                    var category = game.Categories[i];
+                    if (!selectedCategory.Contains(category))
+                    {
+                        game.Categories.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                foreach (var category in selectedCategory)
+                {
+                    if (!game.Categories.Contains(category))
+                    {
+                        game.Categories.Add(category);
+                    }
                 }
 
                 _context.Games.Update(game);

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.ViewModel;
 
 namespace Potratim.Controllers;
 
@@ -18,23 +19,11 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
-    }
+        var viewModel = new HomeIndexViewModel();
 
-    public async Task<IActionResult> SuperIndex()
-    {
-        try
-        {
-            Category category = new() { Id = 1, Name = "Tets Category" };
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-            ViewBag.Message = "Категория успешно добавлена";
-        }
-        catch (Exception ex)
-        {
-            ViewBag.Message = $"Ошибка при работе с БД: {ex.Message}";
-        }
-        return View();
+        viewModel.NewGames = GetNewGamesList(8);
+        
+        return View(viewModel);
     }
 
     public IActionResult Privacy()
@@ -46,5 +35,20 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    public List<GameViewModel> GetNewGamesList(int count)
+    {
+        return _context.Games.OrderByDescending(g => g.ReleaseDate)
+            .Select(g => new GameViewModel
+            {
+                Id = g.Id,
+                Title = g.Title,
+                ReleaseDate = g.ReleaseDate,
+                Price = g.Price,
+                ImageUrl = g.ImageUrl
+            })
+            .Take(count)
+            .ToList();
     }
 }

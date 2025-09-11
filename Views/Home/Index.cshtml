@@ -1,8 +1,64 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Potratim.ViewModel.HomeIndexViewModel
 
-<div class="text-center" style="color: white;">
-    <h1 class="display-4">Welcome</h1>
-    <p>@ViewBag.Message</p>
-</div>
+@* Header *@
+<section class="header-home">
+    <div class="container">
+        <div class="header-content">
+            <h1 class="header-title text-white">Игры для твоей коллекции</h1>
+            <p class="header-description text-white">Тысячи игр по лучшей цене, твоя коллекция начинается здесь.</p>
+        </div>
+    </div>
+</section>
+
+@* New games *@
+<section class="game-new-home mt-4">
+    <div class="container">
+        <h2 class="section-title text-white">Новинки</h2>
+        <hr class="bg-white line-home">
+
+        <div class="swiper game-new-swiper">
+            <div class="swiper-wrapper">
+                @if (Model.NewGames != null && Model.NewGames.Any())
+                {
+                    @foreach (var game in Model.NewGames)
+                    {
+                        <div class="swiper-slide">
+                            <div class="game-card">
+                                <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
+                                <h3 class="game-card-title text-center">@game.Title</h3>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const swiper = new Swiper('.game-new-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    640: { slidesPerView: 2, spaceBetween: 20 },
+                    768: { slidesPerView: 3, spaceBetween: 30 },
+                    1024: { slidesPerView: 4, spaceBetween: 40 },
+                },
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true
+                }
+            });
+        });
+    </script>
+}

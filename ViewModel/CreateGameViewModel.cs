@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Potratim.Models;
 
 namespace Potratim.ViewModel
 {
@@ -40,5 +41,10 @@ namespace Potratim.ViewModel
         public decimal Price { get; set; }
 
         public IFormFile? ImageFile { get; set; } = null;
+
+        [Display(Name = "Категории")]
+        public List<int> SelectedCategoryIds { get; set; } = new();
+
+        public List<Category>? Categories { get; set; }
     }
 }

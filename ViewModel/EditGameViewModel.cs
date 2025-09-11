@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Potratim.Models;
 
 namespace Potratim.ViewModel
 {
@@ -45,5 +46,11 @@ namespace Potratim.ViewModel
 
         [Display(Name = "Новая обложка игры")]
         public IFormFile? ImageFile { get; set; } = null;
+
+
+        [Display(Name = "Категории")]
+        public List<int> CurrentCategoryIds { get; set; } = new();
+        public List<int> SelectedCategoryIds { get; set; } = new();
+        public List<Category>? AllCategories { get; set; }
     }
 }
