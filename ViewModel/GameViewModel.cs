@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Potratim.Models;
 
 namespace Potratim.ViewModel
 {
@@ -23,6 +24,8 @@ namespace Potratim.ViewModel
         public decimal Price { get; set; }
 
         public string? ImageUrl { get; set; } = null;
+
+        public Category? Category { get; set; }
 
     }
 }

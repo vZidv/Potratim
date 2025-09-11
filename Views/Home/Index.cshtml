@@ -1,17 +1,18 @@
 ﻿@model Potratim.ViewModel.HomeIndexViewModel
 
 @* Header *@
-<section class="header-home">
-    <div class="container">
-        <div class="header-content">
-            <h1 class="header-title text-white">Игры для твоей коллекции</h1>
-            <p class="header-description text-white">Тысячи игр по лучшей цене, твоя коллекция начинается здесь.</p>
+<section class="header-section">
+    <div class="header-home">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="header-title text-white">Игры для твоей коллекции</h1>
+                <p class="header-description text-white">Тысячи игр по лучшей цене, твоя коллекция начинается здесь.</p>
+            </div>
         </div>
     </div>
 </section>
 
-@* New games *@
-<section class="game-new-home mt-4">
+<section class="game-new-home mt-4 mb-10">
     <div class="container">
         <h2 class="section-title text-white">Новинки</h2>
         <hr class="bg-white line-home">
@@ -36,6 +37,90 @@
         </div>
     </div>
 </section>
+
+
+
+<section class="game-categories mt-4">
+    <div class="container">
+        <h2 class="section-title text-center text-white">Категории</h2>
+        <hr class="bg-white">
+        <div class="game-categories-list text-center">
+            @if (Model.CategoriesGames != null && Model.CategoriesGames.Any())
+            {
+                foreach (var category in Model.Categories)
+                {
+                    <div class="game-category-item">
+                        <a asp-action="ToCategory" asp-route-id="@category.Id"
+                            class="btn game-category-title text-white">@category.Name</a>
+                    </div>
+                }
+            }
+        </div>
+        <div class="text-center mt-4">
+            <a asp-action="AllCategories" class="game-category-all btn btn-outline-light text-center">Все категории</a>
+        </div>
+    </div>
+</section>
+
+
+@for (int i = 0; i < Model.CategoriesGames.Count; i++)
+{
+    <section class="game-new-home mt-4">
+        <div class="container">
+            <h2 class="section-title text-white">@Model.CategoriesGames[i][0].Category?.Name</h2>
+            <hr class="bg-white line-home">
+
+            <div class="swiper game-new-swiper">
+                <div class="swiper-wrapper">
+                    @if (Model.CategoriesGames[i] != null && Model.CategoriesGames[i].Any())
+                    {
+                        @foreach (var game in Model.CategoriesGames[i])
+                        {
+                            <div class="swiper-slide">
+                                <div class="game-card">
+                                    <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
+                                    <h3 class="game-card-title text-center">@game.Title</h3>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+    </section>
+}
+
+<section>
+    <div class="banner-mini-home mt-4">
+        <img src="images/banner_mini.png" alt="Banner Mini" class="img-fluid ">
+    </div>
+</section>
+
+<section class="some-game-home mt-4">
+    <div class="container"></div>
+    <h2 class="section-title text-center text-white">Популярное и рекомендуемое</h2>
+    <hr class="bg-white">
+    <div class="some-game-home-list">
+        @if (Model.SomeGames != null && Model.SomeGames.Any())
+        {
+            foreach (var game in Model.SomeGames)
+            {
+                <div class="game-card">
+                    <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
+                    <h3 class="game-card-title text-center">@game.Title</h3>
+                </div>
+            }
+        }
+    </div>
+    <div class="text-center mt-4">
+        <a asp-action="AllCategories" class="game-category-all btn btn-outline-light text-center">Вeсь каталог</a>
+    </div>
+    </div>
+</section>
+
+
 
 @section Scripts {
     <script>

@@ -40,8 +40,17 @@ body {
 
 /* Home/index */
 
+.header-section {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
 .header-home {
-  background: radial-gradient(circle, rgba(221, 221, 221, 0.1) 20%, rgba(0, 0, 0, 0.9)),
+  background: radial-gradient(circle, rgba(187, 187, 187, 0.1) 20%, rgba(0, 0, 0, 0.9)),
     url('/images/Banner.png');
   padding: 100px 0;
   background-size: cover;
@@ -49,7 +58,7 @@ body {
   text-align: center;
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  /* border-radius: 20px; */
 }
 
 .header-content {
@@ -58,7 +67,7 @@ body {
 }
 
 .header-title {
-  font-size: 3.2rem;
+  font-size: 3.6rem;
   font-weight: bold;
   margin-bottom: 10px;
 }
@@ -110,7 +119,7 @@ body {
 }
 
 .game-new-swiper {
-  padding: 20px 40px;
+  padding: 10px 40px;
   position: relative;
 }
 
@@ -135,6 +144,61 @@ body {
 .swiper-button-prev::after {
   font-size: 30px;
   font-weight: bold;
+}
+
+.banner-mini-home {
+  text-align: center;
+}
+
+.banner-mini-home img:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+}
+
+.banner-mini-home img {
+  border-radius: 15px;
+}
+
+.game-categories {
+  background-color: #1e1e1e;
+  border-radius: 20px;
+  padding: 20px;
+}
+.game-categories-list {
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-category-item {
+  background: linear-gradient(135deg, #469dff, #ff93d4);
+  border-radius: 5px;
+  padding: 18px;
+  color: white;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+}
+.game-category-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 2px 4px 15px rgba(255, 255, 255, 0.5);
+}
+
+.game-category-title {
+  font-size: 1.8rem;
+  font-weight: 300;
+}
+
+.some-game-home {
+  background-color: #1e1e1e;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.some-game-home-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
 }
 
 /* Страница игры */
