@@ -163,6 +163,7 @@ body {
   border-radius: 20px;
   padding: 20px;
 }
+
 .game-categories-list {
   display: flex;
   flex-direction: row;
@@ -179,6 +180,7 @@ body {
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.7);
   transition: all 0.3s ease;
 }
+
 .game-category-item:hover {
   transform: translateY(-5px);
   box-shadow: 2px 4px 15px rgba(255, 255, 255, 0.5);
@@ -201,225 +203,371 @@ body {
   gap: 20px;
 }
 
-/* Страница игры */
+/* Catalog/Index //////////////////////////////////////// */
 
-.game-top-section {
+.catalog-head-content {
+  background: #1e1e1e;
+  padding: 22px;
+  border-radius: 12px;
+}
+
+.catalog-head-search {
+  border-radius: 12px 0 0 12px;
+  overflow: hidden;
+}
+
+.catalog-head-content-under {
   display: flex;
-  gap: 5px;
-  margin-bottom: 20px;
-  background-color: #1e1e1e;
-  padding: 20px;
-  border-radius: 20px;
-  color: white;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
 }
 
-.game-image {
-  flex: 1;
-  width: 100%;
-}
-
-.game-image img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 15px;
-}
-
-.game-sold-review-result {
+.catalog-body-content {
+  margin-top: 40px;
   display: flex;
   flex-direction: row;
-  color: #646464;
-  gap: 5px;
+  justify-content: space-between;
 }
 
-.game-info {
-  flex: 3.5;
-  font-weight: bold;
-  padding: 10px;
+.game-filter-content {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 20px;
+  min-width: 290px;
 }
 
-.game-price {
+.game-filter-title {
   font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #f0f0f0;
+  margin-bottom: 16px;
 }
 
-/* background: linear-gradient(45deg, #258cfb, #ffffff); */
-
-.game-purchase button {
-  border-radius: 6px;
-  font-size: 1.4rem;
-  color: #1e1e1e;
-  font-weight: bold;
-  border-style: none;
-  margin-right: 14px;
-}
-
-.game-buy-button {
-  background: linear-gradient(135deg, #18ff78, #95ffc1);
-}
-
-.game-add-to-cart-button {
-  background: linear-gradient(135deg, #1780f9, #71b0f7);
-}
-
-/* Детали игры и отзывы */
-.game-details {
-  display: flex;
-  flex-direction: column;
-  background-color: #1e1e1e;
-  border-radius: 20px;
-  padding: 20px;
-}
-
-.game-details-buttons button {
-  background: #BEE4D0;
-  color: #1e1e1e;
-  border-radius: 6px;
-  border-style: none;
-  font-size: 1.4rem;
-  margin-bottom: 20px;
-}
-
-.game-description {
-  background: #252525;
-  color: #f0f0f0;
-  font-size: 1.2rem;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-/* Account/Login.cshtml */
-
-.my-custom-column {
-  background-color: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
+.game-filter-category-item {
   color: white;
+  margin-bottom: 3px;
+  font-size: 1.1rem;
+  font-weight: 300;
+  min-width: 150px;
 }
 
-.log-group {
-  margin-bottom: 15px;
+.game-filter-category-item input {
+  width: 18px;
+  height: 18px;
 }
 
-/* Admin/Panel */
-.user-profile {
-  background-color: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  color: white;
-}
-
-.admin-panel-content {
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  background-color: #1e1e1e;
-  border-radius: 15px;
-  color: white;
-}
-
-.admin-but {
-  border: none;
-  margin: 20px;
-  font-size: 25px;
-  padding: 10px 20px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.admin-but:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.btn-icon {
-  margin-right: 5px;
-  font-size: 30px;
-}
-
-.admin-panel {
-  width: 100%;
-  max-width: 600px;
+.game-filter-price-range {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  min-height: 80vh;
+  gap: 10px;
+  padding: 2px;
 }
 
-/* Admin/Categories */
-.categories-header {
-  margin-bottom: 30px;
+.game-filter-price-range input[type="range"] {
+  flex: 1;
 }
-
-.categories-content {
-  background: linear-gradient(135deg, #2c3e50, #4b6584);
-  padding: 20px 30px;
-  border-radius: 20px;
-}
-
-/* Admin/Categories/Create */
-
-.category-add-form {
-  background: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  color: white;
-}
-
-/* Admin/Categories/Delete */
-
-.category-delete-form {
-  background: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  color: white;
-}
-
-/* Admin/Games */
-
-.games-content {
-  background: linear-gradient(135deg, #2c3e50, #4b6584);
-  padding: 20px 30px;
-  border-radius: 20px;
-}
-
-.game-create-form {
-  background: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  color: white;
-}
-
-/* Admin/Games/Delete */
-
-.game-delete-confirmation {
-  background: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  color: white;
+.price-input-group-container
+{
   display: flex;
   flex-direction: row;
-  align-items: center;
-
-  gap: 15px;
+  gap: 37px;
+}
+.price-input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 100px;
 }
 
-.game-delete-confirmation img {
-  max-width: 100px;
-  height: auto;
-  display: block;
-  border-radius: 18px;
+.price-input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: border-color 0.2s ease;
 }
 
-/* Admin/Games/Edit */
-
-.img-game-edit {
-  max-width: 300px;
-  height: auto;
-  display: block;
-  border-radius: 15px;
+.price-input:focus {
+  outline: none;
+  border-color: #1780f9;
 }
+
+.currency {
+  font-size: 0.9rem;
+  color: #ffffff;
+  margin-left: 5px;
+  margin-top: -2px;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 5px;
+    margin: 20px 0;
+}
+
+.slider-track {
+    position: absolute;
+    width: 100%;
+    height: 5px;
+    background: #333; 
+    border-radius: 5px;
+}
+
+.slider-range {
+    position: absolute;
+    height: 5px;
+    background: #1780f9; 
+    border-radius: 5px;
+}
+
+.price-slider {
+    position: absolute;
+    top: -7px;
+    width: 100%;
+    -webkit-appearance: none;
+    pointer-events: none;
+    height: 20px;
+    background: none;
+    z-index: 1;
+}
+
+.price-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    pointer-events: auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1780f9;
+    cursor: pointer;
+    border: 2px solid white;
+    z-index: 2;
+}
+
+  /* Страница игры */
+
+  .game-top-section {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 20px;
+    color: white;
+  }
+
+  .game-image {
+    flex: 1;
+    width: 100%;
+  }
+
+  .game-image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 15px;
+  }
+
+  .game-sold-review-result {
+    display: flex;
+    flex-direction: row;
+    color: #646464;
+    gap: 5px;
+  }
+
+  .game-info {
+    flex: 3.5;
+    font-weight: bold;
+    padding: 10px;
+  }
+
+  .game-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f0f0f0;
+  }
+
+  /* background: linear-gradient(45deg, #258cfb, #ffffff); */
+
+  .game-purchase button {
+    border-radius: 6px;
+    font-size: 1.4rem;
+    color: #1e1e1e;
+    font-weight: bold;
+    border-style: none;
+    margin-right: 14px;
+  }
+
+  .game-buy-button {
+    background: linear-gradient(135deg, #18ff78, #95ffc1);
+  }
+
+  .game-add-to-cart-button {
+    background: linear-gradient(135deg, #1780f9, #71b0f7);
+  }
+
+  /* Детали игры и отзывы */
+  .game-details {
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  .game-details-buttons button {
+    background: #BEE4D0;
+    color: #1e1e1e;
+    border-radius: 6px;
+    border-style: none;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+  }
+
+  .game-description {
+    background: #252525;
+    color: #f0f0f0;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  /* Account/Login.cshtml */
+
+  .my-custom-column {
+    background-color: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+  }
+
+  .log-group {
+    margin-bottom: 15px;
+  }
+
+  /* Admin/Panel */
+  .user-profile {
+    background-color: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+  }
+
+  .admin-panel-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 15px;
+    color: white;
+  }
+
+  .admin-but {
+    border: none;
+    margin: 20px;
+    font-size: 25px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .admin-but:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-icon {
+    margin-right: 5px;
+    font-size: 30px;
+  }
+
+  .admin-panel {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    min-height: 80vh;
+  }
+
+  /* Admin/Categories */
+  .categories-header {
+    margin-bottom: 30px;
+  }
+
+  .categories-content {
+    background: linear-gradient(135deg, #2c3e50, #4b6584);
+    padding: 20px 30px;
+    border-radius: 20px;
+  }
+
+  /* Admin/Categories/Create */
+
+  .category-add-form {
+    background: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+  }
+
+  /* Admin/Categories/Delete */
+
+  .category-delete-form {
+    background: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+  }
+
+  /* Admin/Games */
+
+  .games-content {
+    background: linear-gradient(135deg, #2c3e50, #4b6584);
+    padding: 20px 30px;
+    border-radius: 20px;
+  }
+
+  .game-create-form {
+    background: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+  }
+
+  /* Admin/Games/Delete */
+
+  .game-delete-confirmation {
+    background: #1e1e1e;
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 15px;
+  }
+
+  .game-delete-confirmation img {
+    max-width: 100px;
+    height: auto;
+    display: block;
+    border-radius: 18px;
+  }
+
+  /* Admin/Games/Edit */
+
+  .img-game-edit {
+    max-width: 300px;
+    height: auto;
+    display: block;
+    border-radius: 15px;
+  }
