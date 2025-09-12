@@ -21,7 +21,8 @@
                 </div>
             </div>
 
-            <p class="section-found-games-count text-white">Найдено игр: <span class="found-games-count">0</span></p>
+            <p class="section-found-games-count text-white">Найдено игр: <span
+                    class="found-games-count">@Model.Games.TotalItemCount</span></p>
             <h2 class="text-white">Тут будет пагинация</h2>
         </div>
     </div>
@@ -38,10 +39,12 @@
                         {
                             @foreach (var category in Model.Categories)
                             {
+
                                 <div class="game-filter-category-item">
                                     <input type="checkbox" id="@category.Id" name="categories" value="@category.Id" />
                                     <label for="@category.Id">@category.Name</label>
                                 </div>
+
                             }
                         }
                     </div>
@@ -82,7 +85,32 @@
 
         </section>
         <section class="game-list">
-            <h2 class="text-white">Список игр</h2>
+            <div class="game-list-content">
+                <div class="game-list-items">
+                    @if (Model.Games != null && Model.Games.Any())
+                    {
+                        foreach (var game in Model.Games)
+                        {
+                            <a class="text-decoration-none" asp-controller="Game" asp-action="Index"
+                                asp-route-gametitle="@game.Title">
+                                <div class="game-list-item">
+                                    <img src="@game.ImageUrl" alt="@game.Title" class="game-catalog-image" />
+                                    <div class="game-list-item-content">
+                                        <h4 class="text-white">@game.Title</h4>
+                                        <div class="game-list-item-categories">
+                                            @for (int i = 0; i < game.Categories.Count && i < 4; i++)
+                                            {
+                                                <span class="game-list-item-category">@game.Categories[i].Name</span>
+                                            }
+                                        </div>
+                                        <h1 class="game-list-item-price">@game.Price.ToString("C")</h1>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
         </section>
     </div>
 </section>

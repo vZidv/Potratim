@@ -4,9 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.ViewModel;
+using X.PagedList;
+using X.PagedList.Extensions;
+using X.PagedList.Mvc.Core;
 
 namespace Potratim.Controllers
 {
@@ -18,12 +22,30 @@ namespace Potratim.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int? page)
         {
-            var categories = _context.Categories.ToList();
+            var categories = await _context.Categories.ToListAsync();
+            int pageSize = 16;
+            int pageNumber = page ?? 1;
+
+            var games =  _context.Games
+            .OrderByDescending(g => g.ReleaseDate)
+            .Select(g => new GameViewModel()
+            {
+                Id = g.Id,
+                Title = g.Title,
+                ReleaseDate = g.ReleaseDate,
+                Price = g.Price,
+                ImageUrl = g.ImageUrl,
+                Categories = g.Categories
+                
+            })
+            .ToPagedList(pageNumber, pageSize);
+
             var viewModel = new CatalogIndexViewModel()
             {
-                Categories = categories
+                Categories = categories,
+                Games = games
             };
             return View(viewModel);
         }

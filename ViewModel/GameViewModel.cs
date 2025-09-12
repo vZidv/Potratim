@@ -25,7 +25,7 @@ namespace Potratim.ViewModel
 
         public string? ImageUrl { get; set; } = null;
 
-        public Category? Category { get; set; }
+        public List<Category>? Categories { get; set; }
 
     }
 }

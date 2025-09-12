@@ -77,7 +77,7 @@ public class HomeController : Controller
                         ReleaseDate = g.ReleaseDate,
                         Price = g.Price,
                         ImageUrl = g.ImageUrl,
-                        Category = categories[number]
+                        Categories = new List<Category> { categories[number] }
                     }).Take(10)
                 .ToList());
                     i++;
