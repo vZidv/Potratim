@@ -22,13 +22,20 @@ namespace Potratim.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index
+        (int? page,
+        string? searchString,
+        List<int>? selectedCategoriesId,
+        int? minPrice,
+        int? maxPrice)
         {
             var categories = await _context.Categories.ToListAsync();
+
             int pageSize = 16;
             int pageNumber = page ?? 1;
 
-            var games =  _context.Games
+
+            var queryAllGames = _context.Games
             .OrderByDescending(g => g.ReleaseDate)
             .Select(g => new GameViewModel()
             {
@@ -38,14 +45,38 @@ namespace Potratim.Controllers
                 Price = g.Price,
                 ImageUrl = g.ImageUrl,
                 Categories = g.Categories
-                
-            })
-            .ToPagedList(pageNumber, pageSize);
+
+            });
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                queryAllGames = queryAllGames.Where(g => EF.Functions.ILike(g.Title, $"%{searchString}%"));
+            }
+            if (selectedCategoriesId != null && selectedCategoriesId.Any())
+            {
+                queryAllGames = queryAllGames.Where(g =>
+                g.Categories.Any(c => selectedCategoriesId.Contains(c.Id)) &&
+            selectedCategoriesId.All(selectedId => 
+                g.Categories.Any(c => c.Id == selectedId))
+                );
+            }
+            if (minPrice.HasValue || maxPrice.HasValue)
+            {
+                queryAllGames = queryAllGames.Where(g => (!minPrice.HasValue || g.Price >= minPrice) && (!maxPrice.HasValue || g.Price <= maxPrice));
+            }
+
+            var games = queryAllGames.ToPagedList(pageNumber, pageSize);
 
             var viewModel = new CatalogIndexViewModel()
             {
                 Categories = categories,
-                Games = games
+                Games = games,
+
+                //Filters
+                SearchString = searchString,
+                SelectedCategoriesId = selectedCategoriesId,
+                MinPrice = minPrice ?? 0,
+                MaxPrice = maxPrice ?? 15000
             };
             return View(viewModel);
         }

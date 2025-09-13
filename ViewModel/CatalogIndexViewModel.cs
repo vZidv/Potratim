@@ -11,5 +11,12 @@ namespace Potratim.ViewModel
     {
         public List<Category> Categories { get; set; } = new();
         public IPagedList<GameViewModel> Games { get; set; }
+
+        //Filters
+
+        public string? SearchString { get; set; } = string.Empty;
+        public List<int>? SelectedCategoriesId { get; set; } = new();
+        public decimal? MinPrice { get; set; } = 0;
+        public decimal? MaxPrice { get; set; } = 15000;
     }
 }

@@ -1,14 +1,14 @@
 @model Potratim.ViewModel.CatalogIndexViewModel
 
-<section class="catalog-head-section">
+
+<form asp-controller="Catalog" asp-action="Index">
     <h2 class="section-title text-white text-center mb-4">Каталог игр</h2>
     <div class="catalog-head-content">
-        <form asp-controller="Catalog" asp-action="Search">
-            <div class="catalog-head-search input-group mb-3">
-                <input type="text" class="form-control" placeholder="Поиск по названию, описанию" name="searchString" />
-                <button class="btn btn-outline-secondary" type="submit">Поиск</button>
-            </div>
-        </form>
+        <div class="catalog-head-search input-group mb-3">
+            <input type="text" class="form-control" placeholder="Поиск по названию, описанию" name="searchString" value="@Model.SearchString" />
+            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+        </div>
+
         <div class="catalog-head-content-under">
             <div class="sorting-pagination">
                 <div class="sorting">
@@ -23,12 +23,34 @@
 
             <p class="section-found-games-count text-white">Найдено игр: <span
                     class="found-games-count">@Model.Games.TotalItemCount</span></p>
-            <h2 class="text-white">Тут будет пагинация</h2>
+            <div class="pagination">
+                <div class="pagination-container">
+                    @if (Model.Games.PageCount > 1)
+                    {
+                        @if (Model.Games.HasPreviousPage)
+                        {
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber - 1)"
+                                class="pagination-btn text-decoration-none btn">Назад</a>
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber - 1)"
+                                class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber - 1)</a>
+                        }
+                        <a class="pagination-btn-selected text-decoration-none btn">@(Model.Games.PageNumber)</a>
+                        @if (Model.Games.HasNextPage)
+                        {
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber + 1)"
+                                class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber + 1)</a>
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber + 1)"
+                                class="pagination-btn text-decoration-none btn">Вперёд</a>
+                        }
+
+                    }
+                </div>
+            </div>
         </div>
     </div>
-</section>
 
-<section class="catalog-body-section">
+
+
     <div class="catalog-body-content">
         <section class="game-filter">
             <div class="game-filter-content">
@@ -41,8 +63,9 @@
                             {
 
                                 <div class="game-filter-category-item">
-                                    <input type="checkbox" id="@category.Id" name="categories" value="@category.Id" />
-                                    <label for="@category.Id">@category.Name</label>
+                                    <input type="checkbox" id="category_@category.Id" name="selectedCategoriesId" value="@category.Id" 
+                                    @(Model.SelectedCategoriesId != null && Model.SelectedCategoriesId.Contains(category.Id) ? "checked" : "") />
+                                    <label for="category_@category.Id">@category.Name</label>
                                 </div>
 
                             }
@@ -57,14 +80,14 @@
 
                             <div class="price-input-group">
                                 <label for="min-price" class="text-white">От</label>
-                                <input type="number" id="min-price" name="minPrice" value="0" min="0" max="15000"
-                                    class="price-input">
+                                <input type="number" id="min-price" name="minPrice" value="@Model.MinPrice" min="0" max="15000"
+                                    class="price-input" asp-route-minPrice="value">
                                 <span class="currency"></span>
                             </div>
 
                             <div class="price-input-group">
                                 <label for="max-price" class="text-white">До</label>
-                                <input type="number" id="max-price" name="maxPrice" value="15000" min="0" max="15000"
+                                <input type="number" id="max-price" name="maxPrice" value="@Model.MaxPrice" min="0" max="15000"
                                     class="price-input">
                                 <span class="currency"></span>
                             </div>
@@ -73,12 +96,17 @@
                         <div class="slider-container">
                             <div class="slider-track"></div>
                             <div class="slider-range"></div>
-                            <input id="min-range" type="range" min="0" max="15000" value="0" step="1"
+                            <input id="min-range" type="range" min="0" max="15000" value="@Model.MinPrice" step="1"
                                 class="price-slider" />
-                            <input id="max-range" type="range" min="0" max="15000" value="15000" step="1"
+                            <input id="max-range" type="range" min="0" max="15000" value="@Model.MaxPrice" step="1"
                                 class="price-slider" />
                         </div>
 
+
+                    </div>
+                    <hr class="text-white" />
+                    <div class="game-filter-apply">
+                        <button type="submit" class="btn btn-primary">Применить фильтры</button>
                     </div>
                 </div>
             </div>
@@ -103,7 +131,7 @@
                                                 <span class="game-list-item-category">@game.Categories[i].Name</span>
                                             }
                                         </div>
-                                        <h1 class="game-list-item-price">@game.Price.ToString("C")</h1>
+                                        <h1 class="game-list-item-price">@((int)game.Price) ₽</h1>
                                     </div>
                                 </div>
                             </a>
@@ -113,7 +141,8 @@
             </div>
         </section>
     </div>
-</section>
+</form>
+
 
 @section Scripts {
     <script>
