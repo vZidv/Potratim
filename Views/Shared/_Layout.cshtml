@@ -23,8 +23,7 @@
                     style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none;"
                     asp-controller="Catalog" asp-action="Index">Каталог</a>
                 <div class="navbar-search input-group">
-                    <input type="text" class="form-control" placeholder="Поиск по магазину"
-                        name="searchString" />
+                    <input type="text" class="form-control" placeholder="Поиск по магазину" name="searchString" />
                     <button class="btn btn-outline-secondary" type="submit">Поиск</button>
                 </div>
                 <a class="btn me-2"
@@ -41,8 +40,55 @@
         </main>
     </div>
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Potratim - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <div class="footer-content">
+            <div class="footer-link-container">
+                <div class="footer-info">
+                    <h2>Potratim</h2>
+                    <p>Ваш надежный источник для формирования и расширения коллекции игровых продуктов.</p>
+                </div>
+                <table class="footer-links-table">
+                    <thead>
+                        <th>Магазин</th>
+                        <th>Поддержка</th>
+                        <th>О компании</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                @* Магазин *@
+                                <div class="footer-links">
+                                    <a asp-controller="Catalog" asp-action="Index">Все игры</a>
+                                    <a asp-controller="Catalog" asp-action="Index" >Новинки</a>
+                                    <a asp-controller="Catalog" asp-action="Index" >Акции</a>
+                                    <a asp-controller="Catalog" asp-action="Index" >Предзаказы</a>
+                                </div>
+                            </td>
+                            <td>
+                                @* Поддержка *@
+                                <div class="footer-links">
+                                    <a href="https://github.com/vZidv">Центр поддержки</a>
+                                    <a href="https://github.com/vZidv">Сообщить о проблеме</a>
+                                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1">Часто задаваемые вопросы</a>
+                                    <a href="https://github.com/vZidv">Контакты</a>
+                                </div>
+                            </td>
+                            <td>
+                                @* О компании *@
+                                <div class="footer-links">
+                                    <a href="https://github.com/vZidv/Potratim">О нас</a>
+                                    <a href="https://github.com/vZidv">Блог</a>
+                                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1">Вакансии</a>
+                                    <a href="https://github.com/vZidv">Партнерская программа</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="footer-bottom">
+                <hr />
+                © @DateTime.Now.Year Potratim. Все права защищены.
+            </div>
         </div>
     </footer>
 
@@ -52,5 +98,4 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>
