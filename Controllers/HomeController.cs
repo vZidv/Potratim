@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Potratim.Data;
@@ -28,6 +29,16 @@ public class HomeController : Controller
         viewModel.SomeGames = await GetSomeGamesList(15);
 
         return View(viewModel);
+    }
+
+    public async Task<IActionResult> ToCategory(int id)
+    {
+        Category category = await _context.Categories.FindAsync(id)!;
+        CatalogIndexViewModel viewModel = new()
+        {
+            Categories = new List<Category> { category }
+        };
+        return RedirectToAction("Index", "Catalog", new { SelectedCategoriesId = new List<int> { category.Id } });
     }
 
     public IActionResult Privacy()
