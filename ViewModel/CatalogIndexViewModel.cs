@@ -18,5 +18,7 @@ namespace Potratim.ViewModel
         public List<int>? SelectedCategoriesId { get; set; } = new();
         public decimal? MinPrice { get; set; } = 0;
         public decimal? MaxPrice { get; set; } = 15000;
+
+        public string? SortOrder { get; set; } = "new";
     }
 }

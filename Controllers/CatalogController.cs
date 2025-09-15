@@ -27,7 +27,8 @@ namespace Potratim.Controllers
         string? searchString,
         List<int>? selectedCategoriesId,
         int? minPrice,
-        int? maxPrice)
+        int? maxPrice,
+        string? sortOrder)
         {
             var categories = await _context.Categories.ToListAsync();
 
@@ -36,7 +37,6 @@ namespace Potratim.Controllers
 
 
             var queryAllGames = _context.Games
-            .OrderByDescending(g => g.ReleaseDate)
             .Select(g => new GameViewModel()
             {
                 Id = g.Id,
@@ -56,7 +56,7 @@ namespace Potratim.Controllers
             {
                 queryAllGames = queryAllGames.Where(g =>
                 g.Categories.Any(c => selectedCategoriesId.Contains(c.Id)) &&
-            selectedCategoriesId.All(selectedId => 
+            selectedCategoriesId.All(selectedId =>
                 g.Categories.Any(c => c.Id == selectedId))
                 );
             }
@@ -65,7 +65,33 @@ namespace Potratim.Controllers
                 queryAllGames = queryAllGames.Where(g => (!minPrice.HasValue || g.Price >= minPrice) && (!maxPrice.HasValue || g.Price <= maxPrice));
             }
 
+            switch (sortOrder)
+            {
+                case "new":
+                    {
+                        queryAllGames = queryAllGames.OrderByDescending(g => g.ReleaseDate);
+                    }
+                    break;
+                case "price_desc":
+                    {
+                        queryAllGames = queryAllGames.OrderByDescending(g => g.Price);
+                    }
+                    break;
+                case "price_asc":
+                    {
+                        queryAllGames = queryAllGames.OrderBy(g => g.Price);
+                    }
+                    break;
+                // case "rating":
+                //     {
+                //         queryAllGames = queryAllGames.OrderByDescending(g => g.ReleaseDate);
+                //     }
+                //     break;
+
+            }
+
             var games = queryAllGames.ToPagedList(pageNumber, pageSize);
+
 
             var viewModel = new CatalogIndexViewModel()
             {
@@ -76,7 +102,8 @@ namespace Potratim.Controllers
                 SearchString = searchString,
                 SelectedCategoriesId = selectedCategoriesId,
                 MinPrice = minPrice ?? 0,
-                MaxPrice = maxPrice ?? 15000
+                MaxPrice = maxPrice ?? 15000,
+                SortOrder = sortOrder ?? "new"
             };
             return View(viewModel);
         }

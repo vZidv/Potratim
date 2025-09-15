@@ -12,11 +12,10 @@
         <div class="catalog-head-content-under">
             <div class="sorting-pagination">
                 <div class="sorting">
-                    <select class="form-select" aria-label="Сортировка">
-                        <option value="new" selected>Сначала новинки</option>
-                        <option value="price_desc">По возрастанию цены</option>
-                        <option value="price_asc">По убыванию цены</option>
-                        <option value="rating">По рейтингу</option>
+                    <select name="sortOrder" class="form-select" aria-label="Сортировка">
+                        <option value="new" selected=@(Model.SortOrder == "new" ? "selected" : null)>Сначала новинки</option>
+                        <option value="price_desc" selected=@(Model.SortOrder == "price_desc" ? "selected" : null)>По возрастанию цены</option>
+                        <option value="price_asc" selected=@(Model.SortOrder == "price_asc" ? "selected" : null)>По убыванию цены</option>
                     </select>
                 </div>
             </div>
