@@ -21,17 +21,15 @@
                 <a class="navbar-brand me-4" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/images/Logo_hor.png" alt="Potratim Logo" class="navbar-logo" style="height: 65px;">
                 </a>
-                <a class="btn me-2"
-                    style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none;"
-                    asp-controller="Catalog" asp-action="Index">Каталог</a>
+                <a class="btn me-2 nav-btn"
+                    asp-controller="Catalog" asp-action="Index"><i class="fa fa-bars" style="font-weight: 300;" aria-hidden="true"></i>Каталог</a>
                 <div class="navbar-search input-group">
                     <input type="text" class="form-control" placeholder="Поиск по магазину" name="searchString" />
                     <button class="btn btn-outline-secondary" type="submit">Поиск</button>
                 </div>
-                <a class="btn me-2"
-                    style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none; margin-left: 10px;">Корзина</a>
-                <a class="btn me-2"
-                    style="width: auto; display: flex; align-items: center; background-color: #258cfb; color: white; border: none;"
+                <a class="btn me-2 nav-btn">
+                    <i class="fa fa-shopping-cart" aria-hidden="true"></i></a>
+                <a class="btn me-2 nav-btn"
                     asp-area="default" asp-controller="Account" asp-action="Login">Профиль</a>
             </div>
         </nav>

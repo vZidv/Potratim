@@ -39,6 +39,23 @@ body {
   text-align: start;
 }
 
+.nav-btn {
+  width: auto;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  background-color: #258cfb;
+  color: white;
+  border: none;
+  margin: 0 10px;
+  gap: 3px;
+}
+
+.nav-btn:hover {
+  background-color: #63aefd;
+  color: white;
+}
+
 .footer-links a {
   color: #bbb;
   text-decoration: none;
