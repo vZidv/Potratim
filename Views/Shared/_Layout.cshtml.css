@@ -43,6 +43,10 @@ button.accept-policy {
   background: #1e1e1e;
   margin: 60px 0px;
 }
+.footer-content{
+  width: 60%;
+  margin: 0 auto;
+}
 
 .footer-bottom {
   color: white;
