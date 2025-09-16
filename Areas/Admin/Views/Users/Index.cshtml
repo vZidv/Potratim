@@ -1,0 +1,71 @@
+@model Potratim.ViewModel.UsersIndexViewModel
+
+<h1 class="text-white text-center mt-4">Управление пользователями</h1>
+
+<div class="users-container mt-4">
+    <div class="users-header">
+        <div class="users-stats-list">
+            <div>
+                <h1>@Model.AllUsersCount</h1>
+                <p>Всего пользователей</p>
+            </div>
+            <div>
+                <h1>@Model.ClientsCount</h1>
+                <p>Всего клиентов</p>
+            </div>
+            <div>
+                <h1>@Model.ModeratorsCount</h1>
+                <p>Модераторов</p>
+            </div>
+            <div>
+                <h1>@Model.AdminsCount</h1>
+                <p>Администраторов</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="users-filters">
+        <form>
+            <div class="users-filters-1 mb-2">
+                <div class="users-input-group">
+                    <sub>Поиск пользователей</sub>
+                    <input type="text" class="form-control users-input-search"
+                        placeholder="Введите ник, email или ID пользователя..." name="searchString" />
+                </div>
+                <div class="users-input-group">
+                    <sub>Роль</sub>
+                    <select class="form-select" name="role">
+                        <option value="">Все роли</option>
+                        <option value="user">Пользователь</option>
+                        <option value="moderator">Модератор</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                <div class="users-input-group ">
+                    <sub>Статус</sub>
+                    <select class="form-select" name="status">
+                        <option value="">Все статусы</option>
+                        <option value="active">Активный</option>
+                        <option value="inactive">Заблокированный</option>
+                    </select>
+                </div>
+            </div>
+            <div class="users-filters-2">
+                <div class="users-input-group-date">
+                    <div class="users-input-group">
+                        <sub>Дата регистрации от</sub>
+                        <input type="date" class="form-control" name="registrationDateFrom" />
+                    </div>
+                    <div class="users-input-group">
+                        <sub>до</sub>
+                        <input type="date" class="form-control" name="registrationDateTo" />
+                    </div>
+                </div>
+                <div class="users-input-group-buttons">
+                    <button type="submit" class="btn-filter btn btn-primary"><i class="fa fa-filter"></i>Применить фильтры</button>
+                    <button type="submit" class="btn-filter btn btn-secondary"><i class="fa fa-repeat" aria-hidden="true"></i>Сбросить фильтры</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

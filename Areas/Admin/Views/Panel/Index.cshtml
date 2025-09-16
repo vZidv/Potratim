@@ -1,7 +1,8 @@
 <div class="admin-panel">
     <h1 class="text-center text-white" style="margin: 20px; font-size: 35px;">Панель администратора</h1>
     <div class="admin-panel-content text-center">
-        <a class="btn btn-primary admin-but" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+        <a class="btn btn-primary admin-but" asp-area="Admin" asp-controller="Users" asp-action="Index"
+         style="background: linear-gradient(135deg, #3498db, #2980b9);">
             <span class="btn-icon">👥</span> Управление пользователями
         </a>
         <a class="btn btn-primary admin-but" style="background: linear-gradient(135deg, #2ecc71, #27ae60);"

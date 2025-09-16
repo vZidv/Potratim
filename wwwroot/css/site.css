@@ -755,3 +755,112 @@ body {
   display: block;
   border-radius: 15px;
 }
+
+/* Users/Index */
+
+.users-container {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+.users-stats-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+}
+
+.users-stats-list div {
+  background: linear-gradient(135deg, #1780f9b9, #71b0f7b6);
+  box-shadow: 2px 5px 6px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  text-align: center;
+  color: white;
+  border-radius: 15px;
+  width: 200px;
+}
+
+.users-stats-list h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.users-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.users-filters {
+  background: #252525;
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+
+.users-filters-1,
+.users-filters-2 {
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.users-input-group sub{
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.users-input-group-buttons{
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: center;
+  margin-left: 40px;
+}
+.btn-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.btn-filter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.users-input-search {
+  flex: 1;
+  min-width: 600px;
+}
+
+.users-input-group select {
+  flex: 1;
+  min-width: 250px;
+}
+
+.users-input-group-date {
+  display: flex;
+  flex-direction: row;
+  gap: 22px;
+}
+
+.users-input-group-date input[type="date"] {
+  flex: 1;
+  min-width: 250px;
+}

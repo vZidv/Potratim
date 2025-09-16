@@ -33,16 +33,7 @@ button.accept-policy {
   line-height: inherit;
 }
 
-.nav-btn {
-width: auto;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  background-color: #258cfb;
-  color: white;
-  border: none;
-  margin-left: 10px;
-}
+
 
 
 .footer {
