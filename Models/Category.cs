@@ -10,7 +10,6 @@ namespace Potratim.Models
     public class Category
     {
         [Key]
-        [Column(TypeName = "serial")]
         public int Id { get; set; }
 
         [StringLength(50)]

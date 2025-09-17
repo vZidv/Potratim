@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Potratim.Models;
+using X.PagedList;
 
 namespace Potratim.ViewModel
 {
     public class UsersIndexViewModel
     {
-        public List<User> Users { get; set; } = new();
+        public IPagedList<UserViewModel> Users { get; set; } = null!;
+        public List<string> Roles { get; set; } = new List<string>();
 
         //Filters
         public string SearchTerm { get; set; } = string.Empty;
         public string SortOrder { get; set; } = "Id";
-        public string RoleFilter { get; set; } = string.Empty;
+        public string? RoleFilter { get; set; } = string.Empty;
+
+
 
         //Support properties
         public int AllUsersCount { get; set; } = 0;
