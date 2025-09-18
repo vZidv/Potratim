@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.ViewModel;
@@ -107,6 +108,43 @@ namespace Potratim.Areas.Admin.Controllers
                 ClientsCount = usersViewModel.Count(u => u.RoleName == "User"),
                 ModeratorsCount = usersViewModel.Count(u => u.RoleName == "Moderator"),
                 AdminsCount = usersViewModel.Count(u => u.RoleName == "Admin")
+            };
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> Delete(string id)
+        {
+            User? user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                IdentityResult result = await _userManager.DeleteAsync(user);
+            }
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            var userRoleName = await _userManager.GetRolesAsync(user);
+            UserRole? userRole = await _context.Roles.FirstOrDefaultAsync(ur => ur.Name == userRoleName.FirstOrDefault());
+            var userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                Nickname = user.Nickname,
+                Email = user.Email!,
+                RoleName = userRole?.Name ?? "User",
+                RoleColor = userRole?.Color ?? "607af7",
+                Status = "Активен",
+                AvatarUrl = user.ProfileImageUrl,
+                RegistrationDate = user.CreatedAt
+            };
+
+            var roles = await _context.Roles.Select(r => r.Name).ToListAsync();
+
+            var viewModel = new UserEditViewModel
+            {
+                User = userViewModel,
+                Roles = roles!,
             };
             return View(viewModel);
         }

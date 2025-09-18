@@ -924,3 +924,55 @@ body {
   border-color: #dc3545 !important;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
+
+/* Users/Edit */
+
+.edit-user-form {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.edit-user-form .header-info {
+  width: 300px;
+  color: #1780f9;
+}
+.edit-user-form .header-info h2 {
+  font-size: 1.4rem;
+}
+.edit-user-form .header-info hr {
+  border-top: 4px solid #1780f9;
+  margin: 8px 0;
+}
+
+.edit-user-form sub {
+  color: #929292;
+  font-size: 0.8rem;
+}
+
+.user-role-status-info-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.user-edit-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: right;
+  margin-left: 40px;
+}
+.user-edit-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.user-edit-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}

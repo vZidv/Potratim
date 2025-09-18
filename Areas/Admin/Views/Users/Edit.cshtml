@@ -1,0 +1,77 @@
+@model Potratim.ViewModel.UserEditViewModel
+
+<h1 class="text-white text-center mt-4">Редактирование пользователя</h1>
+
+<div class="edit-user-form mt-4">
+    <div>
+        <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-secondary mb-3">Назад</a>
+    </div>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="User.Id" />
+        <hr />
+        <div class="user-main-info mb-4">
+            <div class="header-info">
+                <h2>Основная информация</h2>
+                <hr />
+            </div>
+            <div class="mb-3">
+                <label asp-for="User.Id" class="form-label">ID пользователя</label>
+                <input class="form-control" value="@Model.User.Id" class="form-control"
+                    style="color: #929292; cursor: not-allowed;" disabled />
+                <sub>Уникальный идентификатор пользователя. Не может быть изменён.</sub>
+            </div>
+            <div class="mb-3">
+                <label asp-for="User.Nickname" class="form-label">Никнейм</label>
+                <input asp-for="User.Nickname" value="@Model.User.Nickname" class="form-control" />
+                <sub>Отображаемое имя пользователя в системе.</sub>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="User.Email" class="form-label">Email</label>
+                <input asp-for="User.Email" value="@Model.User.Email" class="form-control" />
+                <sub>Электронная почта пользователя.</sub>
+            </div>
+            <div class="mb-3">
+                <label asp-for="User.RegistrationDate" class="form-label">Дата регистрации</label>
+                <input asp-for="User.RegistrationDate" value="@Model.User.RegistrationDate.ToString("yyyy-MM-dd")" class="form-control" type="date" />
+                <sub>Дата регистрации пользователя.</sub>
+            </div>
+        </div>
+        <hr>
+        <div class="user-role-status-info mb-4">
+            <div class="header-info">
+                <h2>Роль и статус</h2>
+                <hr />
+            </div>
+            <div class="user-role-status-info-container">
+                <div class="mb-3" style="flex: 1;">
+                    <label asp-for="User.RoleName" class="form-label">Роль</label>
+                    <select class="form-select" name="roleSelect">
+                        @foreach (string role in Model.Roles)
+                        {
+                            <option value="@role" selected=@(Model.User.RoleName == role ? "selected" : null)>@role</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3" style="flex: 1;">
+                    <label asp-for="User.Status" class="form-label">Статус</label>
+                    <select asp-for="User.Status" class="form-select">
+                        <option value="active">Активный</option>
+                        <option value="inactive">Заблокированный</option>
+                    </select>
+                </div>
+            </div>
+            <hr />
+            <div class="user-edit-buttons">
+                <a asp-area="Admin" asp-controller="Users" asp-action="Delete" asp-route-id="@Model.User.Id"
+                class="btn btn-danger"
+                onclick="return confirm('Вы уверены, что хотите удалить пользователя?');">
+                <i class="fa fa-trash"></i>Удалить пользователя</a>
+                <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-secondary"><i
+                        class="fa fa-times-circle"></i>Отмена</a>
+                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i>Сохранить изменения</button>
+            </div>
+        </div>
+
+    </form>
+</div>

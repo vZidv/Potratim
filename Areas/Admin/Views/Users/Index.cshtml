@@ -109,11 +109,12 @@
                         </td>
                         <td>@user.RegistrationDate.ToShortDateString()</td>
                         <td class="users-list-table-btn">
-                            <a href="@Url.Action("Edit", "Users", new { id = user.Id })"
+                            <a asp-action="Edit" asp-controller="Users" asp-route-id="@user.Id"
                                 class="table-btn btn btn-sm btn-info"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                             @if (user.RoleName != "Admin")
                             {
-                                <a href="@Url.Action("Delete", "Users", new { id = user.Id })"
+                                <a asp-action="Delete" asp-controller="Users" asp-route-id="@user.Id.ToString()"
+                                    onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?\n\n@(user.Email)');"
                                     class="table-btn btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
                             }
                         </td>
