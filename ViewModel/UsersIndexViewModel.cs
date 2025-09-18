@@ -16,8 +16,8 @@ namespace Potratim.ViewModel
         public string SearchTerm { get; set; } = string.Empty;
         public string SortOrder { get; set; } = "Id";
         public string? RoleFilter { get; set; } = string.Empty;
-
-
+        public DateTime? RegistrationDateFrom { get; set; }
+        public DateTime? RegistrationDateTo { get; set; }
 
         //Support properties
         public int AllUsersCount { get; set; } = 0;

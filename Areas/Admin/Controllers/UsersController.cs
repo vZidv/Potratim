@@ -33,13 +33,26 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index(
             int? page,
-            string? roleSelect)
+            string? roleSelect,
+            DateTime? dateFrom,
+            DateTime? dateTo,
+            string? searchString)
         {
             int pageSize = 10;
             int pageNumber = page ?? 1;
 
             IQueryable<User> query = _context.Users;
 
+            //Фильтр по поиску
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                query = query.Where(u =>
+                EF.Functions.ILike(u.Nickname, $"%{searchString}%") ||
+                EF.Functions.ILike(u.Email, $"%{searchString}%") ||
+                EF.Functions.ILike(u.Id.ToString(), $"%{searchString}%"));
+            }
+
+            //Фильтр роли
             if (!string.IsNullOrWhiteSpace(roleSelect))
             {
                 var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleSelect);
@@ -47,6 +60,12 @@ namespace Potratim.Areas.Admin.Controllers
                 query = query.Where(u => _context.UserRoles.Where(ur => ur.RoleId == role.Id)
                     .Select(ur => ur.UserId)
                     .Contains(u.Id));
+            }
+
+            //Проверка по дате регистрации
+            if (dateFrom != null && dateTo != null)
+            {
+                query = query.Where(u => u.CreatedAt >= dateFrom && u.CreatedAt <= dateTo);
             }
 
             var users = query.ToPagedList(pageNumber, pageSize);
@@ -79,6 +98,10 @@ namespace Potratim.Areas.Admin.Controllers
                 Roles = rolesAll.Select(r => r.Name).ToList(),
 
                 RoleFilter = roleSelect,
+                SearchTerm = searchString,
+                RegistrationDateFrom = dateFrom,
+                RegistrationDateTo = dateTo,
+
 
                 AllUsersCount = usersViewModel.Count,
                 ClientsCount = usersViewModel.Count(u => u.RoleName == "User"),

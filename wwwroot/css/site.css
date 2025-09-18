@@ -77,7 +77,7 @@ body {
   font-size: 1.45rem;
   text-decoration: none;
   transition: color 0.3s ease;
-  background:#313131;
+  background: #313131;
   border-radius: 20px;
   padding: 3px;
   text-align: center;
@@ -88,7 +88,7 @@ body {
 .social-icon:hover {
   color: #fff;
   transform: translateY(-1px);
-  background:#363636;
+  background: #363636;
 }
 
 /* Home/index */
@@ -819,18 +819,19 @@ body {
   justify-content: space-between;
 }
 
-.users-input-group sub{
+.users-input-group sub {
   color: #ccc;
   font-size: 0.9rem;
 }
 
-.users-input-group-buttons{
+.users-input-group-buttons {
   display: flex;
   flex-direction: row;
   gap: 15px;
   justify-content: center;
   margin-left: 40px;
 }
+
 .btn-filter {
   display: flex;
   align-items: center;
@@ -865,7 +866,7 @@ body {
   min-width: 250px;
 }
 
-.users-list{
+.users-list {
   border-radius: 8px;
   overflow: hidden;
   background: #2c2c2c;
@@ -919,6 +920,7 @@ body {
   color: white;
 }
 
-
-
-
+.date-error {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}

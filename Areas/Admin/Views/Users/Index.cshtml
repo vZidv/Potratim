@@ -4,6 +4,9 @@
 <h1 class="text-white text-center mt-4">Управление пользователями</h1>
 
 <div class="users-container mt-4">
+    <div>
+        <a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="btn btn-secondary mb-3">Назад к панели</a>
+    </div>
     <div class="users-header">
         <div class="users-stats-list">
             <div>
@@ -26,11 +29,11 @@
     </div>
 
     <div class="users-filters">
-        <form>
+        <form asp-action="Index" method="get" id="filterForm">
             <div class="users-filters-1 mb-2">
                 <div class="users-input-group">
                     <sub>Поиск пользователей</sub>
-                    <input type="text" class="form-control users-input-search"
+                    <input type="text" class="form-control users-input-search" value="@Model.SearchTerm"
                         placeholder="Введите ник, email или ID пользователя..." name="searchString" />
                 </div>
                 <div class="users-input-group">
@@ -41,10 +44,6 @@
                         {
                             <option value="@role" selected=@(Model.RoleFilter == role ? "selected" : null)>@role</option>
                         }
-                        @* <option value="">Все роли</option>
-                        <option value="User">Пользователь</option>
-                        <option value="Moderator">Модератор</option>
-                        <option value="Admin">Администратор</option> *@
                     </select>
                 </div>
                 <div class="users-input-group ">
@@ -60,18 +59,19 @@
                 <div class="users-input-group-date">
                     <div class="users-input-group">
                         <sub>Дата регистрации от</sub>
-                        <input type="date" class="form-control" name="registrationDateFrom" />
+                        <input type="date" class="form-control" name="dateFrom" id="dateFrom" value="@(Model.RegistrationDateFrom?.ToString("yyyy-MM-dd"))" />
                     </div>
                     <div class="users-input-group">
                         <sub>до</sub>
-                        <input type="date" class="form-control" name="registrationDateTo" />
+                        <input type="date" class="form-control" name="dateTo" id="dateTo" value="@(Model.RegistrationDateTo?.ToString("yyyy-MM-dd"))" />
                     </div>
                 </div>
                 <div class="users-input-group-buttons">
                     <button type="submit" class="btn-filter btn btn-primary"><i class="fa fa-filter"></i>Применить
                         фильтры</button>
-                    <button type="submit" class="btn-filter btn btn-secondary"><i class="fa fa-repeat"
-                            aria-hidden="true"></i>Сбросить фильтры</button>
+                    <a asp-action="Index" 
+                    class="btn-filter btn btn-secondary"><i class="fa fa-repeat"
+                            aria-hidden="true"></i>Сбросить фильтры</a>
                 </div>
             </div>
         </form>
@@ -123,3 +123,50 @@
         </table>
     </div>
 </div>
+
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("filterForm");
+        const dateFromInput = document.getElementById("dateFrom");
+        const dateToInput = document.getElementById("dateTo");
+
+        function validateDates() {
+            const fromVal = dateFromInput.value;
+            const toVal = dateToInput.value;
+
+            dateFromInput.classList.remove("date-error");
+            dateToInput.classList.remove("date-error");
+
+            
+            if ((fromVal && !toVal) || (!fromVal && toVal)) {
+                if (fromVal) {
+                    dateToInput.classList.add("date-error");
+                } else {
+                    dateFromInput.classList.add("date-error");
+                }
+                return false; 
+            }
+            return true; 
+        }
+
+        if (dateFromInput && dateToInput) {
+            dateFromInput.addEventListener('input', validateDates);
+            dateToInput.addEventListener('input', validateDates);
+
+            
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    if (!validateDates()) {
+                        e.preventDefault(); 
+                        alert('Пожалуйста, заполните оба поля даты или оставьте их пустыми.');
+                    }
+                });
+            }
+
+            validateDates();
+        }
+    }); 
+</script>
+}
