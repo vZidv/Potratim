@@ -82,10 +82,10 @@ namespace Potratim.Areas.Admin.Controllers
                     Id = user.Id,
                     Nickname = user.Nickname,
                     Email = user.Email,
-                    Status = "Активен",
+                    Status = user.LockoutEnd != null ? "Заблокирован" : "Активен",
                     AvatarUrl = user.ProfileImageUrl,
-                    RoleName = userRole?.Name ?? "User",
-                    RoleColor = userRole?.Color ?? "607af7",
+                    RoleName = userRole?.Name ?? "Empty",
+                    RoleColor = userRole?.Color ?? "a6a6a6",
                     RegistrationDate = user.CreatedAt
                 };
                 usersViewModel.Add(userVM);
@@ -121,6 +121,7 @@ namespace Potratim.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
         }
+        
 
         public async Task<IActionResult> Edit(string id)
         {
@@ -147,6 +148,58 @@ namespace Potratim.Areas.Admin.Controllers
                 Roles = roles!,
             };
             return View(viewModel);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditConfirmed(UserEditViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.User.Id.ToString());
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Nickname = model.User.Nickname;
+            user.Email = model.User.Email;
+
+            var userRole = await _userManager.GetRolesAsync(user);
+            await _userManager.AddToRoleAsync(user, model.User.RoleName);
+            await _userManager.RemoveFromRoleAsync(user, userRole.FirstOrDefault());
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Ban(string id)
+        {
+            User user = await _userManager.FindByIdAsync(id);
+
+            var lockoutEnd = DateTimeOffset.MaxValue;
+            var result = await _userManager.SetLockoutEndDateAsync(user, lockoutEnd);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View("Error");
+        }
+        public async Task<IActionResult> Unban(string id)
+        {
+            User user = await _userManager.FindByIdAsync(id);
+
+            var lockoutEnd = DateTimeOffset.MinValue;
+            var result = await _userManager.SetLockoutEndDateAsync(user, null);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View("Error");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

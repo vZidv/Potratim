@@ -59,18 +59,19 @@
                 <div class="users-input-group-date">
                     <div class="users-input-group">
                         <sub>Дата регистрации от</sub>
-                        <input type="date" class="form-control" name="dateFrom" id="dateFrom" value="@(Model.RegistrationDateFrom?.ToString("yyyy-MM-dd"))" />
+                        <input type="date" class="form-control" name="dateFrom" id="dateFrom"
+                            value="@(Model.RegistrationDateFrom?.ToString("yyyy-MM-dd"))" />
                     </div>
                     <div class="users-input-group">
                         <sub>до</sub>
-                        <input type="date" class="form-control" name="dateTo" id="dateTo" value="@(Model.RegistrationDateTo?.ToString("yyyy-MM-dd"))" />
+                        <input type="date" class="form-control" name="dateTo" id="dateTo"
+                            value="@(Model.RegistrationDateTo?.ToString("yyyy-MM-dd"))" />
                     </div>
                 </div>
                 <div class="users-input-group-buttons">
                     <button type="submit" class="btn-filter btn btn-primary"><i class="fa fa-filter"></i>Применить
                         фильтры</button>
-                    <a asp-action="Index" 
-                    class="btn-filter btn btn-secondary"><i class="fa fa-repeat"
+                    <a asp-action="Index" class="btn-filter btn btn-secondary"><i class="fa fa-repeat"
                             aria-hidden="true"></i>Сбросить фильтры</a>
                 </div>
             </div>
@@ -103,7 +104,8 @@
                             </div>
                         </td>
                         <td>
-                            <div class="user-status" style="background: #2ba576;">
+                            <div class="user-status"
+                                style="background: @(user.Status == "Заблокирован" ? "#ff5969" : "#2ba576");">
                                 @user.Status
                             </div>
                         </td>
@@ -113,6 +115,19 @@
                                 class="table-btn btn btn-sm btn-info"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                             @if (user.RoleName != "Admin")
                             {
+                                @if (user.Status != "Заблокирован")
+                                {
+                                    <a asp-action="Ban" asp-controller="Users" asp-route-id="@user.Id.ToString()"
+                                        onclick="return confirm('Вы уверены, что хотите заблокировать этого пользователя?\n\n@(user.Email)');"
+                                        class="table-btn btn btn-sm btn-warning"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Unban" asp-controller="Users" asp-route-id="@user.Id.ToString()"
+                                        onclick="return confirm('Вы уверены, что хотите разблокировать этого пользователя?\n\n@(user.Email)');"
+                                        class="table-btn btn btn-sm btn-success"><i class="fa fa-check" aria-hidden="true"></i></a>
+                                }
+
                                 <a asp-action="Delete" asp-controller="Users" asp-route-id="@user.Id.ToString()"
                                     onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?\n\n@(user.Email)');"
                                     class="table-btn btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
@@ -127,47 +142,47 @@
 
 
 @section Scripts {
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("filterForm");
-        const dateFromInput = document.getElementById("dateFrom");
-        const dateToInput = document.getElementById("dateTo");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("filterForm");
+            const dateFromInput = document.getElementById("dateFrom");
+            const dateToInput = document.getElementById("dateTo");
 
-        function validateDates() {
-            const fromVal = dateFromInput.value;
-            const toVal = dateToInput.value;
+            function validateDates() {
+                const fromVal = dateFromInput.value;
+                const toVal = dateToInput.value;
 
-            dateFromInput.classList.remove("date-error");
-            dateToInput.classList.remove("date-error");
+                dateFromInput.classList.remove("date-error");
+                dateToInput.classList.remove("date-error");
 
-            
-            if ((fromVal && !toVal) || (!fromVal && toVal)) {
-                if (fromVal) {
-                    dateToInput.classList.add("date-error");
-                } else {
-                    dateFromInput.classList.add("date-error");
-                }
-                return false; 
-            }
-            return true; 
-        }
 
-        if (dateFromInput && dateToInput) {
-            dateFromInput.addEventListener('input', validateDates);
-            dateToInput.addEventListener('input', validateDates);
-
-            
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    if (!validateDates()) {
-                        e.preventDefault(); 
-                        alert('Пожалуйста, заполните оба поля даты или оставьте их пустыми.');
+                if ((fromVal && !toVal) || (!fromVal && toVal)) {
+                    if (fromVal) {
+                        dateToInput.classList.add("date-error");
+                    } else {
+                        dateFromInput.classList.add("date-error");
                     }
-                });
+                    return false;
+                }
+                return true;
             }
 
-            validateDates();
-        }
-    }); 
-</script>
+            if (dateFromInput && dateToInput) {
+                dateFromInput.addEventListener('input', validateDates);
+                dateToInput.addEventListener('input', validateDates);
+
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!validateDates()) {
+                            e.preventDefault();
+                            alert('Пожалуйста, заполните оба поля даты или оставьте их пустыми.');
+                        }
+                    });
+                }
+
+                validateDates();
+            }
+        }); 
+    </script>
 }

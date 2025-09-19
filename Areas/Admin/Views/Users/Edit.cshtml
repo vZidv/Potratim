@@ -45,8 +45,8 @@
             </div>
             <div class="user-role-status-info-container">
                 <div class="mb-3" style="flex: 1;">
-                    <label asp-for="User.RoleName" class="form-label">Роль</label>
-                    <select class="form-select" name="roleSelect">
+                    <label class="form-label">Роль</label>
+                    <select asp-for="User.RoleName" class="form-select" >
                         @foreach (string role in Model.Roles)
                         {
                             <option value="@role" selected=@(Model.User.RoleName == role ? "selected" : null)>@role</option>
@@ -69,7 +69,8 @@
                 <i class="fa fa-trash"></i>Удалить пользователя</a>
                 <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-secondary"><i
                         class="fa fa-times-circle"></i>Отмена</a>
-                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i>Сохранить изменения</button>
+                <button type="submit" asp-action="EditConfirmed"
+                class="btn btn-success"><i class="fa fa-save"></i>Сохранить изменения</button>
             </div>
         </div>
 
