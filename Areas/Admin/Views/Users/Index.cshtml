@@ -50,8 +50,8 @@
                     <sub>Статус</sub>
                     <select class="form-select" name="status">
                         <option value="">Все статусы</option>
-                        <option value="active">Активный</option>
-                        <option value="inactive">Заблокированный</option>
+                        <option value="active" selected="@(Model.StatusFilter == "active")">Активный</option>
+                        <option value="blocked" selected="@(Model.StatusFilter == "blocked")">Заблокированный</option>
                     </select>
                 </div>
             </div>

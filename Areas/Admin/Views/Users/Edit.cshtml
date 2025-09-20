@@ -56,8 +56,8 @@
                 <div class="mb-3" style="flex: 1;">
                     <label asp-for="User.Status" class="form-label">Статус</label>
                     <select asp-for="User.Status" class="form-select">
-                        <option value="active">Активный</option>
-                        <option value="inactive">Заблокированный</option>
+                        <option value="active" selected="@(Model.User.Status == "Активен" ? "selected" : null)">Активный</option>
+                        <option value="blocked" selected="@(Model.User.Status == "Заблокирован" ? "selected" : null)">Заблокированный</option>
                     </select>
                 </div>
             </div>

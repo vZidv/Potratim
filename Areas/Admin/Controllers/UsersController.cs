@@ -37,7 +37,8 @@ namespace Potratim.Areas.Admin.Controllers
             string? roleSelect,
             DateTime? dateFrom,
             DateTime? dateTo,
-            string? searchString)
+            string? searchString,
+            string? status)
         {
             int pageSize = 10;
             int pageNumber = page ?? 1;
@@ -67,6 +68,19 @@ namespace Potratim.Areas.Admin.Controllers
             if (dateFrom != null && dateTo != null)
             {
                 query = query.Where(u => u.CreatedAt >= dateFrom && u.CreatedAt <= dateTo);
+            }
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                switch (status)
+                {
+                    case "active":
+                        query = query.Where(u => u.LockoutEnd == null);
+                        break;
+                    case "blocked":
+                        query = query.Where(u => u.LockoutEnd != null);
+                        break;
+                }
             }
 
             var users = query.ToPagedList(pageNumber, pageSize);
@@ -99,6 +113,7 @@ namespace Potratim.Areas.Admin.Controllers
                 Roles = rolesAll.Select(r => r.Name).ToList(),
 
                 RoleFilter = roleSelect,
+                StatusFilter = status,
                 SearchTerm = searchString,
                 RegistrationDateFrom = dateFrom,
                 RegistrationDateTo = dateTo,
@@ -121,7 +136,7 @@ namespace Potratim.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
         }
-        
+
 
         public async Task<IActionResult> Edit(string id)
         {
@@ -135,7 +150,7 @@ namespace Potratim.Areas.Admin.Controllers
                 Email = user.Email!,
                 RoleName = userRole?.Name ?? "User",
                 RoleColor = userRole?.Color ?? "607af7",
-                Status = "Активен",
+                Status = user.LockoutEnd != null ? "Заблокирован" : "Активен",
                 AvatarUrl = user.ProfileImageUrl,
                 RegistrationDate = user.CreatedAt
             };
@@ -162,9 +177,27 @@ namespace Potratim.Areas.Admin.Controllers
             user.Nickname = model.User.Nickname;
             user.Email = model.User.Email;
 
-            var userRole = await _userManager.GetRolesAsync(user);
-            await _userManager.AddToRoleAsync(user, model.User.RoleName);
-            await _userManager.RemoveFromRoleAsync(user, userRole.FirstOrDefault());
+            if (!string.IsNullOrWhiteSpace(model.User.RoleName))
+            {
+                var userRole = await _userManager.GetRolesAsync(user);
+                if(userRole.FirstOrDefault() != model.User.RoleName)
+                {
+                    await _userManager.AddToRoleAsync(user, model.User.RoleName);
+                    await _userManager.RemoveFromRoleAsync(user, userRole.FirstOrDefault());
+                }
+            }
+
+            switch (model.User.Status)
+            {
+                case "active":
+                    user.LockoutEnd = null;
+                    break;
+                case "blocked":
+                    user.LockoutEnd = DateTimeOffset.MaxValue;
+                    break;
+                default:
+                    break;
+            }
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
