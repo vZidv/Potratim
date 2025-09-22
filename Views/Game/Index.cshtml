@@ -1,41 +1,126 @@
-@using Microsoft.EntityFrameworkCore.Metadata.Internal
-@{
-    ViewData["Title"] = "Game Page";
-}
+@model Potratim.ViewModel.GameIndexViewModel
 
 <div class="game-container">
-    @* Верхняя часть *@
     <div class="game-top-section">
         <div class="game-image">
-            <img src="@ViewBag.Game?.ImageUrl">
+            <img src="@Model.Game?.ImageUrl">
         </div>
         <div class="game-info">
-            <h1>@ViewBag.Game?.Title</h1>
-            <div class="game-sold-review-result">
-                <p>Продано: 256</p>
-                <p>●</p>
-                <p>Отзывы: 128</p>
-            </div>
-            <div class="game-purchase">
-                <div class="game-price">
-                    @ViewBag.Game?.Price.ToString("C")
+            <div class="game-info-content">
+                <h1>@Model.Game?.Title</h1>
+                <div class="game-categories">
+                    @foreach (var category in Model.Categories)
+                    {
+                        <span class="game-category">@category.Name</span>
+                    }
                 </div>
-                <button class="game-buy-button">Купить сейчас</button>
-                <button class="game-add-to-cart-button">Добавить в корзину</button>
+                <div class="game-sold-review-result">
+                    <p>Продано: 256</p>
+                    <p>●</p>
+                    <p>Отзывы: 128</p>
+                </div>
+                <div class="game-info-main">
+                    <div>
+                        <h2>Разработчик</h2>
+                        <p>@Model.Game?.Developer</p>
+                    </div>
+                    <div>
+                        <h2>Издатель</h2>
+                        <p>@Model.Game?.Publisher</p>
+                    </div>
+                    <div>
+                        <h2>Дата выхода</h2>
+                        <p>@Model.Game?.ReleaseDate.ToString("dd MMMM yyyy")</p>
+                    </div>
+                    <div>
+                        <h2>Платформа</h2>
+                        <p>PC</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="game-info-buy">
+            <div>
+                <h1 style="font-size: 2rem; font-weight: bold; color: #18ff78;">@((int)Model.Game.Price) ₽</h1>
+                <div class="game-info-buy-buttons mt-4">
+                    <button class="btn btn-secondary"><i class="fa fa-shopping-cart"></i></button>
+                    <button class="btn btn-primary" style="width: 75%; font-weight: bold;">Купить сейчас</button>
+                </div>
+            </div>
+            <div class="game-info-buy-bags">
+                <div>
+                    <i style="color: #18ff78;" class="fa fa-shield"></i>
+                    <p> Безопасная сделка</p>
+                </div>
+                <div>
+                    <i style="color: #deff4c;" class="fa fa-bolt"></i>
+                    <p> Мгновенная доставка</p>
+                </div>
             </div>
         </div>
     </div>
 
-    @* Нижняя часть *@
     <div class="game-details">
-        <div class="game-details-buttons">
-            <button class="game-description-button">Описание</button>
-            <button class="game-reviews-button">Отзывы</button>
-        </div>
+        <h1 class="text-white mb-0">Описание</h1>
+        <hr class="text-white">
         <div class="game-description">
-            <p>@ViewBag.Game?.Description</p>
+            <p>@Model.Game?.Description</p>
         </div>
 
     </div>
 
+    <div class="game-similar">
+        <div class="swiper-container">
+            <h2 class="section-title text-white">Похожие игры</h2>
+            <hr class="bg-white line-home">
+
+            <div class="swiper game-new-swiper">
+                <div class="swiper-wrapper">
+                    @if (Model.SameGames != null && Model.SameGames.Any())
+                    {
+                        @foreach (var game in Model.SameGames)
+                        {
+                            <div class="swiper-slide">
+                                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-id="@game.Id">
+                                    <div class="game-card">
+                                        <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
+                                        <h3 class="game-card-title text-center">@game.Title</h3>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const swiper = new Swiper('.game-new-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    640: { slidesPerView: 2, spaceBetween: 20 },
+                    768: { slidesPerView: 3, spaceBetween: 30 },
+                    1024: { slidesPerView: 4, spaceBetween: 40 },
+                },
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true
+                }
+            });
+        });
+    </script>
+}

@@ -4,32 +4,56 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.ViewModel;
 
 namespace Potratim.Controllers
 {
-    [Route("[controller]")]
+
     public class GameController : Controller
     {
-        private readonly ILogger<GameController> _logger;
         private readonly PotratimDbContext _context;
 
-        private Game _game;
-
-        public GameController(ILogger<GameController> logger, PotratimDbContext context)
+        public GameController(PotratimDbContext context)
         {
-            _logger = logger;
             _context = context;
         }
 
-        public IActionResult Index(string? gameTitle = "The Witcher 3: Wild Hunt")
+        public async Task<IActionResult> Index(string id)
         {
-            _game = _context.Games.Where(g => g.Title == gameTitle).FirstOrDefault();
-            ViewBag.Game = _game;
+            var game = await _context.Games.Include(g => g.Categories).Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
 
-            return View();
+            var viewModel = new GameIndexViewModel()
+            {
+                Game = game,
+                Categories = game.Categories.ToList(),
+                SameGames = await GetSameGames(game.Id.ToString(), 12)
+            };
+            return View(viewModel);
+        }
+
+        public async Task<List<GameViewModel>> GetSameGames(string id, int count)
+        {
+            var game = await _context.Games.Include(g => g.Categories).FirstOrDefaultAsync(g => g.Id.ToString() == id);
+            var sameGames = await _context.Categories.Include(c => c.Games)
+                .Where(c => game.Categories.Select(gc => gc.Name).Contains(c.Name))
+                .SelectMany(c => c.Games)
+                .Where(g => g.Id != game.Id)
+                .Take(count)
+                .ToHashSetAsync();
+
+            return sameGames.Select(g => new GameViewModel()
+            {
+                Id = g.Id,
+                Title = g.Title,
+                ReleaseDate = g.ReleaseDate,
+                Price = g.Price,
+                ImageUrl = g.ImageUrl,
+                Categories = g.Categories.ToList()
+            }).ToList();
         }
     }
 }

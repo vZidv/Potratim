@@ -119,7 +119,7 @@
                         foreach (var game in Model.Games)
                         {
                             <a class="text-decoration-none" asp-controller="Game" asp-action="Index"
-                                asp-route-gametitle="@game.Title">
+                                asp-route-Id="@game.Id">
                                 <div class="game-list-item">
                                     <img src="@game.ImageUrl" alt="@game.Title" class="game-catalog-image" />
                                     <div class="game-list-item-content">
@@ -136,10 +136,32 @@
                             </a>
                         }
                     }
+
                 </div>
+                    <div class="pagination-container text-center mt-4">
+                    @if (Model.Games.PageCount > 1)
+                    {
+                        @if (Model.Games.HasPreviousPage)
+                        {
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber - 1)"
+                                class="pagination-btn text-decoration-none btn">Назад</a>
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber - 1)"
+                                class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber - 1)</a>
+                        }
+                        <a class="pagination-btn-selected text-decoration-none btn">@(Model.Games.PageNumber)</a>
+                        @if (Model.Games.HasNextPage)
+                        {
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber + 1)"
+                                class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber + 1)</a>
+                            <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber + 1)"
+                                class="pagination-btn text-decoration-none btn">Вперёд</a>
+                        }
+                    }
+                    </div>
             </div>
         </section>
     </div>
+
 </form>
 
 

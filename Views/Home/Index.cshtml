@@ -24,7 +24,7 @@
                     @foreach (var game in Model.NewGames)
                     {
                         <div class="swiper-slide">
-                            <a class="btn" asp-controller="Game" asp-action="Index" asp-route-gametitle="@game.Title">
+                            <a class="btn" asp-controller="Game" asp-action="Index" asp-route-id="@game.Id">
                                 <div class="game-card">
                                     <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
                                     <h3 class="game-card-title text-center">@game.Title</h3>
@@ -79,7 +79,7 @@
                         @foreach (var game in Model.CategoriesGames[i])
                         {
                             <div class="swiper-slide">
-                                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-gametitle="@game.Title">
+                                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-id="@game.Id">
                                     <div class="game-card">
                                         <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
                                         <h3 class="game-card-title text-center">@game.Title</h3>
@@ -111,7 +111,7 @@
         {
             foreach (var game in Model.SomeGames)
             {
-                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-gametitle="@game.Title">
+                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-id="@game.Id">
                     <div class="game-card">
                         <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
                         <h3 class="game-card-title text-center">@game.Title</h3>
