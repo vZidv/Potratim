@@ -96,6 +96,74 @@
             </div>
         </div>
     </div>
+    <div class="game-reviews mt-4">
+        <div class="game-reviews-wrapper mt-4">
+            <h2 class="text-white mb-4">Оставить отзыв</h2>
+            <a class="text-decoration-none" @(User.Identity.IsAuthenticated ? "" : "href=/Account/Login")>
+                <form asp-controller="Game" asp-action="CreateReview" method="post">
+                    <div class="game-reviews-wrapper-content">
+                        <input type="hidden" name="gameId" value="@Model.Game.Id" />
+                        <div class="user-avatar">
+                            <i class="fa fa-user"></i>
+                        </div>
+                        <div class="wrapper">
+                            <textarea class="form-control" name="reviewText" placeholder="Ваш отзыв"></textarea>
+                        </div>
+                        <div class="game-reviews-wrapper-grade">
+                            <input type="radio" id="like-radio" name="reviewGrade" value="true"
+                                class="custom-radio-unvisited" />
+                            <label for="like-radio" class="custom-radio-grade text-white">
+                                <i class="fa fa-thumbs-up"></i>
+                            </label>
+                            <input type="radio" id="dislike-radio" name="reviewGrade" value="false"
+                                class="custom-radio-unvisited" />
+                            <label for="dislike-radio" class="custom-radio-grade text-white">
+                                <i class="fa fa-thumbs-down"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="game-reviews-submit mt-4">
+                        <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                    </div>
+                </form>
+            </a>
+        </div>
+        <div class="game-reviews-list-container mt-4">
+            <h2 class="text-white mb-4">Отзывы</h2>
+            @if (Model.Reviews != null && Model.Reviews.Any())
+            {
+                @foreach (var review in Model.Reviews)
+                {
+                    <div class="game-review-item">
+                        <div class="game-review-header">
+                            <div class="user-avatar">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <div class="wrapper">
+                                <p class="game-review-text">@review.Comment</p>
+                            </div>
+                            <div class="game-review-grade">
+                                @if (review.Like == true)
+                                {
+                                    <i style="color: #28a745;" class="fa fa-thumbs-up"></i>
+                                }
+                                else
+                                {
+                                    <i style="color: #dc3545;" class="fa fa-thumbs-down"></i>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else 
+            {
+                <div class="text-center">
+                    <h2 class="message">Нет отзывов</h2>
+                </div>
+            }
+        </div>
+    </div>
 </div>
 
 

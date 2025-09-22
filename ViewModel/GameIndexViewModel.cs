@@ -11,5 +11,6 @@ namespace Potratim.ViewModel
         public Game Game { get; set; } = null!;
         public IEnumerable<Category>? Categories { get; set; }
         public IEnumerable<GameViewModel> SameGames { get; set; } = null!;
+        public IEnumerable<Review> Reviews { get; set; } = null!;
     }
 }
