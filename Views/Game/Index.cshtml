@@ -41,20 +41,41 @@
         </div>
         <div class="game-info-buy">
             <div>
-                <h1 style="font-size: 2rem; font-weight: bold; color: #18ff78;">@((int)Model.Game.Price) ₽</h1>
+                <h1 style="font-size: 2rem; font-weight: bold; color: #18ff78;">@((int)Model.Game.Price) <i
+                        class="fa fa-rub" style="color: #ffffff; font-size: 1.2rem;" aria-hidden="true"></i></h1>
                 <div class="game-info-buy-buttons mt-4">
                     <button class="btn btn-secondary"><i class="fa fa-shopping-cart"></i></button>
-                    <button class="btn btn-primary" style="width: 75%; font-weight: bold;">Купить сейчас</button>
+                    <button class="btn btn-primary" style="width: 75%; font-weight: bold;"><i
+                            style="color: #ffffff; margin-right: 5px;" class="fa fa-flash"></i>Купить сейчас</button>
                 </div>
             </div>
             <div class="game-info-buy-bags">
-                <div>
-                    <i style="color: #18ff78;" class="fa fa-shield"></i>
-                    <p> Безопасная сделка</p>
+                <div class="game-info-buy-bag">
+                    <div>
+                        <i style="color: #18ff78;" class="fa fa-shield"></i>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <p style="font-weight: bold; margin-bottom: 1px; margin-top: 4px;">Безопасная сделка</p>
+                        <p style="color: #858585;">Гарантия возврата средств</p>
+                    </div>
                 </div>
-                <div>
-                    <i style="color: #deff4c;" class="fa fa-bolt"></i>
-                    <p> Мгновенная доставка</p>
+                <div class="game-info-buy-bag">
+                    <div>
+                        <i style="color: #deff4c;" class="fa fa-flash"></i>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <p style="font-weight: bold; margin-bottom: 1px; margin-top: 4px;">Мгновенная доставка</p>
+                        <p style="color: #858585;">Ключ сразу после оплаты</p>
+                    </div>
+                </div>
+                <div class="game-info-buy-bag">
+                    <div>
+                        <i style="color: #4c5eff;" class="fa fa-phone-square"></i>
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <p style="font-weight: bold; margin-bottom: 1px; margin-top: 4px;">Поддержка 24/7</p>
+                        <p style="color: #858585;">Помощь в любое время</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -156,7 +177,7 @@
                     </div>
                 }
             }
-            else 
+            else
             {
                 <div class="text-center">
                     <h2 class="message">Нет отзывов</h2>
