@@ -21,16 +21,18 @@
                 <a class="navbar-brand me-4" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/images/Logo_hor.png" alt="Potratim Logo" class="navbar-logo" style="height: 65px;">
                 </a>
-                <a class="btn me-2 nav-btn"
-                    asp-controller="Catalog" asp-action="Index"><i class="fa fa-bars" style="font-weight: 300;" aria-hidden="true"></i>Каталог</a>
+                <a class="btn me-2 nav-btn" asp-controller="Catalog" asp-action="Index"><i class="fa fa-bars"
+                        style="font-weight: 300;" aria-hidden="true"></i>Каталог</a>
                 <div class="navbar-search input-group">
-                    <input type="text" class="form-control" placeholder="Поиск по магазину" name="searchString" />
+                    <input type="text" id="globalSearchInput" class="form-control" placeholder="Поиск по магазину"
+                        name="searchString" />
                     <button class="btn btn-outline-secondary" type="submit">Поиск</button>
+                    <div id="searchResultsContainer"
+                    class="search-results-container" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background-color: white; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-height: 500px; overflow-y: auto;"></div>
                 </div>
                 <a class="btn me-2 nav-btn">
                     <i class="fa fa-shopping-cart" aria-hidden="true"></i></a>
-                <a class="btn me-2 nav-btn"
-                    asp-area="default" asp-controller="Account" asp-action="Login">Профиль</a>
+                <a class="btn me-2 nav-btn" asp-area="default" asp-controller="Account" asp-action="Login">Профиль</a>
             </div>
         </nav>
     </header>
@@ -46,10 +48,14 @@
                     <h2>Potratim</h2>
                     <p>Ваш надежный источник для формирования и расширения коллекции игровых продуктов.</p>
                     <div class="footer-info-social">
-                        <a href="https://github.com/vZidv" class="social-icon"><i class="fa fa-vk" aria-hidden="true"></i></a>
-                        <a href="https://github.com/vZidv" class="social-icon"><i class="fa fa-github" aria-hidden="true"></i></a>
-                        <a href="https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1" class="social-icon"><i class="fa fa-youtube"></i></a>
-                        <a href="https://ok.ru/video/455336725001" class="social-icon"><i class="fa fa-odnoklassniki-square" aria-hidden="true"></i></a>
+                        <a href="https://github.com/vZidv" class="social-icon"><i class="fa fa-vk"
+                                aria-hidden="true"></i></a>
+                        <a href="https://github.com/vZidv" class="social-icon"><i class="fa fa-github"
+                                aria-hidden="true"></i></a>
+                        <a href="https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1"
+                            class="social-icon"><i class="fa fa-youtube"></i></a>
+                        <a href="https://ok.ru/video/455336725001" class="social-icon"><i
+                                class="fa fa-odnoklassniki-square" aria-hidden="true"></i></a>
                     </div>
                 </div>
                 <table class="footer-links-table">
@@ -64,9 +70,9 @@
                                 @* Магазин *@
                                 <div class="footer-links">
                                     <a asp-controller="Catalog" asp-action="Index">Все игры</a>
-                                    <a asp-controller="Catalog" asp-action="Index" >Новинки</a>
-                                    <a asp-controller="Catalog" asp-action="Index" >Акции</a>
-                                    <a asp-controller="Catalog" asp-action="Index" >Предзаказы</a>
+                                    <a asp-controller="Catalog" asp-action="Index">Новинки</a>
+                                    <a asp-controller="Catalog" asp-action="Index">Акции</a>
+                                    <a asp-controller="Catalog" asp-action="Index">Предзаказы</a>
                                 </div>
                             </td>
                             <td>
@@ -74,7 +80,9 @@
                                 <div class="footer-links">
                                     <a href="https://github.com/vZidv">Центр поддержки</a>
                                     <a href="https://github.com/vZidv">Сообщить о проблеме</a>
-                                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1">Часто задаваемые вопросы</a>
+                                    <a
+                                        href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1">Часто
+                                        задаваемые вопросы</a>
                                     <a href="https://github.com/vZidv">Контакты</a>
                                 </div>
                             </td>
@@ -83,7 +91,8 @@
                                 <div class="footer-links">
                                     <a href="https://github.com/vZidv/Potratim">О нас</a>
                                     <a href="https://github.com/vZidv">Блог</a>
-                                    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1">Вакансии</a>
+                                    <a
+                                        href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1">Вакансии</a>
                                     <a href="https://github.com/vZidv">Партнерская программа</a>
                                 </div>
                             </td>
@@ -102,6 +111,98 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById('globalSearchInput');
+            const resultsContainer = document.getElementById('searchResultsContainer');
+
+            async function performSearch(query) {
+                if (!query.trim()) {
+                    resultsContainer.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/Search/search?query=${encodeURIComponent(query)}`);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    displayResults(data.games);
+                } catch (error) {
+                    console.error('Error fetching search results:', error);
+                    resultsContainer.innerHTML = '<div class="result-item">Ошибка загрузки</div>';
+                    resultsContainer.style.display = 'block';
+                }
+            }
+
+            function displayResults(results) {
+
+                resultsContainer.innerHTML = '';
+
+                if (results.length === 0) {
+                    const noResultsItem = document.createElement('div');
+                    noResultsItem.className = 'result-item';
+                    noResultsItem.textContent = 'Нет результатов';
+                    resultsContainer.appendChild(noResultsItem);
+                }
+                else {
+                    results.forEach(game => {
+                        const item = document.createElement('div');
+                        item.className = 'result-item';
+
+                        const img = document.createElement('img');
+                        img.src = game.imageUrl || '/images/no-image.png'; 
+                        img.alt = game.title || 'Без названия';
+                        img.style.width = '60px';
+                        img.style.height = '60px';
+                        img.style.objectFit = 'cover';
+                        img.style.marginRight = '12px';
+
+                        const title = document.createElement('h4');
+                        title.className = 'title';
+                        title.textContent = game.title || 'Без названия';
+
+                        const price = document.createElement('span');
+                        price.className = 'price';
+                        const priceValue = game.price !== undefined ? Math.round(game.price) : 0;
+                        price.textContent = `${priceValue.toFixed(0)} р`;
+
+                        item.appendChild(img);
+                        item.appendChild(title);
+                        item.appendChild(price);
+
+                        item.addEventListener('click', function () {
+                            window.location.href = `/Game?Id=${game.id}`; 
+                        });
+                        resultsContainer.appendChild(item);
+                    });
+                }
+                resultsContainer.style.display = 'block';
+            }
+
+            searchInput.addEventListener('input', function () {
+                const query = this.value;
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+                this.timeoutId = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!searchInput.contains(event.target) && !resultsContainer.contains(event.target)) {
+                    resultsContainer.style.display = 'none';
+                }
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
+
+@section Scripts {
+
+}
