@@ -931,6 +931,17 @@ body {
   margin: 10px 0px;
   padding: 12px;
 }
+
+.field-validation-error {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.input-validation-error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
 /* Account/Login.cshtml */
 
 .my-custom-column {

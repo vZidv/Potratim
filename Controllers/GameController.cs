@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,30 +35,41 @@ namespace Potratim.Controllers
                 Game = game,
                 Categories = game.Categories.ToList(),
                 SameGames = await GetSameGames(game.Id.ToString(), 12),
-                Reviews = game.Reviews.ToList()
+                Reviews = game.Reviews.ToList(),
+                CreateReviewModel = new CreateReviewViewModel()
             };
             return View(viewModel);
         }
-        public async Task<IActionResult> CreateReview(string gameId, string reviewText, bool reviewGrade)
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateReview(CreateReviewViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Пожалуйста, исправьте ошибки в форме.";
+                return RedirectToAction("Index", new { id = model.GameId });
+            }
+
             if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Account");
 
             var user = await _userManager.GetUserAsync(User);
 
             Review review = new()
             {
                 Id = Guid.NewGuid(),
-                GameId = Guid.Parse(gameId),
+                GameId = model.GameId,
                 UserId = user.Id,
-                Comment = reviewText,
-                Like = reviewGrade
+                Comment = model.Comment,
+                Like = model.Like
             };
 
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", new { id = gameId });
+            TempData["SuccessMessage"] = "Ваш отзыв был успешно добавлен.";
+            return RedirectToAction("Index", new { id = model.GameId });
         }
 
         public async Task<List<GameViewModel>> GetSameGames(string id, int count)
