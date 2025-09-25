@@ -1,0 +1,118 @@
+@model Potratim.ViewModel.CartViewModel
+
+<div>
+    <a class="btn me-2 nav-btn cart">
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            <span class="cart-count">@Model.Items.Count()</span>
+        }
+        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+    </a>
+    <div class="cart-items-container" style="display: none;">
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            foreach (Game item in Model.Items)
+            {
+                <div class="cart-item">
+                    <img src="@item.ImageUrl" alt="@item.Title" />
+                    <div class="cart-item-details">
+                        <h5>@item.Title</h5>
+                        <p>@((int)(item.Price))</p>
+                    </div>
+                    <div class="cart-item-remove">
+                        <a asp-action="RemoveFromCart" asp-controller="Cart" asp-route-gameId="@item.Id"
+                        class="btn btn-link" style="color: #a1a1a1;" title="Удалить из корзины">
+                            <i class="fa fa-times-circle" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center" style="padding: 1rem;">
+                <p>Корзина пуста</p>
+            </div>
+        }
+    </div>
+</div>
+@* Test Item *@
+@* <div class="cart-item">
+    <img src="/images/game-images/portal2.jpg" alt="Portal 2" />
+    <div class="cart-item-details">
+        <h5>Portal 2</h5>
+        <p>699</p>
+    </div>
+    <div class="cart-item-remove">
+        <button class="btn btn-link" title="Удалить из корзины">
+            <i class="fa fa-times-circle" aria-hidden="true"></i>
+        </button>
+    </div>
+</div> *@
+
+@* <div class="cart-items-container" style="display: none;">
+    <div class="cart-header">
+        <h3>Ваша корзина</h3>
+        <button type="button" class="btn-close" aria-label="Close"></button>
+    </div>
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <div class="cart-items-list">
+            @foreach (var item in Model.Items)
+            {
+                <div class="cart-item">
+                    <img src="@item.ImageUrl" alt="@item.Title" />
+                    <div class="cart-item-details">
+                        <h5>@item.Title</h5>
+                        <p>@item.Price.ToString("C")</p>
+                    </div>
+                    <div class="cart-item-remove">
+                        <form asp-controller="Cart" asp-action="Remove" method="post" style="display:inline;">
+                            <input type="hidden" name="gameId" value="@item.Id" />
+                            <button type="submit" class="btn btn-link" title="Удалить из корзины">
+                                <i class="fa fa-times-circle" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Общая сумма:</strong> @Model.TotalPrice.ToString("C")
+            </div>
+            <a href="@Url.Action("Index", "Cart")" class="btn btn-success">Оформить заказ</a>
+        </div>
+    }
+    else
+    {
+        <div class="text-center p-4">
+            <p>Корзина пуста.</p>
+        </div>
+    }
+</div> *@
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cartIcon = document.querySelector('.cart');
+        const cartContainer = document.querySelector('.cart-items-container');
+
+        cartIcon.addEventListener('click', function (e) {
+            e.preventDefault();
+            cartContainer.style.display = cartContainer.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!cartContainer.contains(e.target) && !cartIcon.contains(e.target)) {
+                cartContainer.style.display = 'none';
+            }
+        });
+
+        const closeBtn = cartContainer.querySelector('.btn-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                cartContainer.style.display = 'none';
+            });
+        }
+    });
+</script>

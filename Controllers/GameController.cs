@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.Services;
 using Potratim.ViewModel;
 
 namespace Potratim.Controllers
@@ -19,11 +20,13 @@ namespace Potratim.Controllers
     {
         private readonly PotratimDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly ICartService _cartService;
 
-        public GameController(PotratimDbContext context, UserManager<User> userManager)
+        public GameController(PotratimDbContext context, UserManager<User> userManager, ICartService cartService)
         {
             _context = context;
             _userManager = userManager;
+            _cartService = cartService;
         }
 
         public async Task<IActionResult> Index(string id)

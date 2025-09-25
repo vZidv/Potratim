@@ -35,7 +35,6 @@ namespace Potratim.Controllers
             int pageSize = 16;
             int pageNumber = page ?? 1;
 
-
             var queryAllGames = _context.Games
             .Select(g => new GameViewModel()
             {

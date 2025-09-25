@@ -44,7 +44,9 @@
                 <h1 style="font-size: 2rem; font-weight: bold; color: #18ff78;">@((int)Model.Game.Price) <i
                         class="fa fa-rub" style="color: #ffffff; font-size: 1.2rem;" aria-hidden="true"></i></h1>
                 <div class="game-info-buy-buttons mt-4">
-                    <button class="btn btn-secondary"><i class="fa fa-shopping-cart"></i></button>
+                    <a class="btn btn-secondary" asp-controller="Cart" asp-action="AddToCart" asp-route-gameId="@Model.Game.Id">
+                        <i class="fa fa-shopping-cart"></i>
+                    </a>
                     <button class="btn btn-primary" style="width: 75%; font-weight: bold;"><i
                             style="color: #ffffff; margin-right: 5px;" class="fa fa-flash"></i>Купить сейчас</button>
                 </div>

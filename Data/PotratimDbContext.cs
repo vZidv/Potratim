@@ -34,6 +34,11 @@ namespace Potratim.Data
             .WithOne(r => r.User)
             .HasForeignKey(r => r.UserId);
 
+            modelBuilder.Entity<User>()
+            .HasOne(u => u.Cart)
+            .WithOne(c => c.User)
+            .HasForeignKey<Cart>(c => c.UserId);
+
             // modelBuilder.Entity<User>()
             // .HasOne(u => u.Role)
             // .WithMany(r => r.Users)

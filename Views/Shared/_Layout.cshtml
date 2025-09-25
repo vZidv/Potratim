@@ -25,13 +25,47 @@
                         style="font-weight: 300;" aria-hidden="true"></i>Каталог</a>
                 <div class="navbar-search input-group">
                     <input type="text" id="globalSearchInput" class="form-control" placeholder="Поиск по магазину"
-                        name="searchString" />
-                    <button class="btn btn-outline-secondary" type="submit">Поиск</button>
-                    <div id="searchResultsContainer"
-                    class="search-results-container" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background-color: white; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-height: 500px; overflow-y: auto;"></div>
+                        name="searchString" style="border-radius: 8px;" />
+                    <div id="searchResultsContainer" class="search-results-container"
+                        style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background-color: white; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-height: 500px; overflow-y: auto;">
+                    </div>
                 </div>
-                <a class="btn me-2 nav-btn">
-                    <i class="fa fa-shopping-cart" aria-hidden="true"></i></a>
+                @await Component.InvokeAsync("Cart") 
+                @* <a class="btn me-2 nav-btn">
+                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                </a> *@
+                @* <div>
+                    <a class="btn me-2 nav-btn">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                    </a>
+                    <div class="cart-items-container">
+                        <div class="cart-item">
+                            <img src="/images/game-images/Cyber2077.jpg" alt="Cyber2077" />
+                            <div class="cart-item-details">
+                                <h5>Cyber2077</h5>
+                                <p>4199</p>
+                            </div>
+                            <div class="cart-item-remove">
+                                <button class="btn btn-link" title="Удалить из корзины">
+                                    <i class="fa fa-times-circle" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cart-item">
+                            <img src="/images/game-images/portal2.jpg" alt="Portal 2" />
+                            <div class="cart-item-details">
+                                <h5>Portal 2</h5>
+                                <p>699</p>
+                            </div>
+                            <div class="cart-item-remove">
+                                <button class="btn btn-link" title="Удалить из корзины">
+                                    <i class="fa fa-times-circle" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div> *@
+
                 <a class="btn me-2 nav-btn" asp-area="default" asp-controller="Account" asp-action="Login">Профиль</a>
             </div>
         </nav>
@@ -111,7 +145,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-        <script>
+    <script>
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById('globalSearchInput');
             const resultsContainer = document.getElementById('searchResultsContainer');
@@ -152,7 +186,7 @@
                         item.className = 'result-item';
 
                         const img = document.createElement('img');
-                        img.src = game.imageUrl || '/images/no-image.png'; 
+                        img.src = game.imageUrl || '/images/no-image.png';
                         img.alt = game.title || 'Без названия';
                         img.style.width = '60px';
                         img.style.height = '60px';
@@ -173,7 +207,7 @@
                         item.appendChild(price);
 
                         item.addEventListener('click', function () {
-                            window.location.href = `/Game?Id=${game.id}`; 
+                            window.location.href = `/Game?Id=${game.id}`;
                         });
                         resultsContainer.appendChild(item);
                     });
