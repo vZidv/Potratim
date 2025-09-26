@@ -93,103 +93,290 @@ body {
 
 /* Стиль для контейнера результатов */
 .search-results-container {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .search-results-container .result-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-    transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .search-results-container .result-item:hover {
-    background-color: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 .search-results-container .result-item img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    margin-right: 12px;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  margin-right: 12px;
 }
 
 .search-results-container .result-item .title {
-    font-weight: 500;
-    margin: 0;
-    flex-grow: 1;
-    word-break: break-word;
+  font-weight: 500;
+  margin: 0;
+  flex-grow: 1;
+  word-break: break-word;
 }
 
 .search-results-container .result-item .discount {
-    background-color: #dc3545;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-right: 8px;
+  background-color: #dc3545;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 8px;
 }
 
 .search-results-container .result-item .price {
-    font-weight: bold;
-    margin: 0;
+  font-weight: bold;
+  margin: 0;
 }
 
- /* Стиль для корзины покупок */
+/* Стиль для корзины покупок */
 
- .cart-items-container{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    position: absolute;
-    z-index: 1000;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    /* Test Properties */
-    /* width: 100px;
+.cart-items-container {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  z-index: 1000;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  /* Test Properties */
+  /* width: 100px;
     height: 100px; */
-    background: white;
- }
+  background: white;
+}
 
- .cart-item {
+.cart-item {
   display: flex;
   justify-content: space-between;
   padding: 6px;
   gap: 8px;
- }
-  .cart-item img {
-    width: 40px;
-    height: auto;
-    border-radius: 8px;
-  }
+}
 
-  .cart-item-details {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-  }
-   .cart-item-details p {
-    margin-top: 8px;
-  }
-  .cart-item-remove{
-    margin-top: 7px;
-  }
-  .cart-item-remove button i {
-    color: rgb(156, 156, 156);
-  }
-  .cart-item-remove button:hover i {
-    color: rgb(255, 88, 88);
-  }
+.cart-item img {
+  width: 40px;
+  height: auto;
+  border-radius: 8px;
+}
 
-  .cart-container {
-    display: flex;
-  }
+.cart-item-details {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
 
+.cart-item-details p {
+  margin-top: 8px;
+}
+
+.cart-item-remove {
+  margin-top: 7px;
+}
+
+.cart-item-remove button i {
+  color: rgb(156, 156, 156);
+}
+
+.cart-item-remove button:hover i {
+  color: rgb(255, 88, 88);
+}
+
+.cart-container {
+  display: flex;
+}
+
+/* Стили для оформления заказа */
+
+.contact-info {
+  background: #1e1e1e;
+  padding: 25px 16px;
+  border-radius: 8px;
+}
+
+.contact-info .header {
+  display: flex;
+}
+
+
+
+.number-move {
+  background: #2b2b2b;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  margin-right: 14px;
+  box-shadow: 3px 5px 4px rgba(0, 0, 0, 0.2);
+}
+
+.number-move p{
+  font-size: 1.5rem;
+  color: #1780f9;
+  margin-top: 10px;
+  font-weight: bold;
+}
+.order-summary .header {
+  display: flex;
+  color: #1780f9;
+}
+
+.order-items{
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 15px;
+}
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #4d4d4d;
+}
+
+.order-item img {
+  width: 8%;
+  border-radius: 8px;
+  box-shadow: 3px 5px 4px rgba(0, 0, 0, 0.5);
+}
+.order-item .item-details{
+  color: rgb(216, 216, 216);
+  margin-left: 20px;
+}
+.order-item .item-price {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  color: rgb(216, 216, 216);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.order-item .item-remove .btn-remove{
+ color: #7c7c7c;
+ font-size: 2rem;
+ transition: transform 0.3s ease;
+ margin-left: 30px;
+}
+
+.order-item .item-remove .btn-remove:hover{
+ color: #ff5858;
+ transform: scale(1.1);
+}
+.order-summary-total {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.order-summary-total h4 {
+  color: rgb(216, 216, 216);
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+.order-summary-total p {
+  color: rgb(216, 216, 216);
+  font-size: 1.4rem;
+  font-weight: 300;
+  margin-left: 10px;
+}
+.order-summary-count {
+  display: flex;
+  margin-top: 10px;
+}
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid #4d4d4d;
+}
+
+.order-payment-way {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 15px;
+}
+.custom-radio-pay {
+  background: #2c2c2c;
+  border-radius: 6px;
+  padding: 4px 4px;
+  width: 150px;
+  height: 130px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.payment-methods {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  gap: 20px;
+}
+.payment-method {
+  box-shadow: 5px 7px 5px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
+}
+.payment-method:hover {
+    box-shadow: 7px 9px 5px rgba(0, 0, 0, 0.4);
+  transform: translateY(-5px);
+}
+
+.custom-radio-unvisited:checked+.custom-radio-pay {
+  background: #1780f9;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.payment-method-details {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: 4rem;
+  align-items: center;
+}
+.payment-method-details p{
+  font-size: 1.1rem;
+}
+
+.custom-radio-pay {
+  cursor: pointer;
+}
+
+.order-finish {
+  background: #1e1e1e;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.agreements {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.order-button-confirm {
+  background: #1bca15;
+  color: white;
+  box-shadow: 4px 6px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.order-button-confirm:hover {
+  color: rgb(204, 204, 204);
+  background: #17a30f;
+  transform: scale(1.05);
+}
 
 /* Home/index //////////////////////////////////////////////////////////////////////////*/
 
@@ -729,8 +916,7 @@ body {
   border-radius: 10px;
 }
 
-.game-categories
-{
+.game-categories {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -740,7 +926,7 @@ body {
   padding: 0 0;
 }
 
-.game-container .game-category{
+.game-container .game-category {
   font-size: 0.8rem;
   color: #b7b7b7;
   background: #444444;
@@ -764,6 +950,7 @@ body {
   align-items: center;
   gap: 10px;
 }
+
 .game-top-section-content {
   display: flex;
   flex-direction: row;
@@ -771,15 +958,16 @@ body {
 
 .game-info-main h2 {
   padding: 0px 0;
- font-size: 1.1rem;
- font-weight: 600;
- color: #6b6b6b;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6b6b6b;
 }
+
 .game-info-main p {
- font-size: 0.9rem;
- font-weight: 400;
- color: #ffffff;
- margin: 0px 0;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin: 0px 0;
 }
 
 .game-info-buy {
@@ -793,12 +981,14 @@ body {
   border-radius: 12px;
   box-shadow: 3px 8px 12px rgba(0, 0, 0, 0.3);
 }
+
 .game-info-buy-bags {
   display: flex;
   flex-direction: column;
   gap: 5px;
   align-items: center;
 }
+
 .game-info-buy-bag {
   background: #1e1e1e;
   border-radius: 6px;
@@ -838,15 +1028,18 @@ body {
   font-size: 2.5rem;
   color: #fff;
 }
+
 .game-reviews-wrapper-content {
   display: flex;
   flex-direction: row;
   gap: 10px;
 }
+
 .game-reviews-wrapper-content .wrapper {
   width: 100%;
 }
-.game-reviews-wrapper-content .wrapper  input[type="text"]{
+
+.game-reviews-wrapper-content .wrapper input[type="text"] {
   width: 100%;
   min-height: 50px;
   border-radius: 10px 10px 10px 0px;
@@ -854,7 +1047,7 @@ body {
   text-wrap-mode: wrap;
 }
 
-.game-reviews-submit{
+.game-reviews-submit {
   display: flex;
   justify-content: flex-end;
   text-align: right;
@@ -866,6 +1059,7 @@ body {
   padding: 14px;
   border-radius: 10px;
 }
+
 .game-reviews-wrapper-grade {
   display: flex;
   flex-direction: row;
@@ -878,6 +1072,7 @@ body {
   width: 0;
   height: 0;
 }
+
 .custom-radio-grade {
   background: #2c2c2c;
   border-radius: 6px;
@@ -890,17 +1085,18 @@ body {
   align-items: center;
   transition: transform 0.3s ease;
 }
+
 .custom-radio-grade i {
   font-size: 2.1rem;
 }
 
-.custom-radio-grade :hover{
+.custom-radio-grade :hover {
   transform: translateY(-2px);
   box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
 
-.custom-radio-unvisited:checked + .custom-radio-grade {
+.custom-radio-unvisited:checked+.custom-radio-grade {
   background: #1780f9;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
@@ -947,26 +1143,30 @@ body {
   width: 60px;
   height: 60px;
 }
-.game-review-item .user-avatar i{
+
+.game-review-item .user-avatar i {
   font-size: 2.5rem;
   color: #fff;
 }
 
 .game-review-item {
   display: flex;
-  flex-direction: column;  
+  flex-direction: column;
   gap: 10px;
 }
+
 .game-review-item .game-review-text {
   text-wrap: wrap;
 }
-.game-review-item .game-review-grade{
+
+.game-review-item .game-review-grade {
   display: flex;
   align-items: center;
   margin-left: auto;
   padding: 10px;
 }
-.game-review-item .game-review-grade i{
+
+.game-review-item .game-review-grade i {
   font-size: 2.5rem;
 }
 
@@ -976,7 +1176,7 @@ body {
   gap: 10px;
 }
 
-.game-reviews-list-container .message{
+.game-reviews-list-container .message {
   background: #444444;
   color: white;
   border-radius: 12px;
@@ -985,13 +1185,13 @@ body {
 }
 
 .field-validation-error {
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .input-validation-error {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
 /* Account/Login.cshtml */
@@ -1313,9 +1513,11 @@ body {
   width: 300px;
   color: #1780f9;
 }
+
 .edit-user-form .header-info h2 {
   font-size: 1.4rem;
 }
+
 .edit-user-form .header-info hr {
   border-top: 4px solid #1780f9;
   margin: 8px 0;
@@ -1340,11 +1542,13 @@ body {
   justify-content: right;
   margin-left: 40px;
 }
+
 .user-edit-buttons .btn {
   display: flex;
   align-items: center;
   gap: 5px;
 }
+
 .user-edit-buttons .btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);

@@ -55,7 +55,7 @@ namespace Potratim.Controllers
             }
 
             if (!User.Identity.IsAuthenticated)
-                    return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Account");
 
             var user = await _userManager.GetUserAsync(User);
 
@@ -94,6 +94,12 @@ namespace Potratim.Controllers
                 ImageUrl = g.ImageUrl,
                 Categories = g.Categories.ToList()
             }).ToList();
+        }
+        public async Task<IActionResult> BuyNow(string id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            await _cartService.AddToCartAsync(user.Id, Guid.Parse(id));
+            return RedirectToAction("Index", "Order");
         }
     }
 }

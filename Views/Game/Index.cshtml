@@ -47,8 +47,9 @@
                     <a class="btn btn-secondary" asp-controller="Cart" asp-action="AddToCart" asp-route-gameId="@Model.Game.Id">
                         <i class="fa fa-shopping-cart"></i>
                     </a>
-                    <button class="btn btn-primary" style="width: 75%; font-weight: bold;"><i
-                            style="color: #ffffff; margin-right: 5px;" class="fa fa-flash"></i>Купить сейчас</button>
+                    <a asp-action="BuyNow" asp-route-id="@Model.Game.Id"
+                       class="btn btn-primary" style="width: 75%; font-weight: bold;"><i
+                            style="color: #ffffff; margin-right: 5px;" class="fa fa-flash"></i>Купить сейчас</a>
                 </div>
             </div>
             <div class="game-info-buy-bags">

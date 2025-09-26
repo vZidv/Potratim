@@ -1,0 +1,127 @@
+@model Potratim.ViewModel.OrderViewModel
+
+<div class="order-summary">
+    <h2 class="text-center text-white mb-4">Оформление заказа</h2>
+    <div class="order-summary-details mb-4">
+        <div class="contact-info">
+            <div class="header">
+                <div class="number-move">
+                    <p>1</p>
+                </div>
+                <h3>Ваш адрес электронной почты</h3>
+            </div>
+            <input value="@(Model.Email != null ? @Model.Email : "")" type="email" class="form-control"
+                placeholder="Введите ваш email" required>
+        </div>
+        <div class="order-items mt-4">
+            <div class="header">
+                <div class="number-move">
+                    <p>2</p>
+                </div>
+                <h3>Ваша корзина</h3>
+            </div>
+            @foreach (Game item in Model.Cart.Items)
+            {
+                <div class="order-item">
+                    <img src="@(item.ImageUrl)" alt="@(item.Title)" />
+                    <div class="item-details">
+                        <h4 class="item-name" style="font-size: 1.9rem; font-weight: bold;">@(item.Title)</h4>
+                    </div>
+                    <div class="item-price">
+                        <p>@((int)item.Price) ₽</p>
+                    </div>
+                    <div class="item-remove">
+                        <a asp-action="RemoveFromCart" asp-controller="Cart" asp-route-gameId="@item.Id"
+                            class="btn btn-link btn-remove"><i class="fa fa-times-circle"></i></a>
+                    </div>
+                </div>
+            }
+            <div class="order-total">
+                <div class="order-summary-total">
+                    <h4 class="text-white">Количество:</h4>
+                    <p class="text-white">@Model.Cart.Items.Count</p>
+                </div>
+                <div class="order-summary-total">
+                    <h4 class="text-white">Итого:</h4>
+                    <p style="color: #17f962; font-weight: bold;">@((int)Model.Cart.TotalPrice) ₽</p>
+                </div>
+            </div>
+        </div>
+        <div class="order-payment-way mt-4">
+            <div class="header">
+                <div class="number-move">
+                    <p>3</p>
+                </div>
+                <h3>Способ оплаты</h3>
+            </div>
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <input type="radio" id="visa-radio" name="paymentMethod" value="false"
+                        class="custom-radio-unvisited" />
+                    <label for="visa-radio" class="custom-radio-pay text-white">
+                        <div class="payment-method-details">
+                            <i class="fa fa-cc-visa" aria-hidden="true"></i>
+                            <p>Карта</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="payment-method">
+                    <input type="radio" id="paypal-radio" name="paymentMethod" value="paypal"
+                        class="custom-radio-unvisited" />
+                    <label for="paypal-radio" class="custom-radio-pay text-white">
+                        <div class="payment-method-details">
+                            <i class="fa fa-cc-paypal" aria-hidden="true"></i>
+                            <p>PayPal</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="payment-method">
+                    <input type="radio" id="mastercard-radio" name="paymentMethod" value="mastercard"
+                        class="custom-radio-unvisited" />
+                    <label for="mastercard-radio" class="custom-radio-pay text-white">
+                        <div class="payment-method-details">
+                            <i class="fa fa-cc-mastercard" aria-hidden="true"></i>
+                            <p>MasterCard</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="payment-method">
+                    <input type="radio" id="qiwi-radio" name="paymentMethod" value="qiwi"
+                        class="custom-radio-unvisited" />
+                    <label for="qiwi-radio" class="custom-radio-pay text-white">
+                        <div class="payment-method-details">
+                            <i class="fa fa-rub" aria-hidden="true"></i>
+                            <p>Qiwi</p>
+                        </div>
+                    </label>
+                </div>
+                <div class="payment-method">
+                    <input type="radio" id="mir-radio" name="paymentMethod" value="mir"
+                        class="custom-radio-unvisited" />
+                    <label for="mir-radio" class="custom-radio-pay text-white">
+                        <div class="payment-method-details">
+                            <i class="fa fa-credit-card" aria-hidden="true"></i>
+                            <p>Карта МИР</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="order-finish mt-4">
+            <div class="agreements">
+                <input type="checkbox" style="align-self: flex-start; margin-right: 10px; margin-top: 10px;"
+                    id="agreement-checkbox" />
+                <label for="agreement-checkbox" class="text-white">
+                    Я подтверждаю, что ознакомлен с условиями использования данного демонстрационного сайта.
+                    Мне известно, что приобретение игр на данном ресурсе не является реальной покупкой и носит
+                    исключительно ознакомительный характер. Данный проект разработан пользователем <a
+                        href="https://github.com/vZidv">vZidv</a> в рамках
+                    учебного (pet-project) и размещен на платформе GitHub (репозиторий <a
+                        href="https://github.com/vZidv/Potratim">Potratim</a>).</label>
+            </div>
+            <div style="text-align: right;">
+                <a class="btn order-button-confirm" style="font-size: 1.3rem; width: 20%; margin-top: 10px;">Оплатить заказ</a>
+            </div>
+        </div>
+    </div>
+</div>

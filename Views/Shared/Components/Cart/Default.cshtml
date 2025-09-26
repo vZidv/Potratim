@@ -17,7 +17,7 @@
                     <img src="@item.ImageUrl" alt="@item.Title" />
                     <div class="cart-item-details">
                         <h5>@item.Title</h5>
-                        <p>@((int)(item.Price))</p>
+                        <p>@((int)(item.Price)) ₽</p>
                     </div>
                     <div class="cart-item-remove">
                         <a asp-action="RemoveFromCart" asp-controller="Cart" asp-route-gameId="@item.Id"
@@ -34,6 +34,13 @@
                 <p>Корзина пуста</p>
             </div>
         }
+        <div class="cart-footer">
+            <div class="cart-total">
+                <strong>Общая сумма:</strong> @((int)(Model.TotalPrice)) ₽
+            </div>
+            <a asp-action="Index" asp-controller="Order"
+            class="btn btn-success mt-4" style="float: right; margin: 5px 3px;">Оформить заказ</a>
+        </div>
     </div>
 </div>
 @* Test Item *@
@@ -50,47 +57,6 @@
     </div>
 </div> *@
 
-@* <div class="cart-items-container" style="display: none;">
-    <div class="cart-header">
-        <h3>Ваша корзина</h3>
-        <button type="button" class="btn-close" aria-label="Close"></button>
-    </div>
-    @if (Model.Items != null && Model.Items.Any())
-    {
-        <div class="cart-items-list">
-            @foreach (var item in Model.Items)
-            {
-                <div class="cart-item">
-                    <img src="@item.ImageUrl" alt="@item.Title" />
-                    <div class="cart-item-details">
-                        <h5>@item.Title</h5>
-                        <p>@item.Price.ToString("C")</p>
-                    </div>
-                    <div class="cart-item-remove">
-                        <form asp-controller="Cart" asp-action="Remove" method="post" style="display:inline;">
-                            <input type="hidden" name="gameId" value="@item.Id" />
-                            <button type="submit" class="btn btn-link" title="Удалить из корзины">
-                                <i class="fa fa-times-circle" aria-hidden="true"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <strong>Общая сумма:</strong> @Model.TotalPrice.ToString("C")
-            </div>
-            <a href="@Url.Action("Index", "Cart")" class="btn btn-success">Оформить заказ</a>
-        </div>
-    }
-    else
-    {
-        <div class="text-center p-4">
-            <p>Корзина пуста.</p>
-        </div>
-    }
-</div> *@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
