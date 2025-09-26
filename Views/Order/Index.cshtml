@@ -10,8 +10,8 @@
                 </div>
                 <h3>Ваш адрес электронной почты</h3>
             </div>
-            <input value="@(Model.Email != null ? @Model.Email : "")" type="email" class="form-control"
-                placeholder="Введите ваш email" required>
+            <input id="email-input" name="Email" value="@(Model.Email != null ? @Model.Email : "")" type="email"
+                class="form-control" placeholder="Введите ваш email" required>
         </div>
         <div class="order-items mt-4">
             <div class="header">
@@ -108,9 +108,9 @@
             </div>
         </div>
         <div class="order-finish mt-4">
-            <div class="agreements">
-                <input type="checkbox" style="align-self: flex-start; margin-right: 10px; margin-top: 10px;"
-                    id="agreement-checkbox" />
+            <div id="agreements-list" class="agreements">
+                <input id="agreement-checkbox" type="checkbox"
+                    style="align-self: flex-start; margin-right: 10px; margin-top: 10px;" />
                 <label for="agreement-checkbox" class="text-white">
                     Я подтверждаю, что ознакомлен с условиями использования данного демонстрационного сайта.
                     Мне известно, что приобретение игр на данном ресурсе не является реальной покупкой и носит
@@ -120,8 +120,77 @@
                         href="https://github.com/vZidv/Potratim">Potratim</a>).</label>
             </div>
             <div style="text-align: right;">
-                <a class="btn order-button-confirm" style="font-size: 1.3rem; width: 20%; margin-top: 10px;">Оплатить заказ</a>
+                <a id="order-confirm-button" class="btn order-button-confirm"
+                    style="font-size: 1.3rem; width: 20%; margin-top: 10px;">Оплатить заказ</a>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const emailInput = document.getElementById("email-input");
+            const paymentMethods = document.querySelectorAll("input[name='paymentMethod']");
+
+            const agreementDiv = document.getElementById("agreements-list");
+            const agreementCheckbox = document.getElementById("agreement-checkbox");
+
+            const confirmButton = document.getElementById("order-confirm-button");
+
+            function showError(message) {
+                alert(message);
+            }
+
+            function hideError() {
+                emailInput.classList.remove("email-error");
+                agreementDiv.classList.remove("email-agreement");
+            }
+
+            function validateForm() {
+                hideError();
+
+                const emailValue = emailInput.value.trim();
+                if (!emailValue) {
+                    showError("Пожалуйста, введите ваш email.");
+                    emailInput.classList.add("email-error");
+                    emailInput.focus();
+                    return false;
+                }
+
+                const orderItems = document.querySelectorAll(".order-item");
+                if (orderItems.length === 0) {
+                    showError("Корзина пуста. Пожалуйста, добавьте товары в корзину.");
+                    return false;
+                }
+
+                let isPaymentMethodSelected = false;
+                paymentMethods.forEach(method => {
+                    if (method.checked) {
+                        isPaymentMethodSelected = true;
+                    }
+                });
+
+                if (!isPaymentMethodSelected) {
+                    showError('Пожалуйста, выберите способ оплаты.');
+                    return false;
+                }
+
+                if (!agreementCheckbox.checked) {
+                    showError('Вы должны согласиться с условиями использования сайта.');
+                    agreementDiv.classList.add("email-agreement");
+                    return false;
+                }
+
+                return true;
+            }
+
+            confirmButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                if (validateForm()) {
+                    alert("Форма успешно отправлена!");
+                }
+            });
+        });
+    </script>
+}

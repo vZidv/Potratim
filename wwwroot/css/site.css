@@ -378,6 +378,15 @@ body {
   transform: scale(1.05);
 }
 
+.email-error {
+  border: 2px solid rgb(255, 74, 74);
+}
+.email-agreement {
+  border: 2px solid rgb(255, 74, 74);
+  border-radius: 8px;
+  padding: 3px;
+}
+
 /* Home/index //////////////////////////////////////////////////////////////////////////*/
 
 .header-section {
