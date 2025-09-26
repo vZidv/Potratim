@@ -376,6 +376,7 @@ body {
   color: rgb(204, 204, 204);
   background: #17a30f;
   transform: scale(1.05);
+    box-shadow: 4px 6px 4px rgba(78, 255, 122, 0.2);
 }
 
 .email-error {
@@ -385,6 +386,82 @@ body {
   border: 2px solid rgb(255, 74, 74);
   border-radius: 8px;
   padding: 3px;
+}
+ /* Order/OrderFinished */
+
+ .order-finished{
+   background: linear-gradient(134deg, #1e1e1e, #252525);
+   margin-top: 100px;
+   width: 38%;
+   margin-left: auto;
+   margin-right: auto;
+   padding: 20px;
+   border-radius: 9px;
+   display: flex;
+   flex-direction: column;
+   border-top: 1px solid #1780f9;
+   box-shadow: 8px 10px 10px rgba(0, 0, 0, 0.5);
+ }
+
+ .order-finished-header {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+ }
+
+ .order-finished-header .order-finished-icon,
+ .order-finished-header .order-finished-title {
+    background: linear-gradient(to right, #1780f9, #ff93d4); 
+    -webkit-background-clip: text; 
+    background-clip: text;
+    -webkit-text-fill-color: transparent; 
+}
+
+.order-finished-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.order-finished-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.order-finished-info {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  background: #2b2b2b;
+  padding: 10px;
+  border-radius: 12px;
+}
+ 
+.order-finished-info hr {
+  color: white;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+.order-finished-detail-value {
+  color: #1bca15;
+  font-weight: bold;
+}
+.order-finished-footer {
+  background: rgba(60, 105, 255, 0.1);
+  margin-top: 14px;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  gap: 10px;
+  text-align: center;
+  align-items: center;
+}
+
+.order-finished-footer-info {
+  color: rgba(255, 255, 255, 0.541);
+  text-align: center;
+  margin-top: 10px;
+  padding: 0px 40px;
 }
 
 /* Home/index //////////////////////////////////////////////////////////////////////////*/

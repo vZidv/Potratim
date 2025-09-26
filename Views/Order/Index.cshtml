@@ -120,12 +120,40 @@
                         href="https://github.com/vZidv/Potratim">Potratim</a>).</label>
             </div>
             <div style="text-align: right;">
-                <a id="order-confirm-button" class="btn order-button-confirm"
+                <a asp-action="OrderFinished" id="order-confirm-button" class="btn order-button-confirm"
                     style="font-size: 1.3rem; width: 20%; margin-top: 10px;">Оплатить заказ</a>
             </div>
         </div>
     </div>
+    <div class="game-similar">
+        <div class="swiper-container">
+            <h2 class="section-title text-white">Вас также может заинтересовать</h2>
+            <hr class="bg-white line-home">
+
+            <div class="swiper game-new-swiper">
+                <div class="swiper-wrapper">
+                    @if (Model.SameGames != null && Model.SameGames.Any())
+                    {
+                        @foreach (var game in Model.SameGames)
+                        {
+                            <div class="swiper-slide">
+                                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-id="@game.Id">
+                                    <div class="game-card">
+                                        <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
+                                        <h3 class="game-card-title text-center">@game.Title</h3>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 @section Scripts {
     <script>
@@ -187,8 +215,29 @@
 
             confirmButton.addEventListener("click", function (event) {
                 event.preventDefault();
-                if (validateForm()) {
-                    alert("Форма успешно отправлена!");
+                validateForm();
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const swiper = new Swiper('.game-new-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    640: { slidesPerView: 2, spaceBetween: 20 },
+                    768: { slidesPerView: 3, spaceBetween: 30 },
+                    1024: { slidesPerView: 4, spaceBetween: 40 },
+                },
+                autoplay: {
+                    delay: 3000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true
                 }
             });
         });

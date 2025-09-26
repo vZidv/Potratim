@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Potratim.Data;
 using Potratim.Models;
 using Potratim.Services;
 using Potratim.ViewModel;
@@ -18,11 +20,13 @@ namespace Potratim.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ICartService _cartService;
+        private readonly PotratimDbContext _context;
 
-        public OrderController(UserManager<User> userManager, ICartService cartService)
+        public OrderController(UserManager<User> userManager, ICartService cartService, PotratimDbContext context)
         {
             _userManager = userManager;
             _cartService = cartService;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -40,9 +44,30 @@ namespace Potratim.Controllers
             var model = new OrderViewModel()
             {
                 Email = userEmail,
-                Cart = cartViewModel
+                Cart = cartViewModel,
+                SameGames = await GetSomeGamesAsync(10)
             };
             return View(model);
+        }
+
+        public IActionResult OrderFinished()
+        {
+            return View();
+        }
+
+        public async Task<List<GameViewModel>> GetSomeGamesAsync(int count)
+        {
+            var someGames = await _context.Games.Take(count).ToListAsync();
+
+            return someGames.Select(g => new GameViewModel()
+            {
+                Id = g.Id,
+                Title = g.Title,
+                ReleaseDate = g.ReleaseDate,
+                Price = g.Price,
+                ImageUrl = g.ImageUrl,
+                Categories = g.Categories.ToList()
+            }).ToList();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
