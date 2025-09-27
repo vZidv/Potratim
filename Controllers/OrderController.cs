@@ -50,8 +50,16 @@ namespace Potratim.Controllers
             return View(model);
         }
 
-        public IActionResult OrderFinished()
+        public async Task<IActionResult> OrderFinished(int totalCost)
         {
+            var user = await _userManager.GetUserAsync(User);
+            foreach (var item in await _cartService.GetCartItemsAsync(user.Id))
+            {
+                if (!user.Games.Contains(item))
+                    user.Games.Add(item);
+            }
+            await _cartService.ClearCartAsync(user.Id);
+            ViewBag.TotalCost = totalCost;
             return View();
         }
 

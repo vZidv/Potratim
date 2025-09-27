@@ -20,13 +20,20 @@
                         <p>@((int)(item.Price)) ₽</p>
                     </div>
                     <div class="cart-item-remove">
-                        <a asp-action="RemoveFromCart" asp-controller="Cart" asp-route-gameId="@item.Id"
-                        class="btn btn-link" style="color: #a1a1a1;" title="Удалить из корзины">
+                        <a asp-action="RemoveFromCart" asp-controller="Cart" asp-route-gameId="@item.Id" class="btn btn-link"
+                            style="color: #a1a1a1;" title="Удалить из корзины">
                             <i class="fa fa-times-circle" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
             }
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <strong>Общая сумма:</strong> @((int)(Model.TotalPrice)) ₽
+                </div>
+                <a asp-action="Index" asp-controller="Order" class="btn btn-success mt-4"
+                    style="float: right; margin: 5px 3px;">Оформить заказ</a>
+            </div>
         }
         else
         {
@@ -34,13 +41,7 @@
                 <p>Корзина пуста</p>
             </div>
         }
-        <div class="cart-footer">
-            <div class="cart-total">
-                <strong>Общая сумма:</strong> @((int)(Model.TotalPrice)) ₽
-            </div>
-            <a asp-action="Index" asp-controller="Order"
-            class="btn btn-success mt-4" style="float: right; margin: 5px 3px;">Оформить заказ</a>
-        </div>
+
     </div>
 </div>
 @* Test Item *@

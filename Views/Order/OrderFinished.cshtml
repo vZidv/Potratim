@@ -7,12 +7,12 @@
     <div class="order-finished-info">
         <div class="order-finished-detail">
             <p class="text-white">Дата оформления:</p>
-            <p class="order-finished-detail-value">26 сентября 2025</p>
+            <p class="order-finished-detail-value">@DateTime.Now.ToString("dd MMMM yyyy")</p>
         </div>
         <hr />
         <div class="order-finished-detail">
             <p class="text-white">Сумма заказа:</p>
-            <p class="order-finished-detail-value">1000 ₽</p>
+            <p class="order-finished-detail-value">@ViewBag.TotalCost ₽</p>
         </div>
         <hr />
         <div class="order-finished-detail">

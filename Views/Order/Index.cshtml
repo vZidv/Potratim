@@ -120,8 +120,11 @@
                         href="https://github.com/vZidv/Potratim">Potratim</a>).</label>
             </div>
             <div style="text-align: right;">
-                <a asp-action="OrderFinished" id="order-confirm-button" class="btn order-button-confirm"
-                    style="font-size: 1.3rem; width: 20%; margin-top: 10px;">Оплатить заказ</a>
+                <form method="post" asp-action="OrderFinished">
+                    <input type="hidden" name="totalCost" value="@((int)Model.Cart.TotalPrice)" />
+                    <button type="submit" id="order-confirm-button" class="btn order-button-confirm"
+                        style="font-size: 1.3rem; width: 20%; margin-top: 10px;">Оплатить заказ</button>
+                </form>
             </div>
         </div>
     </div>
@@ -214,8 +217,9 @@
             }
 
             confirmButton.addEventListener("click", function (event) {
-                event.preventDefault();
-                validateForm();
+                if (!validateForm())
+                    event.preventDefault();
+
             });
         });
     </script>
