@@ -1,0 +1,33 @@
+@model Potratim.ViewModel.UserViewModel
+
+<h1 class="text-white text-center mb-4">Редактировать профиль</h1>
+<div class="edit-profile-container">
+    <div class="edit-profile-form">
+        <form asp-action="EditProfileConfirm" method="post">
+            <div class="user-info bg-standart" style="height: 500px;">
+                <input type="hidden" id="id" name="id" value="@Model.Id" />
+                <div class="text-center">
+                    <img src="/images/Logo_full.png" alt="User Profile Picture" class="profile-picture">
+                </div>
+
+                <div class="edit-fields mb-4">
+                    <div class="form-group mb-4">
+                        <label for="nickname" class="edit-field-label">Никнейм</label>
+                        <input type="text" id="nickname" name="nickname" class="form-control" value="@Model.Nickname">
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="email" class="edit-field-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" value="@Model.Email">
+                    </div>
+                </div>
+                <div class="text-center mt-4" style="margin-bottom: 300px;">
+                    <button type="submit" class="btn btn-success">
+                        Сохранить изменения
+                    </button>
+                    <a asp-action="Profile" asp-controller="Account" class="btn btn-danger"
+                        style="margin-left: 10px;">Отмена</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

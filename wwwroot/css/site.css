@@ -559,6 +559,21 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
+
+/* Account/EditProfile */
+.edit-profile-container {
+ width: 28%;
+ margin: 0 auto;
+}
+
+.edit-field-label {
+  color: white;
+  font-weight: bold;
+  text-align: left;
+}
+
+
+
 /* Home/index //////////////////////////////////////////////////////////////////////////*/
 
 .header-section {

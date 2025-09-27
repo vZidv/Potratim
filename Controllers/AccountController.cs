@@ -31,7 +31,7 @@ namespace Potratim.Controllers
         public async Task<IActionResult> Login()
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user != null)
+            if (user != null)
             {
                 return RedirectToAction("Profile", "Account");
             }
@@ -60,6 +60,13 @@ namespace Potratim.Controllers
             }
 
             return View(model);
+        }
+
+
+        public async Task<IActionResult> SignOut()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Logout()
@@ -106,7 +113,7 @@ namespace Potratim.Controllers
 
             return View(model);
         }
-    
+
         [Authorize]
         public async Task<IActionResult> Profile()
         {
@@ -121,6 +128,17 @@ namespace Potratim.Controllers
             .Include(u => u.Games).Where(g => g.Id == user.Id)
             .SelectMany(u => u.Games).ToList();
 
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                Nickname = user.UserName,
+                Email = user.Email,
+                RoleName = userRole.FirstOrDefault(),
+                RoleColor = roleColor,
+                Status = user.LockoutEnd != null ? "Заблокирован" : "Активен",
+                RegistrationDate = user.CreatedAt,
+            };
+
             var gameCollection = games.Select(g => new GameViewModel
             {
                 Id = g.Id,
@@ -132,17 +150,60 @@ namespace Potratim.Controllers
 
             var model = new UserProfileViewModel()
             {
-                UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                Role = userRole.FirstOrDefault(),
-                RoleColor = roleColor,
-                Status = user.LockoutEnd != null ? "Заблокирован" : "Активен",
-                CreatedAt = user.CreatedAt,
+                User = userViewModel,
                 GameCollection = gameCollection.ToList()
             };
 
             return View(model);
+        }
+
+        public async Task<IActionResult> EditProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var userViewModel = new UserViewModel
+            {
+                Id = user.Id,
+                Nickname = user.UserName,
+                Email = user.Email,
+                RegistrationDate = user.CreatedAt,
+                AvatarUrl = user.ProfileImageUrl
+            };
+
+            return View(userViewModel);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfileConfirm(UserSelfEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("EditProfile", model);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound("Пользователь не найден.");
+            }
+
+            user.UserName = model.Nickname;
+            user.Email = model.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Profile");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View("EditProfile", model);
         }
 
     }

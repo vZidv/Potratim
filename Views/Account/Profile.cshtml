@@ -14,20 +14,29 @@
     </div>
 }
 <div class="user-profile-container">
-    <div class="user-info bg-standart text-center">
-        <img src="/images/Logo_full.png" alt="User Profile Picture" class="profile-picture">
-        <h2 class="user-name">@Model.UserName</h2>
-        <div class="user-email">
-            <i class="fa fa-envelope" aria-hidden="true"></i>
-            <span class="email">@Model.Email</span>
+    <div>
+        <div class="user-info bg-standart text-center">
+            <img src="/images/Logo_full.png" alt="User Profile Picture" class="profile-picture">
+            <h2 class="user-name">@Model.User.Nickname</h2>
+            <div class="user-email">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+                <span class="email">@Model.User.Email</span>
+            </div>
+            <div class="user-statuses">
+                <span class="status" style="background-color: #@Model.User.RoleColor;">@Model.User.RoleName</span>
+                <span class="status @(Model.User.Status == "Заблокирован" ? "bg-danger" : "bg-success")">@Model.User.Status</span>
+            </div>
+            <div class="user-info-footer">
+                <span>Участник с @Model.User.RegistrationDate.ToString("dd.MM.yyyy")</span>
+                <span>Игр: @Model.GameCollection.Count()</span>
+            </div>
         </div>
-        <div class="user-statuses">
-            <span class="status" style="background-color: #@Model.RoleColor;">@Model.Role</span>
-            <span class="status @(Model.Status == "Заблокирован" ? "bg-danger" : "bg-success")">@Model.Status</span>
-        </div>
-        <div class="user-info-footer">
-            <span>Участник с @Model.CreatedAt.ToString("dd.MM.yyyy")</span>
-            <span>Игр: @Model.GameCollection.Count()</span>
+        <div class="text-center mt-4" style="display: flex; justify-content: center;">
+            <a class="btn btn-primary" asp-controller="Account" asp-action="EditProfile">
+                Редактировать профиль
+            </a>
+            <a asp-action="SignOut" asp-controller="Account"
+            class="btn btn-danger" style="margin-left: 10px;"><i class="fa fa-sign-out" aria-hidden="true"></i></a>
         </div>
     </div>
     <div class="user-collection bg-standart" style="padding: 0px;">
