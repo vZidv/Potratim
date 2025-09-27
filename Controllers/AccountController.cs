@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Potratim.Models;
 using Potratim.ViewModel;
+using Potratim.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Potratim.Controllers
 {
@@ -16,12 +18,13 @@ namespace Potratim.Controllers
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
-        private readonly ILogger<AccountController> _logger;
+        private readonly PotratimDbContext _context;
 
-        public AccountController(ILogger<AccountController> logger, UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(PotratimDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         [HttpGet]
@@ -112,7 +115,34 @@ namespace Potratim.Controllers
             {
                 return NotFound("Не удалось найти пользователя.");
             }
-            return View(user);
+            var userRole = await _userManager.GetRolesAsync(user);
+            var roleColor = _context.Roles.FirstOrDefault(r => r.Name == userRole.FirstOrDefault())?.Color;
+            List<Game> games = _context.Users
+            .Include(u => u.Games).Where(g => g.Id == user.Id)
+            .SelectMany(u => u.Games).ToList();
+
+            var gameCollection = games.Select(g => new GameViewModel
+            {
+                Id = g.Id,
+                Title = g.Title,
+                ReleaseDate = g.ReleaseDate,
+                Price = g.Price,
+                ImageUrl = g.ImageUrl
+            });
+
+            var model = new UserProfileViewModel()
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Role = userRole.FirstOrDefault(),
+                RoleColor = roleColor,
+                Status = user.LockoutEnd != null ? "Заблокирован" : "Активен",
+                CreatedAt = user.CreatedAt,
+                GameCollection = gameCollection.ToList()
+            };
+
+            return View(model);
         }
 
     }

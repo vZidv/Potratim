@@ -1,5 +1,11 @@
 @model Potratim.ViewModel.GameIndexViewModel
-
+@if (Model.UserRole == "Admin")
+{
+    <div class="mb-4" style="text-align: right;">
+        <a asp-area="Admin" asp-controller="Games" asp-action="Edit" asp-route-id="@Model.Game.Id"
+            class="btn btn-secondary"><i class="fa fa-pencil"></i> Редактировать</a>
+    </div>
+}
 <div class="game-container">
     <div class="game-top-section">
         <div class="game-image">
@@ -44,12 +50,13 @@
                 <h1 style="font-size: 2rem; font-weight: bold; color: #18ff78;">@((int)Model.Game.Price) <i
                         class="fa fa-rub" style="color: #ffffff; font-size: 1.2rem;" aria-hidden="true"></i></h1>
                 <div class="game-info-buy-buttons mt-4">
-                    <a class="btn btn-secondary" asp-controller="Cart" asp-action="AddToCart" asp-route-gameId="@Model.Game.Id">
+                    <a class="btn btn-secondary" asp-controller="Cart" asp-action="AddToCart"
+                        asp-route-gameId="@Model.Game.Id">
                         <i class="fa fa-shopping-cart"></i>
                     </a>
-                    <a asp-action="BuyNow" asp-route-id="@Model.Game.Id"
-                       class="btn btn-primary" style="width: 75%; font-weight: bold;"><i
-                            style="color: #ffffff; margin-right: 5px;" class="fa fa-flash"></i>Купить сейчас</a>
+                    <a asp-action="BuyNow" asp-route-id="@Model.Game.Id" class="btn btn-primary"
+                        style="width: 75%; font-weight: bold;"><i style="color: #ffffff; margin-right: 5px;"
+                            class="fa fa-flash"></i>Купить сейчас</a>
                 </div>
             </div>
             <div class="game-info-buy-bags">
@@ -124,11 +131,11 @@
 
         <div class="game-reviews-wrapper mt-4">
             <h2 class="text-white mb-4">Оставить отзыв</h2>
-            @if(TempData["ErrorMessage"] != null)
+            @if (TempData["ErrorMessage"] != null)
             {
                 <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
             }
-            @if(TempData["SuccessMessage"] != null)
+            @if (TempData["SuccessMessage"] != null)
             {
                 <div class="alert alert-success">@TempData["SuccessMessage"]</div>
             }
@@ -136,7 +143,7 @@
 
                 <form asp-controller="Game" asp-action="CreateReview" method="post">
                     <div class="game-reviews-wrapper-content">
-                        <input type="hidden" name="GameId" value="@Model.Game.Id"/>
+                        <input type="hidden" name="GameId" value="@Model.Game.Id" />
                         <div class="user-avatar">
                             <i class="fa fa-user"></i>
                         </div>
@@ -188,6 +195,14 @@
                                     <i style="color: #dc3545;" class="fa fa-thumbs-down"></i>
                                 }
                             </div>
+                            @if (Model.UserRole == "Admin" || Model.UserRole == "Moderator")
+                            {
+                                <div class="game-review-buttons">
+                                    <a asp-action="DeleteReview" asp-controller="Game" asp-route-id="@review.Id"
+                                        onclick="return confirm('Вы уверены, что хотите удалить этот отзыв?');"
+                                        class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
@@ -229,9 +244,9 @@
     </script>
 
     <partial name="_ValidationScriptsPartial" />
-    
+
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#review-form').validate({
                 rules: {
                     'CreateReviewModel.ReviewGrade': {
@@ -243,7 +258,7 @@
                         required: 'Пожалуйста, выберите оценку'
                     }
                 },
-                errorPlacement: function(error, element) {
+                errorPlacement: function (error, element) {
                     if (element.attr('name') === 'CreateReviewModel.ReviewGrade') {
                         error.insertAfter('.game-reviews-wrapper-grade');
                     } else {

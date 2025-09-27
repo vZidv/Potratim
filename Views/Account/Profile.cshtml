@@ -1,58 +1,48 @@
-@model Potratim.Models.User
+@model Potratim.ViewModel.UserProfileViewModel
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 
 @{
     var isAdmin = User.IsInRole("Admin");
 }
-
-<h2 style="color: white;">Профиль пользователя</h2>
-
-<div class="user-profile">
-    <h4>Информация</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-3">
-            Имя пользователя
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
-        @if (!string.IsNullOrEmpty(Model.Nickname))
-        {
-            <dt class="col-sm-3">
-                @Html.DisplayNameFor(model => model.Nickname)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Nickname)
-            </dd>
-        }
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.Balance)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.Balance) ₽
-        </dd>
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class="col-sm-9">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-    </dl>
-</div>
-
 @if (isAdmin)
 {
-    <div>
+    <div style="margin: 0 20px 20px 0; text-align: right;">
         <a class="btn btn-danger" asp-controller="Admin" asp-action="Panel" style="margin-top: 20px;">
             Панель администратора
         </a>
     </div>
 }
+<div class="user-profile-container">
+    <div class="user-info bg-standart text-center">
+        <img src="/images/Logo_full.png" alt="User Profile Picture" class="profile-picture">
+        <h2 class="user-name">@Model.UserName</h2>
+        <div class="user-email">
+            <i class="fa fa-envelope" aria-hidden="true"></i>
+            <span class="email">@Model.Email</span>
+        </div>
+        <div class="user-statuses">
+            <span class="status" style="background-color: #@Model.RoleColor;">@Model.Role</span>
+            <span class="status @(Model.Status == "Заблокирован" ? "bg-danger" : "bg-success")">@Model.Status</span>
+        </div>
+        <div class="user-info-footer">
+            <span>Участник с @Model.CreatedAt.ToString("dd.MM.yyyy")</span>
+            <span>Игр: @Model.GameCollection.Count()</span>
+        </div>
+    </div>
+    <div class="user-collection bg-standart" style="padding: 0px;">
+        <h3 class="text-white" style="padding: 12px 16px;">Коллекция</h3>
+        <div class="collection-items">
+            @foreach (var game in Model.GameCollection)
+            {
+                <a class="btn" asp-controller="Game" asp-action="Index" asp-route-id="@game.Id">
+                    <div class="game-card">
+                        <img src="@game.ImageUrl" alt="@game.Title" class="game-card-image">
+                        <h3 class="game-card-title text-center">@game.Title</h3>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+</div>

@@ -32,14 +32,16 @@ namespace Potratim.Controllers
         public async Task<IActionResult> Index(string id)
         {
             var game = await _context.Games.Include(g => g.Categories).Include(g => g.Reviews).Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
-
+            var user = await _userManager.GetUserAsync(User);
+            var userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
             var viewModel = new GameIndexViewModel()
             {
                 Game = game,
                 Categories = game.Categories.ToList(),
                 SameGames = await GetSameGames(game.Id.ToString(), 12),
                 Reviews = game.Reviews.ToList(),
-                CreateReviewModel = new CreateReviewViewModel()
+                CreateReviewModel = new CreateReviewViewModel(),
+                UserRole = userRole
             };
             return View(viewModel);
         }
@@ -100,6 +102,21 @@ namespace Potratim.Controllers
             var user = await _userManager.GetUserAsync(User);
             await _cartService.AddToCartAsync(user.Id, Guid.Parse(id));
             return RedirectToAction("Index", "Order");
+        }
+
+        [Authorize(Roles = "Admin,Moderator")]
+        public async Task<IActionResult> DeleteReview(string id)
+        {
+            var review = await _context.Reviews.FindAsync(Guid.Parse(id));
+            if (review == null)
+            {
+                return NotFound();
+            }
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { id = review.GameId });
         }
     }
 }
