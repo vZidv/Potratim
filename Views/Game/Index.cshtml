@@ -1,5 +1,5 @@
 @model Potratim.ViewModel.GameIndexViewModel
-@if (Model.UserRole == "Admin")
+@if (Model.CurrentUser?.RoleName == "Admin")
 {
     <div class="mb-4" style="text-align: right;">
         <a asp-area="Admin" asp-controller="Games" asp-action="Edit" asp-route-id="@Model.Game.Id"
@@ -145,7 +145,14 @@
                     <div class="game-reviews-wrapper-content">
                         <input type="hidden" name="GameId" value="@Model.Game.Id" />
                         <div class="user-avatar">
-                            <i class="fa fa-user"></i>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <img src="@Model.CurrentUser?.AvatarUrl" alt="User Avatar" class="profile-picture-review">
+                            }
+                            else
+                            {
+                                <img src="/images/Avatarka_2.png" alt="User Avatar" class="profile-picture-review">
+                            }
                         </div>
                         <div class="wrapper">
                             <textarea class="form-control" name="Comment" placeholder="Ваш отзыв"></textarea>
@@ -167,7 +174,6 @@
                         <button type="submit" class="btn btn-primary">Отправить отзыв</button>
                     </div>
                 </form>
-
             </a>
         </div>
 
@@ -180,10 +186,27 @@
                     <div class="game-review-item">
                         <div class="game-review-header">
                             <div class="user-avatar">
-                                <i class="fa fa-user"></i>
+                                @if (!string.IsNullOrEmpty(review.User.AvatarUrl))
+                                {
+                                    <img id="avatar" src="@review.User.AvatarUrl" alt="User Profile Picture"
+                                        class="profile-picture-review">
+                                }
+                                else
+                                {
+                                    <img id="avatar" src="/images/Avatarka_2.png" alt="User Profile Picture"
+                                        class="profile-picture-review">
+                                }
                             </div>
-                            <div class="wrapper">
-                                <p class="game-review-text">@review.Comment</p>
+                            <div>
+                                <div style="display: flex; flex-direction: row; gap: 8px;">
+                                    <p class="game-review-username">@review.User.Nickname</p>
+                                    <div class="game-review-role-container" style="background: #@review.User.RoleColor">
+                                        <p class="game-review-role">@review.User.RoleName</p>
+                                    </div>
+                                </div>
+                                <div class="wrapper">
+                                    <p class="game-review-text">@review.Comment</p>
+                                </div>
                             </div>
                             <div class="game-review-grade">
                                 @if (review.Like == true)
@@ -195,10 +218,10 @@
                                     <i style="color: #dc3545;" class="fa fa-thumbs-down"></i>
                                 }
                             </div>
-                            @if (Model.UserRole == "Admin" || Model.UserRole == "Moderator")
+                            @if (Model.CurrentUser?.RoleName == "Admin" || Model.CurrentUser?.RoleName == "Moderator")
                             {
                                 <div class="game-review-buttons">
-                                    <a asp-action="DeleteReview" asp-controller="Game" asp-route-id="@review.Id"
+                                    <a asp-action="DeleteReview" asp-controller="Game" asp-route-id="@review.User.Id"
                                         onclick="return confirm('Вы уверены, что хотите удалить этот отзыв?');"
                                         class="btn btn-danger"><i class="fa fa-trash"></i></a>
                                 </div>

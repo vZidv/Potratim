@@ -31,17 +31,64 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> Index(string id)
         {
-            var game = await _context.Games.Include(g => g.Categories).Include(g => g.Reviews).Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
+            var game = await _context.Games.Include(g => g.Categories).Include(g => g.Reviews).ThenInclude(r => r.User).Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
             var user = await _userManager.GetUserAsync(User);
             var userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
+
+            List<ReviewViewModel> reviews = new();
+
+            foreach (var r in game.Reviews)
+            {
+                string role = (await _userManager.GetRolesAsync(r.User)).FirstOrDefault();
+                reviews.Add(new ReviewViewModel
+                {
+                    User = new UserViewModel
+                    {
+                        Id = r.UserId,
+                        Nickname = r.User.UserName,
+                        AvatarUrl = r.User.ProfileImageUrl,
+                        RoleName = role,
+                        RoleColor = await _context.Roles.Where(r => r.Name == role).Select(r => r.Color).FirstOrDefaultAsync()
+                    },
+                    GameId = r.GameId,
+                    Like = r.Like,
+                    Comment = r.Comment
+                });
+            }
+
+            // List<ReviewViewModel> reviews = game.Reviews.Select(r => new ReviewViewModel()
+            // {
+            //     User = new UserViewModel
+            //     {
+            //         Id = r.UserId,
+            //         Nickname = r.User.UserName,
+            //         AvatarUrl = r.User.ProfileImageUrl,
+            //     },
+            //     GameId = r.GameId,
+            //     Like = r.Like,
+            //     Comment = r.Comment
+            // }).ToList();
+
+            var currentUser = new UserViewModel
+            {
+                Id = user.Id,
+                Nickname = user.UserName,
+                Email = user.Email,
+                RoleName = userRole,
+                RoleColor = await _context.Roles.Where(r => r.Name == userRole).Select(r => r.Color).FirstOrDefaultAsync(),
+                Status = user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow ? "Заблокирован" : "Активен",
+                AvatarUrl = user.ProfileImageUrl,
+                RegistrationDate = user.CreatedAt
+            };
+
             var viewModel = new GameIndexViewModel()
             {
                 Game = game,
                 Categories = game.Categories.ToList(),
                 SameGames = await GetSameGames(game.Id.ToString(), 12),
-                Reviews = game.Reviews.ToList(),
+                Reviews = reviews,
                 CreateReviewModel = new CreateReviewViewModel(),
-                UserRole = userRole
+                CurrentUser = currentUser
             };
             return View(viewModel);
         }

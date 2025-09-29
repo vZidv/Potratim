@@ -576,15 +576,16 @@ body {
   text-align: left;
 }
 
-.profile-picture {
+.profile-picture-edit {
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
   border: 3px solid #ddd;
   transition: 0.3s;
+
 }
 
-.profile-picture:hover {
+.profile-picture-edit:hover {
   border-color: #1780f9;
 }
 
@@ -1034,7 +1035,7 @@ body {
   font-weight: bold;
 }
 
-/* /Game */
+/* Game/Index */
 
 .game-top-section {
   display: flex;
@@ -1406,6 +1407,35 @@ body {
 .input-validation-error {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.profile-picture-review {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+.game-review-username {
+  color: #1780f9;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.game-review-role-container {
+  padding: 1px;
+  border-radius: 5px;
+  width: 70px;
+  height: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.game-review-role {
+  color: #e2e2e2;
+  font-size: 0.75rem;
+  font-weight: bold;
 }
 
 /* Account/Login.cshtml */

@@ -10,11 +10,11 @@
                 <div class="text-center profile-picture-container">
                     @if (!string.IsNullOrEmpty(Model.AvatarUrl))
                     {
-                        <img id="avatar" src="@Model.AvatarUrl" alt="User Profile Picture" class="profile-picture">
+                        <img id="avatar" src="@Model.AvatarUrl" alt="User Profile Picture" class="profile-picture-edit">
                     }
                     else
                     {
-                        <img id="avatar" src="/images/Avatarka_2.png" alt="User Profile Picture" class="profile-picture">
+                        <img id="avatar" src="/images/Avatarka_2.png" alt="User Profile Picture" class="profile-picture-edit">
                     }
                     <input type="file" name="AvatarFile" id="fileInput" accept="image/*">
                 </div>
