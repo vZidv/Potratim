@@ -11,6 +11,7 @@ using Potratim.Models;
 using Potratim.ViewModel;
 using Potratim.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Potratim.Controllers
 {
@@ -19,12 +20,14 @@ namespace Potratim.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly PotratimDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public AccountController(PotratimDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(PotratimDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment environment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -137,6 +140,7 @@ namespace Potratim.Controllers
                 RoleColor = roleColor,
                 Status = user.LockoutEnd != null ? "Заблокирован" : "Активен",
                 RegistrationDate = user.CreatedAt,
+                AvatarUrl = user.ProfileImageUrl
             };
 
             var gameCollection = games.Select(g => new GameViewModel
@@ -191,6 +195,10 @@ namespace Potratim.Controllers
 
             user.UserName = model.Nickname;
             user.Email = model.Email;
+            if (model.AvatarFile != null)
+            {
+                user.ProfileImageUrl = await SaveFile(model.AvatarFile, FormatFileName(user.Id.ToString()));
+            }
 
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -204,6 +212,39 @@ namespace Potratim.Controllers
             }
 
             return View("EditProfile", model);
+        }
+
+        private async Task<string?> SaveFile(IFormFile file, string fileName)
+        {
+            string fileUrl = null;
+
+            if (file != null && file.Length > 0)
+            {
+
+                string uploadDir = Path.Combine(_environment.WebRootPath, "images", "avatars");
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName + Path.GetExtension(file.FileName);
+
+                if (!Directory.Exists(uploadDir))
+                    Directory.CreateDirectory(uploadDir);
+
+                string filePath = Path.Combine(uploadDir, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+                fileUrl = $"/images/avatars/{uniqueFileName}";
+            }
+
+            return fileUrl;
+        }
+
+        private string FormatFileName(string fileName)
+        {
+            fileName = fileName.Trim().ToLower();
+            fileName = fileName.Replace(" ", "_");
+            fileName = Regex.Replace(fileName, @"[^a-z0-9_-]", "");
+            return fileName;
         }
 
     }

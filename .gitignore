@@ -5,6 +5,7 @@
 
 .cz.json
 wwwroot/images/game-images
+wwwroot/images/avatars
 
 # User-specific files
 *.rsuser

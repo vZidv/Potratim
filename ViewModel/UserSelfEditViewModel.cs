@@ -14,6 +14,6 @@ namespace Potratim.ViewModel
         [Required]
         public string Email { get; set; } = null!;
 
-        public string? AvatarUrl { get; set; } = null;
+        public IFormFile? AvatarFile { get; set; } = null;
     }
 }

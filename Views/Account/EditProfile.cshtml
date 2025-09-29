@@ -1,13 +1,22 @@
+@using Microsoft.CodeAnalysis.CSharp.Syntax
 @model Potratim.ViewModel.UserViewModel
 
 <h1 class="text-white text-center mb-4">Редактировать профиль</h1>
 <div class="edit-profile-container">
     <div class="edit-profile-form">
-        <form asp-action="EditProfileConfirm" method="post">
+        <form asp-action="EditProfileConfirm" method="post" enctype="multipart/form-data">
             <div class="user-info bg-standart" style="height: 500px;">
                 <input type="hidden" id="id" name="id" value="@Model.Id" />
-                <div class="text-center">
-                    <img src="/images/Logo_full.png" alt="User Profile Picture" class="profile-picture">
+                <div class="text-center profile-picture-container">
+                    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                    {
+                        <img id="avatar" src="@Model.AvatarUrl" alt="User Profile Picture" class="profile-picture">
+                    }
+                    else
+                    {
+                        <img id="avatar" src="/images/Avatarka_2.png" alt="User Profile Picture" class="profile-picture">
+                    }
+                    <input type="file" name="AvatarFile" id="fileInput" accept="image/*">
                 </div>
 
                 <div class="edit-fields mb-4">
@@ -31,3 +40,25 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        const avatar = document.getElementById("avatar");
+        const fileInput = document.getElementById("fileInput");
+
+        avatar.addEventListener("click", function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    avatar.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

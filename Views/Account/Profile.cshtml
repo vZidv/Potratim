@@ -16,7 +16,14 @@
 <div class="user-profile-container">
     <div>
         <div class="user-info bg-standart text-center">
-            <img src="/images/Logo_full.png" alt="User Profile Picture" class="profile-picture">
+            @if (!string.IsNullOrEmpty(Model.User.AvatarUrl))
+            {
+                <img id="avatar" src="@Model.User.AvatarUrl" alt="User Profile Picture" class="profile-picture">
+            }
+            else
+            {
+                <img id="avatar" src="/images/Avatarka_2.png" alt="User Profile Picture" class="profile-picture">
+            }
             <h2 class="user-name">@Model.User.Nickname</h2>
             <div class="user-email">
                 <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -24,7 +31,8 @@
             </div>
             <div class="user-statuses">
                 <span class="status" style="background-color: #@Model.User.RoleColor;">@Model.User.RoleName</span>
-                <span class="status @(Model.User.Status == "Заблокирован" ? "bg-danger" : "bg-success")">@Model.User.Status</span>
+                <span
+                    class="status @(Model.User.Status == "Заблокирован" ? "bg-danger" : "bg-success")">@Model.User.Status</span>
             </div>
             <div class="user-info-footer">
                 <span>Участник с @Model.User.RegistrationDate.ToString("dd.MM.yyyy")</span>
@@ -35,8 +43,8 @@
             <a class="btn btn-primary" asp-controller="Account" asp-action="EditProfile">
                 Редактировать профиль
             </a>
-            <a asp-action="SignOut" asp-controller="Account"
-            class="btn btn-danger" style="margin-left: 10px;"><i class="fa fa-sign-out" aria-hidden="true"></i></a>
+            <a asp-action="SignOut" asp-controller="Account" class="btn btn-danger" style="margin-left: 10px;"><i
+                    class="fa fa-sign-out" aria-hidden="true"></i></a>
         </div>
     </div>
     <div class="user-collection bg-standart" style="padding: 0px;">

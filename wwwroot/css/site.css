@@ -503,9 +503,11 @@ body {
   object-fit: cover;
   margin: 16px;
 }
+
 .user-info {
   height: 450px;
 }
+
 .user-info .user-name {
   font-size: 1.5rem;
   font-weight: bold;
@@ -551,9 +553,11 @@ body {
   margin-top: 10px;
   font-style: italic;
 }
+
 .user-collection {
   min-width: 80%;
 }
+
 .user-profile-container .collection-items {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -562,8 +566,8 @@ body {
 
 /* Account/EditProfile */
 .edit-profile-container {
- width: 28%;
- margin: 0 auto;
+  width: 28%;
+  margin: 0 auto;
 }
 
 .edit-field-label {
@@ -572,7 +576,21 @@ body {
   text-align: left;
 }
 
+.profile-picture {
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 3px solid #ddd;
+  transition: 0.3s;
+}
 
+.profile-picture:hover {
+  border-color: #1780f9;
+}
+
+#fileInput {
+  display: none;
+}
 
 /* Home/index //////////////////////////////////////////////////////////////////////////*/
 
