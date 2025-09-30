@@ -12,6 +12,7 @@ using Potratim.ViewModel;
 using Potratim.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using Potratim.Services;
 
 namespace Potratim.Controllers
 {
@@ -21,13 +22,15 @@ namespace Potratim.Controllers
         private readonly UserManager<User> _userManager;
         private readonly PotratimDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ICartService _cartService;
 
-        public AccountController(PotratimDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment environment)
+        public AccountController(PotratimDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment environment, ICartService cartService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _environment = environment;
+            _cartService = cartService;
         }
 
         [HttpGet]
@@ -50,19 +53,31 @@ namespace Potratim.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user != null)
+                    {
+                        await _cartService.MergeCartAsync(HttpContext, user.Id);
+                    }
                     return RedirectToAction("Profile", "Account");
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Неверный логин или пароль.");
                 }
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Неверный логин или пароль.");
+
+                if (result.IsLockedOut)
+                {
+                    ModelState.AddModelError(string.Empty, "Аккаунт заблокирован.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Неверный логин или пароль.");
+                }
             }
 
+
             return View(model);
+
         }
 
 

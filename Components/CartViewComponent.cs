@@ -40,6 +40,20 @@ namespace Potratim.Components
                     return View(viewModel);
                 }
             }
+            else
+            {
+                var cartItems = await _cartService.GetCartItemsAsync(HttpContext);
+                var total = await _cartService.GetCartTotalAsync(HttpContext);
+
+                var viewModel = new CartViewModel()
+                {
+                    Items = cartItems,
+                    TotalPrice = total,
+                    ItemCount = cartItems.Count
+                };
+                return View(viewModel);
+            }
+
             return View(new CartViewModel());
         }
     }

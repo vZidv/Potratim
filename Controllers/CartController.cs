@@ -12,7 +12,7 @@ using Potratim.Services;
 
 namespace Potratim.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;
@@ -24,21 +24,30 @@ namespace Potratim.Controllers
             _userManager = userManager;
         }
 
-        // public IActionResult Index()
-        // {
-        //     return View();
-        // }
-
         public async Task<IActionResult> AddToCartAsync(string gameId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            await _cartService.AddToCartAsync(user.Id, Guid.Parse(gameId));
+            if(User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                await _cartService.AddToCartAsync(user.Id, Guid.Parse(gameId));
+            }
+            else
+            {
+                await _cartService.AddToCartAsync(HttpContext, Guid.Parse(gameId));
+            }
             return RedirectToAction("Index", "Game", new { id = gameId });
         }
         public async Task<IActionResult> RemoveFromCartAsync(string gameId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            await _cartService.RemoveFromCartAsync(user.Id, Guid.Parse(gameId));
+            if(User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                await _cartService.RemoveFromCartAsync(user.Id, Guid.Parse(gameId));
+            }
+            else
+            {
+                await _cartService.RemoveFromCartAsync(HttpContext, Guid.Parse(gameId));
+            }
             var referer = Request.Headers["Referer"].ToString();
 
             if (!string.IsNullOrEmpty(referer))

@@ -137,8 +137,15 @@ namespace Potratim.Controllers
         }
         public async Task<IActionResult> BuyNow(string id)
         {
-            var user = await _userManager.GetUserAsync(User);
-            await _cartService.AddToCartAsync(user.Id, Guid.Parse(id));
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                await _cartService.AddToCartAsync(user.Id, Guid.Parse(id));
+            }
+            else
+            {
+                await _cartService.AddToCartAsync(HttpContext, Guid.Parse(id));
+            }
             return RedirectToAction("Index", "Order");
         }
 

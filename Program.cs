@@ -40,6 +40,14 @@ builder.Services.AddIdentity<User, UserRole>(options =>
 .AddEntityFrameworkStores<PotratimDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(5); // Время жизни сессии
+    options.Cookie.HttpOnly = true; 
+    options.Cookie.IsEssential = true; 
+    options.Cookie.SameSite = SameSiteMode.Strict; 
+});
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -62,6 +70,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

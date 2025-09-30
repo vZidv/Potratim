@@ -15,7 +15,7 @@ using Potratim.ViewModel;
 
 namespace Potratim.Controllers
 {
-    [Authorize]
+
     public class OrderController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -31,15 +31,34 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            var userEmail = await _userManager.GetEmailAsync(user);
+            string? userEmail = null;
+            CartViewModel? cartViewModel = null;
 
-            var cartViewModel = new CartViewModel()
+            if (User.Identity.IsAuthenticated)
             {
-                Items = await _cartService.GetCartItemsAsync(user.Id),
-                TotalPrice = await _cartService.GetCartTotalAsync(user.Id),
-                ItemCount = (await _cartService.GetCartItemsAsync(user.Id)).Count()
-            };
+                var user = await _userManager.GetUserAsync(User);
+                userEmail = await _userManager.GetEmailAsync(user);
+
+
+                cartViewModel = new CartViewModel()
+                {
+                    Items = await _cartService.GetCartItemsAsync(user.Id),
+                    TotalPrice = await _cartService.GetCartTotalAsync(user.Id),
+                    ItemCount = (await _cartService.GetCartItemsAsync(user.Id)).Count()
+                };
+            }
+            else
+            {
+                var cartItems = await _cartService.GetCartItemsAsync(HttpContext);
+                var total = await _cartService.GetCartTotalAsync(HttpContext);
+
+                cartViewModel = new CartViewModel()
+                {
+                    Items = cartItems,
+                    TotalPrice = total,
+                    ItemCount = cartItems.Count
+                };
+            }
 
             var model = new OrderViewModel()
             {
@@ -52,13 +71,20 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> OrderFinished(int totalCost)
         {
-            var user = await _userManager.GetUserAsync(User);
-            foreach (var item in await _cartService.GetCartItemsAsync(user.Id))
+            if (User.Identity.IsAuthenticated)
             {
-                if (!user.Games.Contains(item))
-                    user.Games.Add(item);
+                var user = await _userManager.GetUserAsync(User);
+                foreach (var item in await _cartService.GetCartItemsAsync(user.Id))
+                {
+                    if (!user.Games.Contains(item))
+                        user.Games.Add(item);
+                }
+                await _cartService.ClearCartAsync(user.Id);
             }
-            await _cartService.ClearCartAsync(user.Id);
+            else
+            {
+                await _cartService.ClearCartAsync(HttpContext);
+            }
             ViewBag.TotalCost = totalCost;
             return View();
         }

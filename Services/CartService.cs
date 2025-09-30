@@ -9,6 +9,7 @@ using Potratim.Models;
 using Potratim.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Potratim.Services
 {
@@ -23,6 +24,8 @@ namespace Potratim.Services
             _userManager = userManager;
         }
 
+
+        //Authorization users
         public async Task AddToCartAsync(Guid userId, Guid gameId, int quantity = 1)
         {
             var cart = await GetOrCreateDbCartAsync(userId);
@@ -64,8 +67,6 @@ namespace Potratim.Services
             var cart = await GetOrCreateDbCartAsync(userId);
             return cart.Games.Sum(g => g.Price);
         }
-        
-
 
         private async Task<Cart> GetOrCreateDbCartAsync(Guid userId)
         {
@@ -84,6 +85,147 @@ namespace Potratim.Services
             }
 
             return cart;
+        }
+
+        //unAuthorized users
+
+        public async Task<List<Game>> GetCartItemsAsync(HttpContext httpContext)
+        {
+            var sessionCart = GetSessionCart(httpContext);
+            if (!sessionCart.Any())
+            {
+                return new List<Game>();
+            }
+
+            var gameIds = sessionCart.Keys.ToList();
+            var games = await _context.Games
+                .Where(g => gameIds.Contains(g.Id))
+                .ToDictionaryAsync(g => g.Id, g => g);
+
+            var items = new List<Game>();
+            foreach (var kvp in sessionCart)
+            {
+                if (games.TryGetValue(kvp.Key, out var game))
+                {
+                    items.Add(new Game
+                    {
+                        Id = game.Id,
+                        Title = game.Title,
+                        ImageUrl = game.ImageUrl,
+                        Price = game.Price,
+                    });
+                }
+            }
+            return items;
+        }
+
+        public async Task AddToCartAsync(HttpContext httpContext, Guid gameId, int quantity = 1)
+        {
+            var sessionCart = GetSessionCart(httpContext);
+
+            if (sessionCart.ContainsKey(gameId))
+            {
+                sessionCart[gameId] += quantity;
+            }
+            else
+            {
+                sessionCart[gameId] = quantity;
+            }
+
+            SaveSessionCart(httpContext, sessionCart);
+        }
+
+        public async Task RemoveFromCartAsync(HttpContext httpContext, Guid gameId)
+        {
+            var sessionCart = GetSessionCart(httpContext);
+            if (sessionCart.ContainsKey(gameId))
+            {
+                sessionCart.Remove(gameId);
+                SaveSessionCart(httpContext, sessionCart);
+            }
+        }
+
+        public Task ClearCartAsync(HttpContext httpContext)
+        {
+            var sessionCart = GetSessionCart(httpContext);
+            sessionCart.Clear();
+            SaveSessionCart(httpContext, sessionCart);
+            return Task.CompletedTask;
+        }
+
+        public async Task<decimal> GetCartTotalAsync(HttpContext httpContext)
+        {
+            var sessionCart = GetSessionCart(httpContext);
+            if (!sessionCart.Any())
+            {
+                return 0;
+            }
+
+            var gameIds = sessionCart.Keys.ToList();
+            var games = await _context.Games
+                .Where(g => gameIds.Contains(g.Id))
+                .ToDictionaryAsync(g => g.Id, g => g);
+
+            return games.Sum(g => g.Value.Price * sessionCart[g.Key]);
+        }
+
+
+        public async Task MergeCartAsync(HttpContext httpContext, Guid userId)
+        {
+            var sessionCart = GetSessionCart(httpContext);
+            if (!sessionCart.Any())
+            {
+                return;
+            }
+
+            var dbCart = await GetOrCreateDbCartAsync(userId);
+
+            foreach (var kvp in sessionCart)
+            {
+                var gameId = kvp.Key;
+                var quantity = kvp.Value;
+
+                var existingItem = dbCart.Games.FirstOrDefault(cg => cg.Id == gameId);
+                if (existingItem != null)
+                {
+                    continue;
+                }
+                else
+                {
+                    var gameExists = await _context.Games.FindAsync(gameId);
+                    if (gameExists != null)
+                    {
+                        dbCart.Games.Add(gameExists);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            httpContext.Session.Remove("Cart");
+        }
+
+        private Dictionary<Guid, int> GetSessionCart(HttpContext httpContext)
+        {
+            var sessionCartJson = httpContext.Session.GetString("Cart");
+            if (string.IsNullOrEmpty(sessionCartJson))
+            {
+                return new Dictionary<Guid, int>();
+            }
+
+            try
+            {
+                return JsonSerializer.Deserialize<Dictionary<Guid, int>>(sessionCartJson) ?? new Dictionary<Guid, int>();
+            }
+            catch
+            {
+                return new Dictionary<Guid, int>();
+            }
+        }
+
+        private void SaveSessionCart(HttpContext httpContext, Dictionary<Guid, int> cart)
+        {
+            var sessionCartJson = JsonSerializer.Serialize(cart);
+            httpContext.Session.SetString("Cart", sessionCartJson);
         }
     }
 }
