@@ -145,9 +145,9 @@
                     <div class="game-reviews-wrapper-content">
                         <input type="hidden" name="GameId" value="@Model.Game.Id" />
                         <div class="user-avatar">
-                            @if (User.Identity.IsAuthenticated)
+                            @if (@Model.CurrentUser?.AvatarUrl != null)
                             {
-                                <img src="@Model.CurrentUser?.AvatarUrl" alt="User Avatar" class="profile-picture-review">
+                                <img src="@Model.CurrentUser.AvatarUrl" alt="User Avatar" class="profile-picture-review">
                             }
                             else
                             {

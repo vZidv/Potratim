@@ -32,8 +32,8 @@ namespace Potratim.Controllers
         public async Task<IActionResult> Index(string id)
         {
             var game = await _context.Games.Include(g => g.Categories).Include(g => g.Reviews).ThenInclude(r => r.User).Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
-            var user = await _userManager.GetUserAsync(User);
-            var userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
+            User? user = await _userManager.GetUserAsync(User);
+            string? userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
 
             List<ReviewViewModel> reviews = new();
 
@@ -56,31 +56,22 @@ namespace Potratim.Controllers
                 });
             }
 
-            // List<ReviewViewModel> reviews = game.Reviews.Select(r => new ReviewViewModel()
-            // {
-            //     User = new UserViewModel
-            //     {
-            //         Id = r.UserId,
-            //         Nickname = r.User.UserName,
-            //         AvatarUrl = r.User.ProfileImageUrl,
-            //     },
-            //     GameId = r.GameId,
-            //     Like = r.Like,
-            //     Comment = r.Comment
-            // }).ToList();
+            UserViewModel? currentUser = null;
 
-            var currentUser = new UserViewModel
+            if (user != null)
             {
-                Id = user.Id,
-                Nickname = user.UserName,
-                Email = user.Email,
-                RoleName = userRole,
-                RoleColor = await _context.Roles.Where(r => r.Name == userRole).Select(r => r.Color).FirstOrDefaultAsync(),
-                Status = user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow ? "Заблокирован" : "Активен",
-                AvatarUrl = user.ProfileImageUrl,
-                RegistrationDate = user.CreatedAt
-            };
-
+                currentUser = new UserViewModel
+                {
+                    Id = user.Id,
+                    Nickname = user.UserName,
+                    Email = user.Email,
+                    RoleName = userRole,
+                    RoleColor = await _context.Roles.Where(r => r.Name == userRole).Select(r => r.Color).FirstOrDefaultAsync(),
+                    Status = user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow ? "Заблокирован" : "Активен",
+                    AvatarUrl = user.ProfileImageUrl,
+                    RegistrationDate = user.CreatedAt
+                };
+            }
             var viewModel = new GameIndexViewModel()
             {
                 Game = game,
