@@ -39,5 +39,6 @@ namespace Potratim.Models
         public List<Category> Categories { get; set; } = new List<Category>();
         public List<User> Users { get; set; } = new List<User>();
         public List<Cart> Carts { get; set; } = new List<Cart>();
+        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }

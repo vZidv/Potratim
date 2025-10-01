@@ -15,6 +15,7 @@ namespace Potratim.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
         public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
 
         public PotratimDbContext(DbContextOptions<PotratimDbContext> options)
             : base(options)
@@ -60,7 +61,15 @@ namespace Potratim.Data
             .WithMany(c => c.Games)
             .UsingEntity(e => e.ToTable("CartToGame"));
 
-            
+            modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.Game)
+            .WithMany(g => g.Transactions)
+            .HasForeignKey(t => t.GameId);
+
+            modelBuilder.Entity<Transaction>()
+            .HasOne(t => t.User)
+            .WithMany(u => u.Transactions)
+            .HasForeignKey(t => t.UserId);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -69,11 +69,31 @@ namespace Potratim.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> OrderFinished(int totalCost)
+        public async Task<IActionResult> OrderFinished(OrderFinishedViewModel model)
         {
+            User? user = null;
             if (User.Identity.IsAuthenticated)
+                user = await _userManager.GetUserAsync(User);
+
+            List<Game> purchasedGames = await (user != null ? _cartService.GetCartItemsAsync(user.Id) : _cartService.GetCartItemsAsync(HttpContext));
+
+            foreach (var item in purchasedGames)
             {
-                var user = await _userManager.GetUserAsync(User);
+                Transaction transaction = new Transaction()
+                {
+                    GameId = item.Id,
+                    Email = model.Email,
+                    UserId = user?.Id,
+                    Cost = item.Price,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                _context.Transactions.Add(transaction);
+                await _context.SaveChangesAsync();
+            }
+
+
+            if (user != null)
+            {
                 foreach (var item in await _cartService.GetCartItemsAsync(user.Id))
                 {
                     if (!user.Games.Contains(item))
@@ -85,7 +105,8 @@ namespace Potratim.Controllers
             {
                 await _cartService.ClearCartAsync(HttpContext);
             }
-            ViewBag.TotalCost = totalCost;
+
+            ViewBag.TotalCost = model.TotalCost;
             return View();
         }
 

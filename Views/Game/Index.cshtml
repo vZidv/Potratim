@@ -21,9 +21,9 @@
                     }
                 </div>
                 <div class="game-sold-review-result">
-                    <p>Продано: 256</p>
+                    <p>Продано: @(Model.Game.Transactions.Count())</p>
                     <p>●</p>
-                    <p>Отзывы: 128</p>
+                    <p>Отзывы: @(Model.Reviews?.Count() ?? 0)</p>
                 </div>
                 <div class="game-info-main">
                     <div>

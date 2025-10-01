@@ -37,5 +37,6 @@ namespace Potratim.Models
 
         public List<Game> Games { get; set; } = new List<Game>();
         public Cart Cart { get; set; } = null!;
+        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }
