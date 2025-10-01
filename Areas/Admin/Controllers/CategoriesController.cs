@@ -25,7 +25,7 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.Include(c => c.Games).ToListAsync();
             return View(categories);
         }
 
