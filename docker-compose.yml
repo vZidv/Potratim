@@ -1,30 +1,28 @@
 version: '3.8'
 
 services:
-  # --- Контейнер с PostgreSQL ---
+
   db:
-    image: postgres:16-alpine # Используем Alpine Linux для меньшего размера образа
+    image: postgres:16-alpine 
     container_name: potratim_db
     environment:
       POSTGRES_DB: PotratimDb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: YourStrongPassword123! # Используй сложный пароль
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      # Открываем порт 5432 для доступа к БД с хоста (опционально, для разработки)
       - "5432:5432"
     networks:
       - potratim_network
 
-  # --- Контейнер с ASP.NET Core приложением ---
   web:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: potratim_web
     environment:
-      ConnectionStrings__PotratimDbContext: "Host=db;Port=5432;Database=PotratimDb;Username=postgres;Password=YourStrongPassword123!"
+      ConnectionStrings__PotratimDbContext: "Host=db;Port=5432;Database=PotratimDb;Username=postgres;Password=${POSTGRES_PASSWORD}"
     ports:
       - "8080:8080"
     depends_on:
@@ -32,11 +30,10 @@ services:
     networks:
       - potratim_network
 
-# --- Именованные volumes для хранения данных БД ---
+
 volumes:
   postgres_data:
 
-# --- Сеть для связи контейнеров ---
 networks:
   potratim_network:
     driver: bridge

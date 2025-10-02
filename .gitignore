@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 .cz.json
-#wwwroot/images/game-images
+wwwroot/images/game-images
 wwwroot/images/avatars
 
 # User-specific files
