@@ -91,11 +91,16 @@ sudo apt install docker.io
 sudo apt install docker-compose
 ```
 
-### Команды
+### 🚀 Команды для запуска
 ``` bash
  git clone https://github.com/vZidv/Potratim.git
  cd Potratim
- docker-compose up --build
+```
+После нужно установить пароль для **базы данных** в файле окружения ```.env```, как пример заполнения есть файл ```.env.example```.
+
+``` bash
+echo POSTGRES_PASSWORD=YourStrongPassword123 >> .env
+docker-compose up --build
 ```
 
 После запуска будут развернуты два **контейнера**:  

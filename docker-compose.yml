@@ -4,12 +4,11 @@ services:
 
   db:
     image: postgres:16-alpine 
-    container_name: potratim_db
     env_file: .env
+    container_name: potratim_db
     environment:
       POSTGRES_DB: PotratimDb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} 
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -21,8 +20,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      env_file: .env
     container_name: potratim_web
+    env_file: .env
     environment:
       ConnectionStrings__PotratimDbContext: "Host=db;Port=5432;Database=PotratimDb;Username=postgres;Password=${POSTGRES_PASSWORD}"
     ports:
