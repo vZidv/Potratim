@@ -86,66 +86,7 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-
-    UserRole[] userRoles = new[]
-    {
-        new UserRole { Id = Guid.NewGuid(), Name = "Admin" , Color = "ff5252"},
-        new UserRole { Id = Guid.NewGuid(), Name = "User", Color = "b0b0b0" },
-        new UserRole { Id = Guid.NewGuid(), Name = "Moderator", Color = "42caff" }
-    };
-    foreach (var userRole in userRoles)
-    {
-        if (!await roleManager.RoleExistsAsync(userRole.Name))
-        {
-            await roleManager.CreateAsync(userRole);
-        }
-    }
-
-    // if (!userManager.Users.Any())
-    {
-        // Создаем администратора
-        var adminUser = new User()
-        {
-            Id = Guid.NewGuid(),
-            UserName = "admin",
-            Email = "admin@example.com",
-            Nickname = "Admin",
-            CreatedAt = DateTime.UtcNow
-        };
-        var result = await userManager.CreateAsync(adminUser, "admin123");
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-        }
-        else
-        {
-            System.Console.WriteLine($"Ошибка создания администратора: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-        }
-
-        // Создаем модератора
-        var moderatorUser = new User
-        {
-            Id = Guid.NewGuid(),
-            UserName = "moderator@example.com",
-            Email = "moderator@example.com",
-            Nickname = "Moder",
-            CreatedAt = DateTime.UtcNow,
-        };
-        var moderatorResult = await userManager.CreateAsync(moderatorUser, "moder123");
-        if (moderatorResult.Succeeded)
-        {
-            await userManager.AddToRoleAsync(moderatorUser, "Moderator");
-        }
-        else
-        {
-            Console.WriteLine($"Ошибка создания модератора: {string.Join(", ", moderatorResult.Errors.Select(e => e.Description))}");
-        }
-    }
-}
+SeedData.SeedDatabaseAsync(app.Services).Wait();
 
 
 app.Run();

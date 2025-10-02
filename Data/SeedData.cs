@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Potratim.Models;
 
@@ -14,20 +15,29 @@ namespace Potratim.Data
             using (var scope = serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<PotratimDbContext>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRole>>();
 
-                //Roles
-                await SeedUserRolesAsync(context);
-                //Categories
-                await SeedCategoriesAsync(context);
+                if (!context.Database.CanConnect())
+                {
+                    await context.Database.EnsureCreatedAsync();
+                    /////////////////////////////////////
+                    //Roles
+                    await SeedUserRolesAsync(context, roleManager);
+                    //Categories
+                    await SeedCategoriesAsync(context);
+                    //Games
+                    await SeedGamesAsync(context);
+                    //Users
+                    await SeedUsersAsync(context, userManager);
 
-
-                await context.Database.EnsureCreatedAsync();
-                /////////////////////////////////////
+                    System.Console.WriteLine("SeedDatabase successfully completed.");
+                }
             }
         }
 
 
-        private static async Task SeedUserRolesAsync(PotratimDbContext context)
+        private static async Task SeedUserRolesAsync(PotratimDbContext context, RoleManager<UserRole> roleManager)
         {
             if (!context.Roles.Any())
             {
@@ -38,8 +48,9 @@ namespace Potratim.Data
                     new UserRole { Name = "User", Color = "607af7" }
                 };
 
-                context.Roles.AddRange(roles);
-                await context.SaveChangesAsync();
+                foreach (var role in roles)
+                    await roleManager.CreateAsync(role);
+
             }
         }
 
@@ -93,14 +104,12 @@ namespace Potratim.Data
 Hollow Knight – классическое двухмерное приключение в огромном взаимосвязанном мире. Исследуйте извилистые пещеры, древние города и смертоносные пустоши, сражайтесь с порчеными тварями и заводите дружбу со странными жуками, раскрывайте древние тайны в самом сердце королевства.
 Особенности игры
 Классический боевик с промоткой кадра в сторону и всеми характеристиками современной игры.
-Тонко настраиваемое 2D-управление. Прокладывайте себе мечом путь сквозь строй самых страшных противников.
-Исследуйте огромный взаимосвязанный мир забытых трактов, заросших пустошей и обратившихся в развалины замков.
-Станьте хозяином своей судьбы! Мир Халлоунеста огромен и открыт.",
+Тонко настраиваемое 2D-управление. Прокладывайте себе мечом путь сквозь строй самых страшных противников.",
                         ReleaseDate = new DateTime(2017, 2, 24),
                         Developer = "Team Cherry",
                         Publisher = "Team Cherry",
                         Price = 659,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/c6141edc-ea1a-4722-83c9-e0914fffabc5_hollow_knight.jpg",
                         Categories = new List<Category> { catIndie!, catAction!, catAdventure! }
                     },
                     new Game
@@ -112,7 +121,7 @@ Hollow Knight – классическое двухмерное приключе
                         Developer = "Team Cherry",
                         Publisher = "Team Cherry",
                         Price = 849,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/dc093675-653e-4613-a485-0fe555c3309a_hollow_knight_silksong.jpg",
                         Categories = new List<Category> { catIndie!, catAction!, catAdventure! }
                     },
                     new Game
@@ -129,7 +138,7 @@ Hollow Knight – классическое двухмерное приключе
                         Developer = "Supergiant Games",
                         Publisher = "Supergiant Games",
                         Price = 1749,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/2b72259c-f960-4c63-ab40-93e7374997fd_hades.jpg",
                         Categories = new List<Category> { catIndie!, catAction!, catAdventure! }
                     },
                     new Game
@@ -145,7 +154,7 @@ Hollow Knight – классическое двухмерное приключе
                         Developer = "Team PEAK",
                         Publisher = "Aggro Crab, Landfall",
                         Price = 399,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/e8d70884-4315-4cb8-9e8e-452924a8c4bf_peak.png",
                         Categories = new List<Category> { catIndie!, catAction!, catAdventure! }
                     },
                     new Game
@@ -162,7 +171,7 @@ Hollow Knight – классическое двухмерное приключе
                         Developer = "Ghost Ship Games",
                         Publisher = "Coffee Stain",
                         Price = 399,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/bffe2d6a-3686-4756-90d7-f0185342d9c1_deep_rock_galactic.png",
                         Categories = new List<Category> { catIndie!, catAction!, catShooter! }
                     },
                     new Game
@@ -174,7 +183,7 @@ Hollow Knight – классическое двухмерное приключе
                         Developer = "Trioskaz",
                         Publisher = "CRITICAL REFLEX",
                         Price = 349 ,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/46980ef8-e6c1-4467-b04e-86dd97339424_no_im_not_a_human.png",
                         Categories = new List<Category> { catIndie!, catNovel!, catRPG! }
                     },
 
@@ -185,15 +194,12 @@ Hollow Knight – классическое двухмерное приключе
                         Title = "DOOM Eternal",
                         Description = @"DOOM Eternal от id Software — прямое продолжение хита DOOM, получившего награду «Лучший боевик» на церемонии The Game Awards 2016 года. Прорывайтесь сквозь измерения, сокрушая всё на своём пути с невероятной силой и скоростью. Эта игра задаёт новый стандарт для шутеров с видом от первого лица. Она создана на движке id Tech 7 и сопровождается взрывным саундтреком от композитора Мика Гордона. Хватайте мощное оружие и в роли Палача Рока отправляйтесь разносить в клочья новых и хорошо знакомых демонов, заполонивших неизведанные миры DOOM Eternal.
 
-Вы — Палач Рока. Вы вернулись на Землю, захваченную ордами кровожадных демонов. Теперь вам предстоит крушить адских тварей, раскрыть тайну прошлого и довести свою великую миссию до конца.
-
-Палач стал ещё опаснее
-Используйте новейшие средства уничтожения демонов, которыми оснащена преторианская броня Палача Рока, в том числе наплечный огнемёт и выдвижной клинок Рока на запястье.",
+Вы — Палач Рока. Вы вернулись на Землю, захваченную ордами кровожадных демонов. Теперь вам предстоит крушить адских тварей, раскрыть тайну прошлого и довести свою великую миссию до конца.",
                         ReleaseDate = new DateTime(2020, 03, 19),
                         Developer = "id Software",
                         Publisher = "Bethesda Softworks",
                         Price = 749 ,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/6c3e9b06-f7fc-4998-83a9-81a9b06737d3_doom_eternal.png",
                         Categories = new List<Category> { catAction!, catShooter! }
                     },
                     new Game
@@ -205,7 +211,7 @@ Hollow Knight – классическое двухмерное приключе
                         Developer = "Saber Interactive",
                         Publisher = "Focus Entertainment",
                         Price = 1859,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/41cf039e-4042-4580-933e-31d49c3a21e8_warhammer_40000_space_marine_2.png",
                         Categories = new List<Category> { catAction!, catShooter!, catRPG! }
                     },
                     new Game
@@ -214,28 +220,25 @@ Hollow Knight – классическое двухмерное приключе
                         Title = "Grand Theft Auto V",
                         Description = @"Когда молодой уличный жулик, отставной грабитель банков и опасный для общества психопат оказываются втянуты в разборки с самыми пугающими и сумасшедшими представителями криминального мира, правительства США и индустрии развлечений, им приходится выполнить серию рискованных налетов, чтобы выжить в безжалостном городе, где они не могут доверять никому – и в первую очередь друг другу.
 
-Grand Theft Auto V для PC позволяет игрокам исследовать знаменитый мир Лос-Сантоса и округа Блэйн в разрешении до 4k и выше с частотой 60 кадров в секунду.
-
-Игра предлагает множество уникальных для компьютера настроек, в том числе более 25 отдельных параметров для настройки качества текстур, шейдеров, тесселяции, сглаживания и не только, а также поддержку и настройку управления с помощью клавиатуры и мыши. Из дополнительных возможностей можно отметить ползунок населенности города, управляющий плотностью потока машин и пешеходов, поддержку двух и трех мониторов, поддержку 3D и функцию «plug-and-play» для геймпадов.",
+Grand Theft Auto V для PC позволяет игрокам исследовать знаменитый мир Лос-Сантоса и округа Блэйн в разрешении до 4k и выше с частотой 60 кадров в секунду.",
                         ReleaseDate = new DateTime(2013, 09, 17),
                         Developer = "Rockstar Games",
                         Publisher = "Rockstar Games",
                         Price = 1199,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/19f52207-87ee-4092-8fbe-74e2513b9eab_grand_theft_auto_v.jpg",
                         Categories = new List<Category> { catAction!, catShooter!, catRPG!, catAdventure! }
                     },
                     new Game
                     {
                         Id = Guid.NewGuid(),
                         Title = "DOOM: The Dark Ages",
-                        Description = @"СТАНЬТЕ ПАЛАЧОМ В СРЕДНЕВЕКОВОЙ ВОЙНЕ С АДОМ
-DOOM: The Dark Ages от студии id Software — это зрелищное эпическое сказание о Палаче Рока и его ярости, которое поведает предысторию снискавших всемирную известность игр DOOM (2016) и DOOM Eternal. В третьей части современной серии DOOM игроки вновь наденут броню Палача Рока и прольют реки крови в мрачной средневековой войне с силами ада, какой ещё не видели.
+                        Description = @"СТАНЬТЕ ПАЛАЧОМ В СРЕДНЕВЕКОВОЙ ВОЙНЕ С АДОМ DOOM: The Dark Ages от студии id Software — это зрелищное эпическое сказание о Палаче Рока и его ярости, которое поведает предысторию снискавших всемирную известность игр DOOM (2016) и DOOM Eternal. В третьей части современной серии DOOM игроки вновь наденут броню Палача Рока и прольют реки крови в мрачной средневековой войне с силами ада, какой ещё не видели.
 Рвите врагов в клочья, ведь вы — настоящее супероружие богов и царей. Для этой цели в вашем распоряжении окажутся не только классические средства, такие как супердробовик: вы сможете перемалывать кости врагам массой нового оружия, в том числе универсальным щитом-пилой. Игрокам будут противостоять орды демонов — приготовьтесь к безжалостным сражениям в духе оригинальной DOOM.",
                         ReleaseDate = new DateTime(2025, 05, 14),
                         Developer = "id Software",
                         Publisher = "Bethesda Softworks",
                         Price = 4911,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/b66803d6-2675-4ec1-9cd3-809ea37375f4_doom_the_dark_ages.jpg",
                         Categories = new List<Category> { catAction!, catShooter!, catRPG!}
                     },
 
@@ -249,7 +252,7 @@ DOOM: The Dark Ages от студии id Software — это зрелищное 
                         Developer = "DICE",
                         Publisher = "Electronic Arts",
                         Price = 549,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/2861452a-642a-46fd-b819-f796bc141efb_battlefield_2042.jpg",
                         Categories = new List<Category> { catShooter!, catAction!}
                     },
                     new Game
@@ -263,17 +266,14 @@ DOOM: The Dark Ages от студии id Software — это зрелищное 
 -- Облик исполнителя Гоуста 'Зомби'*
 
 АДАПТИРУЙТЕСЬ ИЛИ УМРИТЕ В БОРЬБЕ С МОЩНОЙ УГРОЗОЙ
-
 В прямом продолжении игры Call of Duty®: Modern Warfare® II капитан Прайс и ОТГ-141 противостоят величайшей угрозе. Ультранационалистический военный преступник Владимир Макаров распространяет свою власть по всему миру, заставляя ОТГ-141 сражаться, как никогда раньше.
-
 ПРИШЛО ВРЕМЯ СВОДИТЬ СТАРЫЕ СЧЕТЫ И НАЧАТЬ НОВЫЕ
-
-Modern Warfare® III отмечает 20-летие Call of Duty® одной из величайших когда-либо собранных коллекций сетевых карт - как популярных, так и совершенно новых. Все 16 стартовых карт из оригинальной Modern Warfare® 2 (2009 г.) были модернизированы новыми режимами и геймплейными функциями, и будут доступны при запуске, а более 12 совершенно новых основных карт 6х6 появятся в течение различных сезонов после выхода игры.",
+Modern Warfare® III отмечает 20-летие Call of Duty® одной из величайших когда-либо собранных коллекций сетевых карт - как популярных, так и совершенно новых.",
                         ReleaseDate = new DateTime(2023, 11, 10),
                         Developer = "Sledgehammer Games",
                         Publisher = "Activision",
                         Price = 3221,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/ba8f25ff-2c66-4b76-8719-a9af5db7afbc_call_of_duty_modern_warfare_iii.png",
                         Categories = new List<Category> { catShooter!, catAction!}
                     },
                     new Game
@@ -286,11 +286,11 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
 
 Развивайтесь, выполняя служебные задания, которые предоставляют опыт, а затем настройте своего солдата с помощью специализаций, чтобы он соответствовал вашему стилю игры. Опробуйте такие полюбившиеся поклонникам режимы игры, как «Захват» и «Линия фронта», отправьтесь добровольцем на многоэтапные сражения в «Операциях» или объединитесь с друзьями, вступив в один взвод.
 ",
-                        ReleaseDate = new DateTime(2023, 11, 10),
+                        ReleaseDate = new DateTime(2016, 11, 10),
                         Developer = "DICE",
                         Publisher = "Electronic Arts",
                         Price = 2899,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/a5cae8fd-c1b1-46fe-8ffd-27d4f3c5d37f_battlefield_1.jpg",
                         Categories = new List<Category> { catShooter!, catAction!}
                     },
                     new Game
@@ -310,7 +310,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Teyon",
                         Publisher = "Nacon",
                         Price = 149,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/cecfe367-f9ff-4865-927e-7320f7bd2d57_robocop_rogue_city.png",
                         Categories = new List<Category> { catShooter!, catAction!, catAdventure!, catRPG!}
                     },
                     new Game
@@ -324,7 +324,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Reissad Studio",
                         Publisher = "Reissad Studio",
                         Price = 1119,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/a098beb9-e729-46b8-99e9-993b235ce230_bodycam.jpg",
                         Categories = new List<Category> { catShooter!, catAction!}
                     },
 
@@ -335,14 +335,12 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Title = "Red Dead Redemption 2",
                         Description = @"Америка, 1899 год.
 
-Артур Морган и другие подручные Датча ван дер Линде вынуждены пуститься в бега. Их банде предстоит участвовать в кражах, грабежах и перестрелках в самом сердце Америки. За ними по пятам идут федеральные агенты и лучшие в стране охотники за головами, а саму банду разрывают внутренние противоречия. Артуру предстоит выбрать, что для него важнее: его собственные идеалы или же верность людям, которые его взрастили.
-
-В комплекте новый контент для сюжетного режима, полноценный фоторежим и доступ к совместной игре в мире Red Dead Online, позволяющие игрокам найти свое место на Диком Западе. Вы можете выслеживать опасных преступников в роли охотника за головами, развивать собственное дело в роли торговца, разыскивать уникальные сокровища в роли коллекционера и открыть подпольное производство алкоголя в роли самогонщика, а также многое другое.",
+Артур Морган и другие подручные Датча ван дер Линде вынуждены пуститься в бега. Их банде предстоит участвовать в кражах, грабежах и перестрелках в самом сердце Америки. За ними по пятам идут федеральные агенты и лучшие в стране охотники за головами, а саму банду разрывают внутренние противоречия. Артуру предстоит выбрать, что для него важнее: его собственные идеалы или же верность людям, которые его взрастили. В комплекте новый контент для сюжетного режима, полноценный фоторежим и доступ к совместной игре в мире Red Dead Online, позволяющие игрокам найти свое место на Диком Западе.",
                         ReleaseDate = new DateTime(2018, 10, 26),
                         Developer = "Rockstar Games",
                         Publisher = "Rockstar Games",
                         Price = 1499,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/e36164f4-96ad-4435-ac09-676cdbf01ddb_red_dead_redemption_2.jpg",
                         Categories = new List<Category> { catShooter!, catAction!, catAdventure!, catRPG!}
                     },
                     new Game
@@ -353,14 +351,12 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
 СОЗДАЙТЕ СВОЙ МИР КИБЕРПАНКА
 Станьте оснащённым имплантами преступником и сделайте себе имя на улицах Найт-Сити.
 ПОСЕЛИТЕСЬ В ГОРОДЕ БУДУЩЕГО
-В Найт-Сити всегда есть чем заняться, куда сходить и с кем поговорить. Место, время и способ передвижения выбираете только вы.
-СТАНЬТЕ ЛЕГЕНДОЙ
-Проворачивайте смелые аферы и заводите дружбу с харизматичными персонажами, на жизнь которых влияют ваши решения.",
+В Найт-Сити всегда есть чем заняться, куда сходить и с кем поговорить. Место, время и способ передвижения выбираете только вы.",
                         ReleaseDate = new DateTime(2020, 12, 10),
                         Developer = "CD Projekt Red",
                         Publisher = "CD Projekt Red",
                         Price = 2999,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/da9608bb-0c71-47f1-9cb8-0bcee81a7ae1_cyberpunk_2077.jpg",
                         Categories = new List<Category> { catShooter!, catAction!, catAdventure!, catRPG!}
                     },
                     new Game
@@ -372,7 +368,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "CD Projekt Red",
                         Publisher = "CD Projekt Red",
                         Price = 2799,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/37464508-77e6-4893-b9f8-63f2fa731336_the_witcher_3_wild_hunt.png",
                         Categories = new List<Category> { catAction!, catAdventure!, catRPG!}
                     },
                     new Game
@@ -384,7 +380,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Obsidian Entertainment",
                         Publisher = "Bethesda Softworks",
                         Price = 59,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/f937f1ad-ad1f-4bbb-91fb-2590e8d58ac4_fallout_new_vegas.png",
                         Categories = new List<Category> { catShooter!, catAction!, catAdventure!, catRPG!}
                     },
                     new Game
@@ -403,7 +399,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Santa Monica Studio",
                         Publisher = "Sony Interactive",
                         Price = 3499,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/1f13d589-9dad-40ac-9ca0-d4699a0ff89b_god_of_war.jpg",
                         Categories = new List<Category> { catAction!, catAdventure!, catRPG!}
                     },
 
@@ -417,7 +413,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Bethesda Game Studios",
                         Publisher = "Bethesda Softworks",
                         Price = 749,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/5c057659-3ace-4e78-896a-63066dd6b3dd_the_elder_scrolls_v_skyrim.jpg",
                         Categories = new List<Category> { catRPG!, catAction!, catAdventure!}
                     },
                     new Game
@@ -429,7 +425,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Warhorse Studios",
                         Publisher = "Warhorse Studios",
                         Price = 399,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/47259a2d-6d99-48f6-9f57-8ffab79a3282_kingdom_come_deliverance.jpg",
                         Categories = new List<Category> { catRPG!, catAction!, catAdventure!}
                     },
                     new Game
@@ -441,7 +437,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Larian Studios",
                         Publisher = "Larian Studios",
                         Price = 2119,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/851d0583-d738-4f1a-a560-5319763f9f70_baldurs_gate_3.jpg",
                         Categories = new List<Category> { catRPG!, catAction!, catAdventure!}
                     },
                     new Game
@@ -451,13 +447,12 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Description = @"В Portal 2 вы откроете для себя инновационный геймплей, сюжет и музыку, которая помогла оригиналу заработать более 70 наград в игровой индустрии и стать культовым.
 
 Одиночный режим Portal 2 представит вам нескольких новых персонажей, разнообразные неожиданные головоломки и ещё больше тестовых комнат. Игроки смогут познакомиться с неизвестными им частями лаборатории Aperture Science и снова встретятся с ГЛаДОС — порою кровожадной компьютерной компаньоншей, которая сопровождала главную героиню на протяжении первой части игры.
-
-Играя в кооперативном режиме, игроки откроют для себя абсолютно новую, независимую от оригинальной сюжетную линию с уникальными тестовыми комнатами и двумя персонажами. Здесь каждому из вас придётся проявить всё то, что вы знаете о порталах. Чтобы добиться успеха, вы будете обязаны не просто играть вместе, но и думать сообща.",
+Играя в кооперативном режиме, игроки откроют для себя абсолютно новую, независимую от оригинальной сюжетную линию с уникальными тестовыми комнатами и двумя персонажами. Здесь каждому из вас придётся проявить всё то, что вы знаете о порталах.",
                         ReleaseDate = new DateTime(2011, 04, 18),
                         Developer = "Valve",
                         Publisher = "Valve",
                         Price = 699,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/8ed442e7-183f-430e-b3ad-7c0898847bdc_portal_2.jpg",
                         Categories = new List<Category> { catRPG!, catAdventure!}
                     },
                     new Game
@@ -469,7 +464,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Naughty Dog",
                         Publisher = "Sony Interactive",
                         Price = 4899,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/a1bb9975-b952-4c38-8462-c0aaa60f8bcf_the_last_of_us_part_ii.png",
                         Categories = new List<Category> { catRPG!, catAdventure!}
                     },
 
@@ -483,7 +478,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Atlus",
                         Publisher = "SEGA",
                         Price = 1299,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/d6fbcbd6-5ba0-443c-a914-82d0196e2d23_persona_5.jpg",
                         Categories = new List<Category> { catAnime!, catRPG! }
                     },
                     new Game
@@ -498,7 +493,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Neople",
                         Publisher = "NEXON",
                         Price = 2349,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/13c76021-212f-47b0-86a2-def0442b7e1f_the_first_berserker_khazan.jpg",
                         Categories = new List<Category> { catAnime!, catRPG!, catAction! }
                     },
                     new Game
@@ -510,7 +505,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "CyberConnect2",
                         Publisher = "Bandai Namco Entertainment",
                         Price = 399,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/f7197bac-a905-40ad-8790-c65bf8c5250b_naruto_ultimate_ninja_storm.jpg",
                         Categories = new List<Category> { catAnime!, catRPG!, catAction! }
                     },
                     new Game
@@ -530,7 +525,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Bandai Namco Studios",
                         Publisher = "Bandai Namco Entertainment",
                         Price = 269,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/f2d2fcee-f529-438d-a5b4-791e2c762e5a_code_vein.jpg",
                         Categories = new List<Category> { catAnime!, catRPG!, catAction! }
                     },
                     new Game
@@ -542,7 +537,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Dimps",
                         Publisher = "Bandai Namco Entertainment",
                         Price = 399,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/51d90120-4512-44c5-ab9f-e6edbced7959_dragon_ball_xenoverse_2.jpg",
                         Categories = new List<Category> { catAnime!, catRPG!, catAction! }
                     },
 
@@ -556,7 +551,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Capcom",
                         Publisher = "Capcom",
                         Price = 649,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/20a3e727-1f1f-4144-961f-bca7f017edf1_devil_may_cry_5.jpg",
                         Categories = new List<Category> { catSlasher!, catAnime!, catRPG!, catAction! }
                     },
                     new Game
@@ -564,15 +559,13 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Id = Guid.NewGuid(),
                         Title = "DmC: Devil May Cry",
                         Description = @"Являясь пересказом истории становления личности Данте, переложенным на современную действительность, DmC Devil May Cry™ сохранил стильную постановку, гибкую систему боя и самоуверенного главного героя, которые были определяющими чертами этой культовой серии игр, а также привнес толику мрачности и жестокости.
-
-
 Данте в DmC — юноша, не признающий чужой авторитет, да и всё общество в целом. Данте знает: он не человек, но и не из той нечисти, которая терзала его на протяжении всей жизни. Зажатый меж миров, он чувствует себя изгоем.
-Благодаря своему брату-близнецу Вергилию, лидеру оппозиционной группы «Орден», Данте познает, что означает быть отпрыском беса и ангела. Это раздвоение личности существенно влияет на игровую механику, давая Данте возможность пользоваться способностями обеих сторон в любой момент, на лету перевоплощая клинок Мятежник, меняющий как бой, так и передвижение.",
+Благодаря своему брату-близнецу Вергилию, лидеру оппозиционной группы «Орден», Данте познает, что означает быть отпрыском беса и ангела. Это раздвоение личности существенно влияет на игровую механику, давая Данте возможность пользоваться способностями обеих сторон в любой момент.",
                         ReleaseDate = new DateTime(2013, 01, 14),
                         Developer = "Capcom",
                         Publisher = "Capcom",
                         Price = 299,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/f1f074be-3dc8-4e63-b46c-599316248ca6_dmc_devil_may_cry.png",
                         Categories = new List<Category> { catSlasher!, catAnime!, catRPG!, catAction! }
                     },
                     new Game
@@ -582,31 +575,24 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Description = @"Разработанная Kojima Productions и PlatinumGames, METAL GEAR RISING: REVENGEANCE выводит знаменитую серию METAL GEAR на новый уровень, предлагая совершенно новый игровой опыт в жанре экшена. Игра безупречно сочетает в себе динамичные сражения и масштабное повествование, в центре которого — Райден, бывший ребенок-солдат, превращенный в кибер-ниндзю. Вооруженный высокочастотным катана, он рассекает всё на своём мстящем пути!
 
 Оглушительно успешная на Xbox 360® и PlayStation®3, METAL GEAR RISING: REVENGEANCE выходит на PC с фирменным боевым стилем и графикой, реализованной в красивом HD-качестве.
-
-Эта новая PC-версия включает в себя все три дополнительных миссии: Blade Wolf, Jetstream и VR Missions, а также все костюмы и улучшения для Райдена: Белые Доспехи, Доспехи Инферно, Коммандос Доспехи, тело Райдена из MGS4 и культовый костюм Кибер-Ниндзи.
-
-В Главное меню добавлена опция «СЦЕНКИ». Просматривайте все внутриигровые ролики.
-",
+Эта новая PC-версия включает в себя все три дополнительных миссии: Blade Wolf, Jetstream и VR Missions, а также все костюмы и улучшения для Райдена: Белые Доспехи, Доспехи Инферно, Коммандос Доспехи, тело Райдена из MGS4 и культовый костюм Кибер-Ниндзи.",
                         ReleaseDate = new DateTime(2014, 01, 09),
                         Developer = "Platinum Games",
                         Publisher = "KONAMI",
                         Price = 699,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/b2b888dc-e2ea-4ae0-815a-df995c4e90ac_metal_gear_rising.jpg",
                         Categories = new List<Category> { catSlasher!, catRPG!, catAction! }
                     },
                     new Game
                     {
                         Id = Guid.NewGuid(),
                         Title = "Nier: Automata",
-                        Description = @"NieR: Automata – это свежий взгляд на жанр Action/RPG, гармонично сочетающий увлекательный боевик и захватывающе интересный сюжет. Игра является продолжением ставшего культовым хита 2010 г – NIER и разрабатывается поистине звездной командой разработчиков PlatinumGames. В игре NieR: Automata захватчики из другого мира напали внезапно, обрушив всю мощь живых машин на людей. Перед лицом, казалось, несокрушимой угрозы человеческая раса была вынуждена покинуть землю и укрыться на Луне.
-
-Изгнанное человечество создало армию андроидов, призванную дать отпор орде машин, но смогло лишь замедлить ее продвижение. Чтобы исправить ситуацию, прямо в гущу схватки было брошено новоиспеченное поколение солдат-андроидов – подразделение YoRHa. Там, внизу, среди заброшенных развалин бушует пламя войны. Войны, которая вскоре раскроет давно забытую тайну мира.
-",
+                        Description = @"NieR: Automata – это свежий взгляд на жанр Action/RPG, гармонично сочетающий увлекательный боевик и захватывающе интересный сюжет. Игра является продолжением ставшего культовым хита 2010 г – NIER и разрабатывается поистине звездной командой разработчиков PlatinumGames. В игре NieR: Automata захватчики из другого мира напали внезапно, обрушив всю мощь живых машин на людей. Перед лицом, казалось, несокрушимой угрозы человеческая раса была вынуждена покинуть землю и укрыться на Луне.Изгнанное человечество создало армию андроидов, призванную дать отпор орде машин, но смогло лишь замедлить ее продвижение. Чтобы исправить ситуацию, прямо в гущу схватки было брошено новоиспеченное поколение солдат-андроидов – подразделение YoRHa.",
                         ReleaseDate = new DateTime(2017, 04, 17),
                         Developer = "Platinum Games, Virtuos",
                         Publisher = "Square Enix",
                         Price = 829,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/79ea7505-177a-4cfb-a998-4e8ebbd98ff5_nier_automata.png",
                         Categories = new List<Category> { catSlasher!, catAnime!, catRPG!, catAction! }
                     },
                     new Game
@@ -618,7 +604,7 @@ Modern Warfare® III отмечает 20-летие Call of Duty® одной и
                         Developer = "Capcom",
                         Publisher = "Capcom",
                         Price = 113,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/aad0d71a-280a-47e8-a2fc-77b494761f68_devil_may_cry_3.png",
                         Categories = new List<Category> { catSlasher!, catAnime!, catRPG!, catAction! }
                     },
 
@@ -646,7 +632,7 @@ STEINS;GATE 0 продолжает тему путешествий во врем
                         Developer = "5pb. Games, Nitroplus",
                         Publisher = "Spike Chunsoft Co., Ltd",
                         Price = 419,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/2bddc324-4dc6-4be2-9943-1c0c0c8e77f7_steinsgate_0.jpg",
                         Categories = new List<Category> {catNovel!, catAnime!}
                     },
                      new Game
@@ -660,7 +646,7 @@ STEINS;GATE 0 продолжает тему путешествий во врем
                         Developer = "Saikono",
                         Publisher = "Saikono",
                         Price = 329,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/7ba70f85-9ee9-4d6a-8d14-9ca9443d941c_tiny_bunny.jpg",
                         Categories = new List<Category> {catNovel!, catAnime!}
                     },
                      new Game
@@ -674,7 +660,7 @@ STEINS;GATE 0 продолжает тему путешествий во врем
                         Developer = "Team Salvato",
                         Publisher = "Team Salvato",
                         Price = 549,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/a51ef3bc-a1b8-4e1a-aef7-5e8fef77c15b_doki_doki_literature_club.png",
                         Categories = new List<Category> {catNovel!, catAnime!}
                     },
                      new Game
@@ -686,7 +672,7 @@ STEINS;GATE 0 продолжает тему путешествий во врем
                         Developer = "Soviet Games",
                         Publisher = "Soviet Games",
                         Price = 20,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/42921b03-f09a-4568-86e1-bd8f2dbd4835_everlasting_summer.jpg",
                         Categories = new List<Category> {catNovel!, catAnime!}
                     },
                      new Game
@@ -700,7 +686,7 @@ STEINS;GATE 0 продолжает тему путешествий во врем
                         Developer = "Soviet Games",
                         Publisher = "Soviet Games",
                         Price = 349,
-                        ImageUrl =  null,
+                        ImageUrl =  "/images/game-images/0f6b251f-9837-4550-aa0e-66324674e9ad_love_money_rocknroll.jpg",
                         Categories = new List<Category> {catNovel!, catAnime!}
                     },
 
@@ -709,6 +695,58 @@ STEINS;GATE 0 продолжает тему путешествий во врем
                 context.Games.AddRange(games);
                 await context.SaveChangesAsync();
             }
+        }
+        private static async Task SeedUsersAsync(PotratimDbContext context, UserManager<User> userManager)
+        {
+            if (!context.Users.Any())
+            {
+
+                // Создание администратора
+                var adminUser = new User()
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = "admin",
+                    Email = "admin@example.com",
+                    Nickname = "Admin",
+                    CreatedAt = DateTime.UtcNow
+                };
+                var result = await userManager.CreateAsync(adminUser, "admin123");
+                if (result.Succeeded)
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                else
+                    System.Console.WriteLine($"Ошибка создания администратора: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+
+                // Создание модератора
+                var moderatorUser = new User
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = "moder",
+                    Email = "moderator@example.com",
+                    Nickname = "Moder",
+                    CreatedAt = DateTime.UtcNow,
+                };
+                var moderatorResult = await userManager.CreateAsync(moderatorUser, "moder123");
+                if (moderatorResult.Succeeded)
+                    await userManager.AddToRoleAsync(moderatorUser, "Moderator");
+                else
+                    Console.WriteLine($"Ошибка создания модератора: {string.Join(", ", moderatorResult.Errors.Select(e => e.Description))}");
+
+                // Создание пользователя
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = "user",
+                    Email = "user@example.com",
+                    Nickname = "User",
+                    CreatedAt = DateTime.UtcNow,
+                };
+                var userResult = await userManager.CreateAsync(user, "user123");
+                if (userResult.Succeeded)
+                    await userManager.AddToRoleAsync(user, "User");
+                else
+                    Console.WriteLine($"Ошибка создания пользователя: {string.Join(", ", userResult.Errors.Select(e => e.Description))}");
+            }
+
         }
     }
 }
