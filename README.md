@@ -93,7 +93,7 @@ sudo apt install docker-compose
 
 ### Команды
 ``` bash
- git clone git@github.com:vZidv/Potratim.git
+ git clone https://github.com/vZidv/Potratim.git
  cd Potratim
  docker-compose up --build
 ```
