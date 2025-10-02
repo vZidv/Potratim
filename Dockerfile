@@ -25,4 +25,4 @@ COPY --from=build /app/out .
 EXPOSE 8080
 
 # Указываем команду для запуска приложения
-ENTRYPOINT ["dotnet", "Potratim.dll"]
+ENTRYPOINT ["dockerize", "-wait", "tcp://db:5432", "-timeout", "60s", "dotnet", "Potratim.dll"]
