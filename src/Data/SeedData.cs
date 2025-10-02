@@ -18,9 +18,16 @@ namespace Potratim.Data
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRole>>();
 
-                if (!context.Database.CanConnect())
+                if (!await context.Database.CanConnectAsync())
                 {
                     await context.Database.EnsureCreatedAsync();
+                }
+
+                await context.Database.MigrateAsync();
+                
+                if (!await context.Categories.AnyAsync())
+                {
+
                     /////////////////////////////////////
                     //Roles
                     await SeedUserRolesAsync(context, roleManager);

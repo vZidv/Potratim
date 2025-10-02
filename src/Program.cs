@@ -12,18 +12,33 @@ var configuration = builder.Configuration;
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//Database
 var connectionString = configuration.GetConnectionString(nameof(PotratimDbContext));
-var dbPassword = builder.Configuration["DatabasePassword"];
-var fullConnectionString = new NpgsqlConnectionStringBuilder(connectionString)
+// var dbPassword = builder.Configuration["DatabasePassword"];
+// var fullConnectionString = new NpgsqlConnectionStringBuilder(connectionString)
+// {
+//     Password = dbPassword
+// };
+
+if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
 {
-    Password = dbPassword
-};
+    var dbPassword = builder.Configuration["DatabasePassword"];
+
+    if (!string.IsNullOrEmpty(dbPassword) && !string.IsNullOrEmpty(connectionString))
+    {
+        var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
+        {
+            Password = dbPassword
+        };
+        connectionString = connectionStringBuilder.ToString();
+    }
+}
 
 builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddDbContext<PotratimDbContext>(options =>
 {
-    options.UseNpgsql(fullConnectionString.ToString());
+    options.UseNpgsql(connectionString);
 });
 
 builder.Services.AddIdentity<User, UserRole>(options =>
@@ -43,9 +58,9 @@ builder.Services.AddIdentity<User, UserRole>(options =>
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromDays(5); // Время жизни сессии
-    options.Cookie.HttpOnly = true; 
-    options.Cookie.IsEssential = true; 
-    options.Cookie.SameSite = SameSiteMode.Strict; 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
