@@ -1512,18 +1512,21 @@ body {
   border-radius: 20px;
 }
 
+.categories-filter-1 {
+  display: flex;
+  gap: 40px;
+}
+.categories-filter-2 {
+  display: flex;
+  gap: 12px;
+  justify-content: end;
+  height: 70px;
+}
+
+
 /* Admin/Categories/Create */
 
 .category-add-form {
-  background: #1e1e1e;
-  border-radius: 15px;
-  padding: 20px;
-  color: white;
-}
-
-/* Admin/Categories/Delete */
-
-.category-delete-form {
   background: #1e1e1e;
   border-radius: 15px;
   padding: 20px;

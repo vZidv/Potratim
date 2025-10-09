@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.ViewModel;
+using src.ViewModel;
 
 namespace Potratim.Areas.Admin.Controllers
 {
@@ -23,10 +25,35 @@ namespace Potratim.Areas.Admin.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+        string? searchString,
+        string? sortOrder
+        )
         {
-            var categories = await _context.Categories.Include(c => c.Games).ToListAsync();
-            return View(categories);
+            IQueryable<Category> categories = _context.Categories.Include(c => c.Games);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                categories = categories.Where(c => EF.Functions.ILike(c.Name, $"%{searchString}%"));
+            }
+            switch (sortOrder)
+            {
+                case "name":
+                    categories = categories.OrderBy(c => c.Name);
+                    break;
+                case "games_count":
+                    categories = categories.OrderByDescending(c => c.Games.Count());
+                    break;
+                default:
+                    categories = categories.OrderBy(c => c.Id);
+                    break;
+            }
+            var viewModel = new CategoriesIndexViewModel()
+            {
+                Categories = categories,
+                SearchString = searchString,
+                SortOrder = sortOrder
+            };
+            return View(viewModel);
         }
 
         /////////////////////////////////////////////////////////////////
@@ -57,19 +84,6 @@ namespace Potratim.Areas.Admin.Controllers
             return View(category);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Categories.FindAsync(id);
