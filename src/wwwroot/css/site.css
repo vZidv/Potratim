@@ -1548,6 +1548,14 @@ body {
   color: white;
 }
 
+.pagination-ellipsis{
+  text-align: center;
+  margin: 0 5px;
+  padding: 15px 0;
+  height: 5px;
+  font-size: 1rem;
+}
+
 /* Admin/Games/Delete */
 
 .game-delete-confirmation {

@@ -1,55 +1,286 @@
-@model IEnumerable<Potratim.Models.Game>
+@model src.ViewModel.GamesIndexViewModel
 
 <h1 class="text-white text-center md-6 games-header">Управление играми</h1>
 
-<div class="games-content mt-4">
-    <div >
+<div class="users-container mt-4">
+    <div>
         <a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="btn btn-secondary mb-3">Назад к панели</a>
     </div>
-    <form asp-area="Admin" asp-controller="Games" asp-action="Search">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Поиск по категориям" name="searchString" />
-            <button class="btn btn-outline-secondary" type="submit">Поиск</button>
-        </div>
-    </form>
+    <div class="users-filters">
+        <form asp-action="Index" method="get" id="filterForm">
+            <div class="users-filters-1 mb-2">
+                <div class="users-input-group">
+                    <sub>Поиск игр</sub>
+                    <input type="text" class="form-control users-input-search" value="@Model.SearchTerm"
+                        placeholder="Введите название игры, издателя, разработчика или ID..." name="searchString" />
+                </div>
+                <div class="users-input-group">
+                    <sub>Цена от</sub>
+                    <input type="text" value="@(Model.PriceMin?.ToString())"
+                    class="form-control " placeholder="Введите мин цену" id="minPrice" name="minPrice" />
+                </div>
+                <div class="users-input-group ">
+                    <sub>до</sub>
+                    <input type="text" value="@(Model.PriceMax?.ToString())"
+                    class="form-control " placeholder="Введите макс цену" id="maxPrice" name="maxPrice" />
+                </div>
+            </div>
+            <div class="users-filters-2">
+                <div class="users-input-group-date">
+                    <div class="users-input-group">
+                        <sub>Дата релиза от</sub>
+                        <input type="date" value="@(Model.ReleaseDateFrom?.ToString("yyyy-MM-dd"))"
+                         class="form-control" name="dateFrom" id="dateFrom" />
+                    </div>
+                    <div class="users-input-group">
+                        <sub>до</sub>
+                        <input type="date" value="@(Model.ReleaseDateTo?.ToString("yyyy-MM-dd"))"
+                         class="form-control" name="dateTo" id="dateTo" />
+                    </div>
+                </div>
+                <div class="users-input-group-buttons">
+                    <button type="submit" class="btn-filter btn btn-primary"><i class="fa fa-filter"></i>Применить
+                        фильтры</button>
+                    <a asp-action="Index" class="btn-filter btn btn-secondary"><i class="fa fa-repeat"
+                            aria-hidden="true"></i>Сбросить фильтры</a>
+                </div>
+            </div>
+        </form>
+    </div>
     <div class="text-end md-3">
         <a asp-area="Admin" asp-controller="Games" asp-action="Create" class="btn btn-success mb-3">+ Добавить
             игру</a>
     </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Название</th>
-                <th>Релиз дата</th>
-                <th>Разработчик</th>
-                <th>Издатель</th>
-                <th>Цена</th>
-                <th>Описание</th>
-                <th class="text-center">Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var game in Model)
+    <div class="pagination-container" style="display: flex; justify-content: center;">
+        @if (Model.Games.PageCount > 1)
+        {
+            @if (Model.Games.PageNumber > 2)
             {
-                <tr>
-                    <td>@game.Id</td>
-                    <td>@game.Title</td>
-                    <td>@game.ReleaseDate.ToShortDateString()</td>
-                    <td>@game.Developer</td>
-                    <td>@game.Publisher</td>
-                    <td style="min-width: 100px;">@game.Price.ToString("C")</td>
-                    <td>@game.Description</td>
-                    <td>
-                        <div style="text-align: center;">
-                            <a asp-area="Admin" asp-controller="Games" asp-action="Edit" asp-route-id="@game.Id"
-                                class="btn btn-primary">Редактировать</a>
-                            <a asp-area="Admin" asp-controller="Games" asp-action="Delete" asp-route-id="@game.Id"
-                                class="btn btn-danger">Удалить</a>
-                        </div>
-                    </td>
-                </tr>
+                <a asp-action="Index" asp-route-page="1"
+                    class="pagination-btn text-decoration-none btn">1</a>
+                <div class="pagination-ellipsis">
+                    <p ">...</p>
+                </div>
             }
-        </tbody>
-    </table>
+            @if (Model.Games.HasPreviousPage)
+            {
+                <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber - 1)"
+                    class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber - 1)</a>
+            }
+            <a class="pagination-btn-selected text-decoration-none btn">@(Model.Games.PageNumber)</a>
+            @if (Model.Games.HasNextPage)
+            {
+                <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber + 1)"
+                    class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber + 1)</a>
+            }
+            @if (Model.Games.PageNumber != Model.Games.PageCount &&
+                 Model.Games.PageNumber != Model.Games.PageCount - 1 )
+            {
+                <div class="pagination-ellipsis">
+                    <p ">...</p>
+                </div>
+                <a asp-action="Index" asp-route-page="@(Model.Games.PageCount)"
+                    class="pagination-btn text-decoration-none btn">@(Model.Games.PageCount)</a>
+            }
+
+        }
+    </div>
+    <div class="users-list">
+        <table class="users-list-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Релиз дата</th>
+                    <th>Разработчик</th>
+                    <th>Издатель</th>
+                    <th>Цена</th>
+                    <th>Описание</th>
+                    <th class="text-center">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var game in Model.Games)
+                {
+                    <tr>
+                        <td>@game.Id</td>
+                        <td>@game.Title</td>
+                        <td>@game.ReleaseDate.ToShortDateString()</td>
+                        <td>@game.Developer</td>
+                        <td>@game.Publisher</td>
+                        <td style="min-width: 100px;">@game.Price.ToString("C")</td>
+                        <td>@game.Description</td>
+                        <td class="users-list-table-btn">
+                            <a asp-controller="Games" asp-action="Edit" asp-route-id="@game.Id"
+                                class="table-btn btn btn-sm btn-info"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+
+                            <a asp-controller="Games" asp-action="DeleteConfirmed" asp-route-id="@game.Id"
+                                onclick="return confirm('Вы уверены, что хотите удалить @game.Title?\n\n');"
+                                class="table-btn btn btn-sm btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></a>
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination-container" style="display: flex; justify-content: center; margin-top: 20px;">
+        @if (Model.Games.PageCount > 1)
+        {
+            @if (Model.Games.PageNumber > 2)
+            {
+                <a asp-action="Index" asp-route-page="1"
+                    class="pagination-btn text-decoration-none btn">1</a>
+                <div class="pagination-ellipsis">
+                    <p ">...</p>
+                </div>
+            }
+            @if (Model.Games.HasPreviousPage)
+            {
+                <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber - 1)"
+                    class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber - 1)</a>
+            }
+            <a class="pagination-btn-selected text-decoration-none btn">@(Model.Games.PageNumber)</a>
+            @if (Model.Games.HasNextPage)
+            {
+                <a asp-action="Index" asp-route-page="@(Model.Games.PageNumber + 1)"
+                    class="pagination-btn text-decoration-none btn">@(Model.Games.PageNumber + 1)</a>
+            }
+            @if (Model.Games.PageNumber != Model.Games.PageCount &&
+                 Model.Games.PageNumber != Model.Games.PageCount - 1 )
+            {
+                <div class="pagination-ellipsis">
+                    <p ">...</p>
+                </div>
+                <a asp-action="Index" asp-route-page="@(Model.Games.PageCount)"
+                    class="pagination-btn text-decoration-none btn">@(Model.Games.PageCount)</a>
+            }
+
+        }
+    </div>
 </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("filterForm");
+            const dateFromInput = document.getElementById("dateFrom");
+            const dateToInput = document.getElementById("dateTo");
+
+            function validateDates() {
+                const fromVal = dateFromInput.value;
+                const toVal = dateToInput.value;
+
+                dateFromInput.classList.remove("date-error");
+                dateToInput.classList.remove("date-error");
+
+
+                if ((fromVal && !toVal) || (!fromVal && toVal)) {
+                    if (fromVal) {
+                        dateToInput.classList.add("date-error");
+                    } else {
+                        dateFromInput.classList.add("date-error");
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            if (dateFromInput && dateToInput) {
+                dateFromInput.addEventListener('input', validateDates);
+                dateToInput.addEventListener('input', validateDates);
+
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!validateDates()) {
+                            e.preventDefault();
+                            alert('Пожалуйста, заполните оба поля даты или оставьте их пустыми.');
+                        }
+                    });
+                }
+
+                validateDates();
+            }
+        }); 
+    </script>
+
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("filterForm");
+            const minPrice = document.getElementById("minPrice");
+            const maxPrice = document.getElementById("maxPrice");
+
+            function validatePrices() {
+                const minVal = minPrice.value;
+                const maxVal = maxPrice.value;
+
+                minPrice.classList.remove("date-error");
+                maxPrice.classList.remove("date-error");
+
+                if ((minVal && !maxVal) || (!minVal && maxVal)) {
+                    if (minVal) {
+                        maxPrice.classList.add("date-error");
+                    } else {
+                        minPrice.classList.add("date-error");
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            if (minPrice && maxPrice) {
+                minPrice.addEventListener('input', validatePrices);
+                maxPrice.addEventListener('input', validatePrices);
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!validatePrices()) {
+                            e.preventDefault();
+                            alert('Пожалуйста, заполните оба поля цены или оставьте их пустыми.');
+                        }
+                    });
+                }
+
+                validatePrices();
+            }
+        });
+    </script>
+
+        <script>
+
+                dateFromInput.classList.remove("date-error");
+                dateToInput.classList.remove("date-error");
+
+
+                if ((fromVal && !toVal) || (!fromVal && toVal)) {
+                    if (fromVal) {
+                        dateToInput.classList.add("date-error");
+                    } else {
+                        dateFromInput.classList.add("date-error");
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            if (dateFromInput && dateToInput) {
+                dateFromInput.addEventListener('input', validateDates);
+                dateToInput.addEventListener('input', validateDates);
+
+
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!validateDates()) {
+                            e.preventDefault();
+                            alert('Пожалуйста, заполните оба поля даты или оставьте их пустыми.');
+                        }
+                    });
+                }
+
+                validateDates();
+            }
+        }); 
+    </script>
+}

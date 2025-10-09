@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
 using Potratim.ViewModel;
+using src.ViewModel;
+using X.PagedList.Extensions;
 
 namespace Potratim.Areas.Admin.Controllers
 {
@@ -27,10 +29,47 @@ namespace Potratim.Areas.Admin.Controllers
             _environment = environment;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(
+            int? page,
+            string? searchString,
+            int? minPrice,
+            int? maxPrice,
+            DateTime? dateFrom,
+            DateTime? dateTo
+            )
         {
-            var games = _context.Games.ToList();
-            return View(games);
+
+            int pageSize = 10;
+            int pageNumber = page ?? 1;
+
+            IQueryable<Game> query = _context.Games;
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                query = query.Where(g => g.Title.Contains(searchString));
+            }
+            if(dateFrom.HasValue && dateTo.HasValue)
+            {
+                query = query.Where(g => g.ReleaseDate >= dateFrom.Value && g.ReleaseDate <= dateTo.Value);
+            }
+            if(minPrice.HasValue && maxPrice.HasValue)
+            {
+                query = query.Where(g => g.Price >= minPrice.Value && g.Price <= maxPrice.Value);
+            }
+
+            var games = query.ToPagedList(pageNumber, pageSize);
+
+            var viewModel = new GamesIndexViewModel()
+            {
+                Games = games,
+                SearchTerm = searchString,
+                PriceMin = minPrice,
+                PriceMax = maxPrice,
+                ReleaseDateFrom = dateFrom,
+                ReleaseDateTo = dateTo
+            };
+
+            return View(viewModel);
         }
         /////////////////////////////////////////////////////////
 
@@ -74,20 +113,14 @@ namespace Potratim.Areas.Admin.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Delete(Guid Id)
+        public async Task<IActionResult> DeleteConfirmed(Guid Id)
         {
             var game = await _context.Games.FindAsync(Id);
             if (game == null)
             {
                 return NotFound();
             }
-            return View(game);
-        }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Game game)
-        {
             if (!String.IsNullOrWhiteSpace(game.ImageUrl))
             {
                 var imagePath = Path.Combine(_environment.WebRootPath, game.ImageUrl);
