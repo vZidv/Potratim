@@ -5,6 +5,7 @@ using Potratim.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Xml.Serialization;
 using Potratim.Services;
+using src.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -35,6 +36,7 @@ if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Passwo
 }
 
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IGameService, GameService>();
 
 builder.Services.AddDbContext<PotratimDbContext>(options =>
 {

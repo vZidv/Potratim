@@ -5,18 +5,21 @@ using Microsoft.EntityFrameworkCore;
 using Potratim.Data;
 using Potratim.Models;
 using Potratim.ViewModel;
+using src.Services;
 
 namespace Potratim.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
     private readonly PotratimDbContext _context;
+    private readonly IGameService _gameService;
 
-    public HomeController(ILogger<HomeController> logger, PotratimDbContext context)
+    public HomeController(
+        PotratimDbContext context,
+        IGameService gameService)
     {
-        _logger = logger;
         _context = context;
+        _gameService = gameService;
     }
 
     public async Task<IActionResult> Index()
@@ -26,7 +29,7 @@ public class HomeController : Controller
         viewModel.NewGames = GetNewGamesList(8);
         viewModel.CategoriesGames = await GetGamesCategoriesList(2);
         viewModel.Categories = await GetCategoriesList(10);
-        viewModel.SomeGames = await GetSomeGamesList(15);
+        viewModel.SomeGames = await _gameService.GetSomeGamesAsync(15);
 
         return View(viewModel);
     }
@@ -111,18 +114,6 @@ public class HomeController : Controller
             categories.RemoveAt(index);
         }
         return result;
-    }
-
-    public async Task<List<GameViewModel>> GetSomeGamesList(int count)
-    {
-        return await _context.Games.Select(g => new GameViewModel
-        {
-            Id = g.Id,
-            Title = g.Title,
-            ReleaseDate = g.ReleaseDate,
-            Price = g.Price,
-            ImageUrl = g.ImageUrl
-        }).Take(count).ToListAsync();
     }
 }
 

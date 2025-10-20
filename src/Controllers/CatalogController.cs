@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
+using Potratim.Models;
 using Potratim.ViewModel;
+using src.Services;
 using X.PagedList;
 using X.PagedList.Extensions;
 using X.PagedList.Mvc.Core;
@@ -17,9 +19,13 @@ namespace Potratim.Controllers
     public class CatalogController : Controller
     {
         private readonly PotratimDbContext _context;
-        public CatalogController(PotratimDbContext context)
+        private readonly IGameService _gameService;
+        public CatalogController(
+            PotratimDbContext context,
+            IGameService gameService)
         {
             _context = context;
+            _gameService = gameService;
         }
 
         public async Task<IActionResult> Index
@@ -36,16 +42,7 @@ namespace Potratim.Controllers
             int pageNumber = page ?? 1;
 
             var queryAllGames = _context.Games
-            .Select(g => new GameViewModel()
-            {
-                Id = g.Id,
-                Title = g.Title,
-                ReleaseDate = g.ReleaseDate,
-                Price = g.Price,
-                ImageUrl = g.ImageUrl,
-                Categories = g.Categories
-
-            });
+            .Select(g => _gameService.GameToGameViewModel(g));
 
             if (!string.IsNullOrWhiteSpace(searchString))
             {
@@ -81,11 +78,6 @@ namespace Potratim.Controllers
                         queryAllGames = queryAllGames.OrderBy(g => g.Price);
                     }
                     break;
-                // case "rating":
-                //     {
-                //         queryAllGames = queryAllGames.OrderByDescending(g => g.ReleaseDate);
-                //     }
-                //     break;
 
             }
 

@@ -12,6 +12,7 @@ using Potratim.Data;
 using Potratim.Models;
 using Potratim.Services;
 using Potratim.ViewModel;
+using src.Services;
 
 namespace Potratim.Controllers
 {
@@ -21,12 +22,18 @@ namespace Potratim.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ICartService _cartService;
         private readonly PotratimDbContext _context;
+        private readonly IGameService _gameService;
 
-        public OrderController(UserManager<User> userManager, ICartService cartService, PotratimDbContext context)
+        public OrderController(
+            UserManager<User> userManager,
+            ICartService cartService,
+            PotratimDbContext context,
+            IGameService gameService)
         {
             _userManager = userManager;
             _cartService = cartService;
             _context = context;
+            _gameService = gameService;
         }
 
         public async Task<IActionResult> Index()
@@ -64,7 +71,7 @@ namespace Potratim.Controllers
             {
                 Email = userEmail,
                 Cart = cartViewModel,
-                SameGames = await GetSomeGamesAsync(10)
+                SameGames = await _gameService.GetSomeGamesAsync(10)
             };
             return View(model);
         }
@@ -108,21 +115,6 @@ namespace Potratim.Controllers
 
             ViewBag.TotalCost = model.TotalCost;
             return View();
-        }
-
-        public async Task<List<GameViewModel>> GetSomeGamesAsync(int count)
-        {
-            var someGames = await _context.Games.Take(count).ToListAsync();
-
-            return someGames.Select(g => new GameViewModel()
-            {
-                Id = g.Id,
-                Title = g.Title,
-                ReleaseDate = g.ReleaseDate,
-                Price = g.Price,
-                ImageUrl = g.ImageUrl,
-                Categories = g.Categories.ToList()
-            }).ToList();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

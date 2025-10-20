@@ -12,6 +12,7 @@ using Potratim.Data;
 using Potratim.Models;
 using Potratim.Services;
 using Potratim.ViewModel;
+using src.Services;
 
 namespace Potratim.Controllers
 {
@@ -21,12 +22,18 @@ namespace Potratim.Controllers
         private readonly PotratimDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly ICartService _cartService;
+        private readonly IGameService _gameService;
 
-        public GameController(PotratimDbContext context, UserManager<User> userManager, ICartService cartService)
+        public GameController(
+            PotratimDbContext context,
+            UserManager<User> userManager,
+            ICartService cartService,
+            IGameService gameService)
         {
             _context = context;
             _userManager = userManager;
             _cartService = cartService;
+            _gameService = gameService;
         }
 
         public async Task<IActionResult> Index(string id)
@@ -76,7 +83,7 @@ namespace Potratim.Controllers
             {
                 Game = game,
                 Categories = game.Categories.ToList(),
-                SameGames = await GetSameGames(game.Id.ToString(), 12),
+                SameGames = await _gameService.GetSimilarGamesAsync(game.Id.ToString(),12),
                 Reviews = reviews,
                 CreateReviewModel = new CreateReviewViewModel(),
                 CurrentUser = currentUser
@@ -113,27 +120,6 @@ namespace Potratim.Controllers
 
             TempData["SuccessMessage"] = "Ваш отзыв был успешно добавлен.";
             return RedirectToAction("Index", new { id = model.GameId });
-        }
-
-        public async Task<List<GameViewModel>> GetSameGames(string id, int count)
-        {
-            var game = await _context.Games.Include(g => g.Categories).FirstOrDefaultAsync(g => g.Id.ToString() == id);
-            var sameGames = await _context.Categories.Include(c => c.Games)
-                .Where(c => game.Categories.Select(gc => gc.Name).Contains(c.Name))
-                .SelectMany(c => c.Games)
-                .Where(g => g.Id != game.Id)
-                .Take(count)
-                .ToHashSetAsync();
-
-            return sameGames.Select(g => new GameViewModel()
-            {
-                Id = g.Id,
-                Title = g.Title,
-                ReleaseDate = g.ReleaseDate,
-                Price = g.Price,
-                ImageUrl = g.ImageUrl,
-                Categories = g.Categories.ToList()
-            }).ToList();
         }
         public async Task<IActionResult> BuyNow(string id)
         {
