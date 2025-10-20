@@ -23,13 +23,16 @@ namespace Potratim.Areas.Admin.Controllers
     {
         private readonly PotratimDbContext _context;
         private readonly IGameService _gameService;
+        private readonly ICategoryService _categoryService;
 
         public GamesController(
         PotratimDbContext context,
-        IGameService gameService)
+        IGameService gameService,
+        ICategoryService categoryService)
         {
             _context = context;
             _gameService = gameService;
+            _categoryService = categoryService;
         }
 
         public IActionResult Index(
@@ -80,7 +83,7 @@ namespace Potratim.Areas.Admin.Controllers
         {
             var model = new CreateGameViewModel();
 
-            model.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+            model.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(model);
         }
 
@@ -129,7 +132,7 @@ namespace Potratim.Areas.Admin.Controllers
 
             };
 
-            editGame.AllCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+            editGame.AllCategories = await _categoryService.GetAllCategoriesAsync();
             editGame.CurrentCategoryIds = game.Categories.Select(c => c.Id).ToList();
             return View(editGame);
         }

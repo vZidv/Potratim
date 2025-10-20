@@ -14,9 +14,7 @@ namespace Potratim.Areas.Admin.Controllers
     public class PanelController : Controller
     {
 
-        public PanelController()
-        {
-        }
+        public PanelController(){}
         public IActionResult Index()
         {
             return View();

@@ -38,7 +38,7 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> Index(string id)
         {
-            var game = await _context.Games.Include(g => g.Categories).Include(g => g.Transactions).Include(g => g.Reviews).ThenInclude(r => r.User).Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
+            var game = await _gameService.GetGameAsync(id);
             User? user = await _userManager.GetUserAsync(User);
             string? userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
 

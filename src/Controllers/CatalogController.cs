@@ -20,12 +20,15 @@ namespace Potratim.Controllers
     {
         private readonly PotratimDbContext _context;
         private readonly IGameService _gameService;
+        private readonly ICategoryService _categoryService;
         public CatalogController(
             PotratimDbContext context,
-            IGameService gameService)
+            IGameService gameService,
+            ICategoryService categoryService)
         {
             _context = context;
             _gameService = gameService;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index
@@ -36,7 +39,7 @@ namespace Potratim.Controllers
         int? maxPrice,
         string? sortOrder)
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _categoryService.GetAllCategoriesAsync();
 
             int pageSize = 16;
             int pageNumber = page ?? 1;

@@ -15,11 +15,6 @@ builder.Services.AddControllersWithViews();
 
 //Database
 var connectionString = configuration.GetConnectionString(nameof(PotratimDbContext));
-// var dbPassword = builder.Configuration["DatabasePassword"];
-// var fullConnectionString = new NpgsqlConnectionStringBuilder(connectionString)
-// {
-//     Password = dbPassword
-// };
 
 if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
 {
@@ -37,6 +32,7 @@ if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Passwo
 
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddDbContext<PotratimDbContext>(options =>
 {

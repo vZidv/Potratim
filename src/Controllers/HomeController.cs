@@ -13,13 +13,16 @@ public class HomeController : Controller
 {
     private readonly PotratimDbContext _context;
     private readonly IGameService _gameService;
+    private readonly ICategoryService _categoryService;
 
     public HomeController(
         PotratimDbContext context,
-        IGameService gameService)
+        IGameService gameService,
+        ICategoryService categoryService)
     {
         _context = context;
         _gameService = gameService;
+        _categoryService = categoryService;
     }
 
     public async Task<IActionResult> Index()
@@ -28,7 +31,7 @@ public class HomeController : Controller
 
         viewModel.NewGames = GetNewGamesList(8);
         viewModel.CategoriesGames = await GetGamesCategoriesList(2);
-        viewModel.Categories = await GetCategoriesList(10);
+        viewModel.Categories = await _categoryService.GetSomeRandCategoriesAsync(10);
         viewModel.SomeGames = await _gameService.GetSomeGamesAsync(15);
 
         return View(viewModel);
@@ -73,7 +76,7 @@ public class HomeController : Controller
     public async Task<List<List<GameViewModel>>> GetGamesCategoriesList(int count)
     {
         var result = new List<List<GameViewModel>>();
-        var categories = await _context.Categories.Include(c => c.Games).ToListAsync();
+        var categories = await _categoryService.GetAllCategoriesAsync();
 
         HashSet<int> selectedIndexes = new();
         Random random = new();
@@ -97,21 +100,6 @@ public class HomeController : Controller
                     i++;
                 }
             }
-        }
-        return result;
-    }
-
-    public async Task<List<Category>> GetCategoriesList(int count)
-    {
-        var result = new List<Category>();
-        Random random = new();
-
-        var categories = await _context.Categories.ToListAsync();
-        for (int i = 0; i < count && i < categories.Count; i++)
-        {
-            int index = random.Next(0, categories.Count);
-            result.Add(categories[index]);
-            categories.RemoveAt(index);
         }
         return result;
     }

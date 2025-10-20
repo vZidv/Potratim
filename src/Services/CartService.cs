@@ -10,6 +10,7 @@ using Potratim.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using src.Services;
 
 namespace Potratim.Services
 {
@@ -17,11 +18,16 @@ namespace Potratim.Services
     {
         private readonly PotratimDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IGameService _gameService;
 
-        public CartService(PotratimDbContext context, UserManager<User> userManager)
+        public CartService(
+            PotratimDbContext context,
+            UserManager<User> userManager,
+            IGameService gameService)
         {
             _context = context;
             _userManager = userManager;
+            _gameService = gameService;
         }
 
 
@@ -33,7 +39,7 @@ namespace Potratim.Services
             var cartGame = cart.Games.FirstOrDefault(g => g.Id == gameId);
             if (cartGame == null)
             {
-                var game = await _context.Games.FindAsync(gameId);
+                var game = await _gameService.GetGameAsync(gameId);
                 cart.Games.Add(game);
                 await _context.SaveChangesAsync();
             }
@@ -192,7 +198,7 @@ namespace Potratim.Services
                 }
                 else
                 {
-                    var gameExists = await _context.Games.FindAsync(gameId);
+                    var gameExists = await _gameService.GetGameAsync(gameId);
                     if (gameExists != null)
                     {
                         dbCart.Games.Add(gameExists);
