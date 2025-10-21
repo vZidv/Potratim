@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.MyExceptions;
 
 namespace src.Services
 {
@@ -24,22 +25,28 @@ namespace src.Services
         public async Task<Category> GetCategoryAsync(int id)
         {
             if (id == null || id <= 0)
-                throw new ArgumentNullException();
+                throw new ValidationException("Id cannot be null and <= 0")
+                {
+                    PropertyName = nameof(id),
+                    AttemptedValue = id
+                };
 
-            return await _context.Categories
+            var category = await _context.Categories
             .Include(c => c.Games)
             .Where(c => c.Id == id)
             .FirstOrDefaultAsync();
+
+            if (category == null)
+                throw new CategoryNotFoundException($"Category with ID {id} not found")
+                {
+                    CategoryId = id
+                };
+
+            return category;
         }
         public async Task<bool> DeleteCategoryAsync(int id)
         {
-            if (id == null || id <= 0)
-                throw new ArgumentNullException();
-
             Category category = await GetCategoryAsync(id);
-            if (category == null)
-                return false;
-
             _context.Categories.Remove(category);
             _context.SaveChanges();
             return true;
@@ -63,7 +70,11 @@ namespace src.Services
         public async Task<Category> UpdateCategoryAsync(Category category)
         {
             if (category == null || string.IsNullOrWhiteSpace(category.Name))
-                throw new ArgumentNullException();
+                throw new ValidationException("Category cannot be null or category's name empty")
+                {
+                    PropertyName = nameof(category),
+                    AttemptedValue = category
+                };
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
@@ -74,7 +85,11 @@ namespace src.Services
         public async Task<Category> CreateCategoryAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullException();
+                throw new ValidationException("Name cannot be null and white space")
+                {
+                    PropertyName = nameof(name),
+                    AttemptedValue = name
+                };
 
             Category newCategory = new() { Name = name };
             await _context.Categories.AddAsync(newCategory);

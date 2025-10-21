@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using src.Services;
+using Potratim.MyExceptions;
 
 namespace Potratim.Services
 {
@@ -76,6 +77,15 @@ namespace Potratim.Services
 
         private async Task<Cart> GetOrCreateDbCartAsync(Guid userId)
         {
+            if (userId == Guid.Empty)
+            {
+                throw new ValidationException($"Invalid user ID {userId}")
+                {
+                    PropertyName = nameof(userId),
+                    AttemptedValue = userId
+                };
+            }
+            
             var cart = await _context.Carts.Include(c => c.Games)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 

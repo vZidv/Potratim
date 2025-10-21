@@ -90,7 +90,7 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if(!(await _categoryService.DeleteCategoryAsync(id)))
+            if (!(await _categoryService.DeleteCategoryAsync(id)))
             {
                 return NotFound();
             }
@@ -100,12 +100,16 @@ namespace Potratim.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            try
+            {
+                var category = await _categoryService.GetCategoryAsync(id);
+                return View(category);
+            }
+            catch (Exception ex)
             {
                 return NotFound();
             }
-            return View(category);
+
         }
 
         [HttpPost]

@@ -26,20 +26,29 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> AddToCartAsync(string gameId)
         {
-            if(User.Identity.IsAuthenticated)
+            try
             {
-                var user = await _userManager.GetUserAsync(User);
-                await _cartService.AddToCartAsync(user.Id, Guid.Parse(gameId));
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    await _cartService.AddToCartAsync(user.Id, Guid.Parse(gameId));
+                }
+                else
+                {
+                    await _cartService.AddToCartAsync(HttpContext, Guid.Parse(gameId));
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                await _cartService.AddToCartAsync(HttpContext, Guid.Parse(gameId));
+                return View("Error", ex);
             }
             return RedirectToAction("Index", "Game", new { id = gameId });
+
         }
         public async Task<IActionResult> RemoveFromCartAsync(string gameId)
         {
-            if(User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 var user = await _userManager.GetUserAsync(User);
                 await _cartService.RemoveFromCartAsync(user.Id, Guid.Parse(gameId));
