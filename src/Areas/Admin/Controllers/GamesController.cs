@@ -11,7 +11,9 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.MyExceptions;
 using Potratim.ViewModel;
+using src.MyExceptions;
 using src.Services;
 using src.ViewModel;
 using X.PagedList.Extensions;
@@ -82,8 +84,15 @@ namespace Potratim.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             var model = new CreateGameViewModel();
+            try
+            {
+                model.Categories = await _categoryService.GetAllCategoriesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", "Не удалось загрузить категории");
+            }
 
-            model.Categories = await _categoryService.GetAllCategoriesAsync();
             return View(model);
         }
 
@@ -97,10 +106,15 @@ namespace Potratim.Areas.Admin.Controllers
                 {
                     await _gameService.CreateGameAsync(model);
                 }
+                catch (ValidationException ex)
+                {
+                    return StatusCode(400, ex);
+                }
                 catch (Exception ex)
                 {
-                    System.Console.WriteLine(ex);
+                    return View("Error", ex);
                 }
+
                 return RedirectToAction("Index");
             }
             return View(model);
@@ -108,17 +122,46 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> DeleteConfirmed(Guid Id)
         {
-            await _gameService.DeleteGameAsync(Id);
+            try
+            {
+                await _gameService.DeleteGameAsync(Id);
+            }
+            catch (ValidationException ex)
+            {
+                return StatusCode(400, ex);
+            }
+            catch (GameNotFoundException ex)
+            {
+                return StatusCode(404, ex);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Edit(Guid Id)
         {
-            var game = await _gameService.GetGameAsync(Id);
-            if (game == null)
+            var game = new Game();
+
+            try
             {
-                return NotFound();
+                game = await _gameService.GetGameAsync(Id);
             }
+            catch (ValidationException ex)
+            {
+                return StatusCode(400, ex);
+            }
+            catch (GameNotFoundException ex)
+            {
+                return StatusCode(404, ex);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
+
             EditGameViewModel editGame = new()
             {
                 Id = game.Id,
@@ -142,7 +185,23 @@ namespace Potratim.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _gameService.UpdateGameAsync(model);
+                try
+                {
+                    await _gameService.UpdateGameAsync(model);
+                }
+                catch (ValidationException ex)
+                {
+                    return StatusCode(400, ex);
+                }
+                catch (ImageSaveFailException ex)
+                {
+                    return StatusCode(400, ex);
+                }
+                catch (Exception ex)
+                {
+                    return View("Error", ex);
+                }
+
                 return RedirectToAction("Index");
             }
             return View(model);

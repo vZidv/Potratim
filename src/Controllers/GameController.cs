@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.MyExceptions;
 using Potratim.Services;
 using Potratim.ViewModel;
 using src.Services;
@@ -38,57 +39,72 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> Index(string id)
         {
-            var game = await _gameService.GetGameAsync(id);
-            User? user = await _userManager.GetUserAsync(User);
-            string? userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
-
-            List<ReviewViewModel> reviews = new();
-
-            foreach (var r in game.Reviews)
+            try
             {
-                string role = (await _userManager.GetRolesAsync(r.User)).FirstOrDefault();
-                reviews.Add(new ReviewViewModel
+                var game = await _gameService.GetGameAsync(id);
+                User? user = await _userManager.GetUserAsync(User);
+                string? userRole = user != null ? (await _userManager.GetRolesAsync(user)).FirstOrDefault() : null;
+
+                List<ReviewViewModel> reviews = new();
+
+                foreach (var r in game.Reviews)
                 {
-                    User = new UserViewModel
+                    string role = (await _userManager.GetRolesAsync(r.User)).FirstOrDefault();
+                    reviews.Add(new ReviewViewModel
                     {
-                        Id = r.UserId,
-                        Nickname = r.User.UserName,
-                        AvatarUrl = r.User.ProfileImageUrl,
-                        RoleName = role,
-                        RoleColor = await _context.Roles.Where(r => r.Name == role).Select(r => r.Color).FirstOrDefaultAsync()
-                    },
-                    GameId = r.GameId,
-                    Like = r.Like,
-                    Comment = r.Comment
-                });
-            }
+                        User = new UserViewModel
+                        {
+                            Id = r.UserId,
+                            Nickname = r.User.UserName,
+                            AvatarUrl = r.User.ProfileImageUrl,
+                            RoleName = role,
+                            RoleColor = await _context.Roles.Where(r => r.Name == role).Select(r => r.Color).FirstOrDefaultAsync()
+                        },
+                        GameId = r.GameId,
+                        Like = r.Like,
+                        Comment = r.Comment
+                    });
+                }
 
-            UserViewModel? currentUser = null;
+                UserViewModel? currentUser = null;
 
-            if (user != null)
-            {
-                currentUser = new UserViewModel
+                if (user != null)
                 {
-                    Id = user.Id,
-                    Nickname = user.UserName,
-                    Email = user.Email,
-                    RoleName = userRole,
-                    RoleColor = await _context.Roles.Where(r => r.Name == userRole).Select(r => r.Color).FirstOrDefaultAsync(),
-                    Status = user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow ? "Заблокирован" : "Активен",
-                    AvatarUrl = user.ProfileImageUrl,
-                    RegistrationDate = user.CreatedAt
+                    currentUser = new UserViewModel
+                    {
+                        Id = user.Id,
+                        Nickname = user.UserName,
+                        Email = user.Email,
+                        RoleName = userRole,
+                        RoleColor = await _context.Roles.Where(r => r.Name == userRole).Select(r => r.Color).FirstOrDefaultAsync(),
+                        Status = user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow ? "Заблокирован" : "Активен",
+                        AvatarUrl = user.ProfileImageUrl,
+                        RegistrationDate = user.CreatedAt
+                    };
+                }
+                var viewModel = new GameIndexViewModel()
+                {
+                    Game = game,
+                    Categories = game.Categories.ToList(),
+                    SameGames = await _gameService.GetSimilarGamesAsync(game.Id.ToString(), 12),
+                    Reviews = reviews,
+                    CreateReviewModel = new CreateReviewViewModel(),
+                    CurrentUser = currentUser
                 };
+                return View(viewModel);
             }
-            var viewModel = new GameIndexViewModel()
+            catch (GameNotFoundException ex)
             {
-                Game = game,
-                Categories = game.Categories.ToList(),
-                SameGames = await _gameService.GetSimilarGamesAsync(game.Id.ToString(),12),
-                Reviews = reviews,
-                CreateReviewModel = new CreateReviewViewModel(),
-                CurrentUser = currentUser
-            };
-            return View(viewModel);
+                return NotFound("Такая игра не найдена");
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest("Не верный формат идентификатора игры");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Внутренняя ошибка сервера");
+            }
         }
         [HttpPost]
         [Authorize]

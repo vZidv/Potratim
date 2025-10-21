@@ -7,6 +7,10 @@ using Potratim.Models;
 using Potratim.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using System.ComponentModel.DataAnnotations;
+using Potratim.MyExceptions;
+using ValidationException = Potratim.MyExceptions.ValidationException;
+using src.MyExceptions;
 
 namespace src.Services
 {
@@ -24,23 +28,37 @@ namespace src.Services
         }
         public async Task<Game?> GetGameAsync(Guid id)
         {
-            if (id == null)
-                throw new ArgumentNullException();
-
             string strId = id.ToString();
             return await GetGameAsync(strId);
         }
         public async Task<Game?> GetGameAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
-                throw new ArgumentNullException();
+                throw new ValidationException("Game ID cannot be empty")
+                {
+                    PropertyName = nameof(id),
+                    AttemptedValue = id
+                };
+
+            if (!Guid.TryParse(id, out var guidId))
+                throw new ValidationException($"Invalid game ID format: {id}")
+                {
+                    PropertyName = nameof(id),
+                    AttemptedValue = id
+                };
 
             var game = await _context.Games
             .Include(g => g.Categories)
             .Include(g => g.Transactions)
             .Include(g => g.Reviews)
             .ThenInclude(r => r.User)
-            .Where(g => g.Id.ToString() == id).FirstOrDefaultAsync();
+            .Where(g => g.Id == guidId).FirstOrDefaultAsync();
+
+            if (game == null)
+                throw new GameNotFoundException($"Game with ID {id} not found")
+                {
+                    GameId = guidId
+                };
 
             return game;
         }
@@ -48,7 +66,11 @@ namespace src.Services
         public async Task<Game> CreateGameAsync(CreateGameViewModel model)
         {
             if (model == null)
-                throw new ArgumentNullException();
+                throw new ValidationException("Game model cannot be null")
+                {
+                    PropertyName = nameof(model),
+                    AttemptedValue = model
+                };
 
             var imageUrl = await SaveGameImageAsync(model.ImageFile, FormatFileName(model.Title));
             Game game = new()
@@ -101,6 +123,13 @@ namespace src.Services
 
         private string FormatFileName(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ValidationException("fileName cannot be null or white space")
+                {
+                    PropertyName = nameof(fileName),
+                    AttemptedValue = fileName
+                };
+
             fileName = fileName.Trim().ToLower();
             fileName = fileName.Replace(" ", "_");
             fileName = Regex.Replace(fileName, @"[^a-z0-9_-]", "");
@@ -110,7 +139,11 @@ namespace src.Services
         public async Task<Game> UpdateGameAsync(EditGameViewModel model)
         {
             if (model == null)
-                throw new ArgumentNullException();
+                throw new ValidationException("fileName cannot be null")
+                {
+                    PropertyName = nameof(model),
+                    AttemptedValue = model
+                };
 
             var game = await GetGameAsync(model.Id);
 
@@ -124,6 +157,9 @@ namespace src.Services
             if (model.ImageFile != null)
             {
                 var imageUrl = await SaveGameImageAsync(model.ImageFile, FormatFileName(model.Title));
+                if (imageUrl == null)
+                    throw new ImageSaveFailException();
+
                 game.ImageUrl = imageUrl;
             }
 
@@ -153,10 +189,9 @@ namespace src.Services
 
         public async Task<bool> DeleteGameAsync(Guid id)
         {
-            if (id == null)
-                throw new ArgumentNullException();
 
             var game = await GetGameAsync(id);
+
             if (!String.IsNullOrWhiteSpace(game.ImageUrl))
             {
                 var imagePath = Path.Combine(_environment.WebRootPath, game.ImageUrl);
@@ -196,7 +231,11 @@ namespace src.Services
         public async Task<List<GameViewModel>> GetSomeGamesAsync(int count)
         {
             if (count <= 0 || count > 100)
-                throw new ArgumentException();
+                throw new ValidationException($"Count cant be {count}, it must be > 0 and <= 100")
+                {
+                    PropertyName = nameof(count),
+                    AttemptedValue = count
+                };
 
             var someGames = await _context.Games.Take(count).ToListAsync();
 
@@ -206,7 +245,11 @@ namespace src.Services
         public GameViewModel GameToGameViewModel(Game game)
         {
             if (game == null)
-                throw new ArgumentNullException();
+                throw new ValidationException($"Game cannot be null")
+                {
+                    PropertyName = nameof(game),
+                    AttemptedValue = game
+                };
 
             return new GameViewModel()
             {
