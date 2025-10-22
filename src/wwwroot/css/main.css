@@ -1,0 +1,31 @@
+/* Pages */
+
+@import "pages/_home.css";
+@import "pages/_catalog.css";
+@import "pages/_game.css";
+@import "pages/_order.css";
+@import "pages/_orderFinish.css";
+
+@import "pages/admin/_panel.css";
+@import "pages/admin/_categories.css";
+@import "pages/admin/_games.css";
+@import "pages/admin/_users.css";
+
+@import "pages/account/_login.css";
+@import "pages/account/_profile.css";
+@import "pages/account/_editProfile.css";
+
+/* Components */
+
+@import "components/_globalSearchResult.css";
+@import "components/_cart.css";
+@import "components/_gameCard.css";
+@import "components/_gameCardFull.css";
+@import "components/_swiper.css";
+@import "components/_paginationBtn.css";
+@import "components/_gameReview.css";
+
+/* Layout */
+
+@import "layouts/_header.css";
+@import "layouts/_footer.css";

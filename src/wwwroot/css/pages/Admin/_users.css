@@ -1,0 +1,220 @@
+.users-container {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+.users-stats-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+}
+
+.users-stats-list div {
+  background: linear-gradient(135deg, #1780f9b9, #71b0f7b6);
+  box-shadow: 2px 5px 6px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  text-align: center;
+  color: white;
+  border-radius: 15px;
+  width: 200px;
+}
+
+.users-stats-list h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.users-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.users-filters {
+  background: #252525;
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+
+.users-filters-1,
+.users-filters-2 {
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.users-input-group sub {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.users-input-group-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: center;
+  margin-left: 40px;
+}
+
+.btn-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-filter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.users-input-search {
+  flex: 1;
+  min-width: 600px;
+}
+
+.users-input-group select {
+  flex: 1;
+  min-width: 250px;
+}
+
+.users-input-group-date {
+  display: flex;
+  flex-direction: row;
+  gap: 22px;
+}
+
+.users-input-group-date input[type="date"] {
+  flex: 1;
+  min-width: 250px;
+}
+
+.users-list {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #2c2c2c;
+}
+
+.users-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-list-table th {
+  background: #252525;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #444;
+}
+
+
+.users-list-table th:hover {
+  background: #414141;
+}
+
+.users-list-table td {
+  padding: 12px;
+  border-bottom: 2px solid #444;
+  text-align: center;
+}
+
+.users-list .user-status,
+.users-list .user-role {
+  padding: 2px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 6px 0px;
+  min-width: 90px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.table-btn {
+  font-size: 1.1rem;
+  color: white;
+  width: 35px;
+  height: 35;
+}
+
+.table-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.date-error {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.edit-user-form {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.edit-user-form .header-info {
+  width: 300px;
+  color: #1780f9;
+}
+
+.edit-user-form .header-info h2 {
+  font-size: 1.4rem;
+}
+
+.edit-user-form .header-info hr {
+  border-top: 4px solid #1780f9;
+  margin: 8px 0;
+}
+
+.edit-user-form sub {
+  color: #929292;
+  font-size: 0.8rem;
+}
+
+.user-role-status-info-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.user-edit-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: right;
+  margin-left: 40px;
+}
+
+.user-edit-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-edit-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
