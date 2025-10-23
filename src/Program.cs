@@ -6,6 +6,22 @@ using Microsoft.AspNetCore.Identity;
 using System.Xml.Serialization;
 using Potratim.Services;
 using src.Services;
+using Serilog;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .WriteTo.Console()
+    .WriteTo.File(
+        Path.Combine("logs", "error", "error-.txt"),
+        rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Error)
+    .WriteTo.File(
+        Path.Combine("logs", "info", "info-.txt"),
+        rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Information)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -29,6 +45,8 @@ if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Passwo
         connectionString = connectionStringBuilder.ToString();
     }
 }
+
+builder.Host.UseSerilog();
 
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IGameService, GameService>();

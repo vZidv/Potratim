@@ -18,21 +18,28 @@ namespace src.Services
     {
         private readonly PotratimDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<GameService> _logger;
 
         public GameService(
             PotratimDbContext context,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            ILogger<GameService> logger)
         {
             _context = context;
             _environment = environment;
+            _logger = logger;
         }
         public async Task<Game?> GetGameAsync(Guid id)
         {
+            _logger.LogDebug($"Retrieving game with ID {id}");
+
             string strId = id.ToString();
             return await GetGameAsync(strId);
         }
         public async Task<Game?> GetGameAsync(string id)
         {
+            _logger.LogDebug($"Retrieving game with ID {id}");
+
             if (string.IsNullOrWhiteSpace(id))
                 throw new ValidationException("Game ID cannot be empty")
                 {
@@ -65,6 +72,8 @@ namespace src.Services
 
         public async Task<Game> CreateGameAsync(CreateGameViewModel model)
         {
+            _logger.LogDebug($"Creating game with title {model.Title}");
+
             if (model == null)
                 throw new ValidationException("Game model cannot be null")
                 {
@@ -98,6 +107,8 @@ namespace src.Services
 
         private async Task<string?> SaveGameImageAsync(IFormFile file, string fileName)
         {
+            _logger.LogDebug($"Saving game image for file: {fileName}");
+
             string fileUrl = null;
 
             if (file != null && file.Length > 0)
@@ -123,6 +134,8 @@ namespace src.Services
 
         private string FormatFileName(string fileName)
         {
+            _logger.LogDebug($"Formatting file name: {fileName}");
+
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new ValidationException("fileName cannot be null or white space")
                 {
@@ -138,6 +151,8 @@ namespace src.Services
 
         public async Task<Game> UpdateGameAsync(EditGameViewModel model)
         {
+            _logger.LogDebug($"Updating game with ID {model.Id}");
+
             if (model == null)
                 throw new ValidationException("fileName cannot be null")
                 {
@@ -189,6 +204,7 @@ namespace src.Services
 
         public async Task<bool> DeleteGameAsync(Guid id)
         {
+            _logger.LogDebug($"Deleting game with ID {id}");
 
             var game = await GetGameAsync(id);
 
@@ -210,6 +226,8 @@ namespace src.Services
 
         public async Task<List<GameViewModel>> GetSimilarGamesAsync(string id, int count)
         {
+            _logger.LogDebug($"Retrieving similar games for game ID {id}, count: {count}");
+
             var game = await GetGameAsync(id);
 
             var similarGames = await _context.Categories.Include(c => c.Games)
@@ -230,6 +248,8 @@ namespace src.Services
         /// <exception cref="ArgumentException"></exception>
         public async Task<List<GameViewModel>> GetSomeGamesAsync(int count)
         {
+            _logger.LogDebug($"Retrieving some games, count: {count}");
+
             if (count <= 0 || count > 100)
                 throw new ValidationException($"Count cant be {count}, it must be > 0 and <= 100")
                 {
@@ -244,6 +264,8 @@ namespace src.Services
 
         public GameViewModel GameToGameViewModel(Game game)
         {
+            _logger.LogDebug($"Mapping game to GameViewModel for game ID {game.Id}");
+            
             if (game == null)
                 throw new ValidationException($"Game cannot be null")
                 {

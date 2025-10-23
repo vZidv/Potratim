@@ -17,15 +17,18 @@ namespace Potratim.Controllers
     {
         private readonly ICartService _cartService;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(ICartService cartService, UserManager<User> userManager)
+        public CartController(ICartService cartService, UserManager<User> userManager, ILogger<CartController> logger)
         {
             _cartService = cartService;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<IActionResult> AddToCartAsync(string gameId)
         {
+            _logger.LogInformation($"Initiating add to cart process for game ID: {gameId}");
             try
             {
                 if (User.Identity.IsAuthenticated)
@@ -41,6 +44,7 @@ namespace Potratim.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Error adding game to cart: {gameId}");
                 return View("Error", ex);
             }
             return RedirectToAction("Index", "Game", new { id = gameId });
@@ -48,6 +52,7 @@ namespace Potratim.Controllers
         }
         public async Task<IActionResult> RemoveFromCartAsync(string gameId)
         {
+            _logger.LogInformation($"Initiating remove from cart process for game ID: {gameId}");
             if (User.Identity.IsAuthenticated)
             {
                 var user = await _userManager.GetUserAsync(User);

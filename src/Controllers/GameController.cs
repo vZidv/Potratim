@@ -24,21 +24,26 @@ namespace Potratim.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ICartService _cartService;
         private readonly IGameService _gameService;
+        private readonly ILogger<GameController> _logger;
 
         public GameController(
             PotratimDbContext context,
             UserManager<User> userManager,
             ICartService cartService,
-            IGameService gameService)
+            IGameService gameService,
+            ILogger<GameController> logger)
         {
             _context = context;
             _userManager = userManager;
             _cartService = cartService;
             _gameService = gameService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index(string id)
         {
+            _logger.LogInformation($"Loading game page for game ID: {id}");
+
             try
             {
                 var game = await _gameService.GetGameAsync(id);
@@ -95,14 +100,17 @@ namespace Potratim.Controllers
             }
             catch (GameNotFoundException ex)
             {
+                _logger.LogError(ex, $"Game not found for ID: {id}");
                 return NotFound("Такая игра не найдена");
             }
             catch (ValidationException ex)
             {
+                _logger.LogError(ex, $"Invalid game ID format: {id}");
                 return BadRequest("Не верный формат идентификатора игры");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Error loading game page for ID: {id}");
                 return StatusCode(500, "Внутренняя ошибка сервера");
             }
         }
@@ -111,8 +119,11 @@ namespace Potratim.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReview(CreateReviewViewModel model)
         {
+            _logger.LogInformation($"Creating review for game ID: {model.GameId}");
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning($"Invalid review model state for game ID: {model.GameId}");
                 TempData["ErrorMessage"] = "Пожалуйста, исправьте ошибки в форме.";
                 return RedirectToAction("Index", new { id = model.GameId });
             }
@@ -139,6 +150,8 @@ namespace Potratim.Controllers
         }
         public async Task<IActionResult> BuyNow(string id)
         {
+            _logger.LogInformation($"Initiating buy now process for game ID: {id}");
+
             if (User.Identity.IsAuthenticated)
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -154,9 +167,11 @@ namespace Potratim.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         public async Task<IActionResult> DeleteReview(string id)
         {
+            _logger.LogInformation($"Attempting to delete review for game with ID: {id}");
             var review = await _context.Reviews.FindAsync(Guid.Parse(id));
             if (review == null)
             {
+                _logger.LogWarning($"Review not found for game with ID: {id}");
                 return NotFound();
             }
 

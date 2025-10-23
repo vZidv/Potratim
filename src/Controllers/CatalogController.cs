@@ -22,14 +22,18 @@ namespace Potratim.Controllers
         private readonly PotratimDbContext _context;
         private readonly IGameService _gameService;
         private readonly ICategoryService _categoryService;
+        private readonly ILogger<CatalogController> _logger;
+
         public CatalogController(
             PotratimDbContext context,
             IGameService gameService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            ILogger<CatalogController> logger)
         {
             _context = context;
             _gameService = gameService;
             _categoryService = categoryService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index
@@ -40,6 +44,8 @@ namespace Potratim.Controllers
         int? maxPrice,
         string? sortOrder)
         {
+            _logger.LogInformation($"Loading catalog page");
+            _logger.LogDebug($"Search String: {searchString}, Selected Categories: {string.Join(", ", selectedCategoriesId ?? new List<int>())}, Min Price: {minPrice}, Max Price: {maxPrice}, Sort Order: {sortOrder}");
             try
             {
                 var categories = await _categoryService.GetAllCategoriesAsync();
@@ -48,7 +54,15 @@ namespace Potratim.Controllers
                 int pageNumber = page ?? 1;
 
                 var queryAllGames = _context.Games
-                .Select(g => _gameService.GameToGameViewModel(g));
+                .Select(g => new GameViewModel()
+                {
+                    Id = g.Id,
+                    Title = g.Title,
+                    ReleaseDate = g.ReleaseDate,
+                    Price = g.Price,
+                    ImageUrl = g.ImageUrl,
+                    Categories = g.Categories
+                });
 
                 if (!string.IsNullOrWhiteSpace(searchString))
                 {
@@ -106,13 +120,15 @@ namespace Potratim.Controllers
             }
             catch (ValidationException ex)
             {
+                _logger.LogError(ex, $"Invalid catalog filter parameters");
                 return NotFound();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, $"Error loading catalog page");
                 return StatusCode(500, "Внутренняя ошибка сервера");
             }
-            
+
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

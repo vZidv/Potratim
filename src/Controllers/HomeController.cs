@@ -14,42 +14,59 @@ public class HomeController : Controller
     private readonly PotratimDbContext _context;
     private readonly IGameService _gameService;
     private readonly ICategoryService _categoryService;
+    private readonly ILogger<HomeController> _logger;
 
     public HomeController(
         PotratimDbContext context,
         IGameService gameService,
-        ICategoryService categoryService)
+        ICategoryService categoryService,
+        ILogger<HomeController> logger)
     {
         _context = context;
         _gameService = gameService;
         _categoryService = categoryService;
+        _logger = logger;
     }
 
     public async Task<IActionResult> Index()
     {
-        var viewModel = new HomeIndexViewModel();
+        try
+        {
+            _logger.LogInformation("Load home page");
+            var viewModel = new HomeIndexViewModel();
 
-        viewModel.NewGames = GetNewGamesList(8);
-        viewModel.CategoriesGames = await GetGamesCategoriesList(2);
-        viewModel.Categories = await _categoryService.GetSomeRandCategoriesAsync(10);
-        viewModel.SomeGames = await _gameService.GetSomeGamesAsync(15);
+            viewModel.NewGames = GetNewGamesList(8);
+            viewModel.CategoriesGames = await GetGamesCategoriesList(2);
+            viewModel.Categories = await _categoryService.GetSomeRandCategoriesAsync(10);
+            viewModel.SomeGames = await _gameService.GetSomeGamesAsync(15);
 
-        return View(viewModel);
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading home page");
+            return View("Error");
+        }
     }
 
     public async Task<IActionResult> ToCategory(int id)
     {
-        Category category = await _context.Categories.FindAsync(id)!;
-        CatalogIndexViewModel viewModel = new()
+        try
         {
-            Categories = new List<Category> { category }
-        };
-        return RedirectToAction("Index", "Catalog", new { SelectedCategoriesId = new List<int> { category.Id } });
-    }
+            _logger.LogInformation($"Redirecting to category with ID: {id}");
+            Category category = await _context.Categories.FindAsync(id)!;
+            CatalogIndexViewModel viewModel = new()
+            {
+                Categories = new List<Category> { category }
+            };
+            return RedirectToAction("Index", "Catalog", new { SelectedCategoriesId = new List<int> { category.Id } });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error redirecting to category with ID: {id}");
+            return NotFound();
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -60,6 +77,8 @@ public class HomeController : Controller
 
     public List<GameViewModel> GetNewGamesList(int count)
     {
+        _logger.LogDebug("Getting new games list");
+
         return _context.Games.OrderByDescending(g => g.ReleaseDate)
             .Select(g => new GameViewModel
             {
@@ -75,6 +94,8 @@ public class HomeController : Controller
 
     public async Task<List<List<GameViewModel>>> GetGamesCategoriesList(int count)
     {
+        _logger.LogDebug("Getting games categories list");
+
         var result = new List<List<GameViewModel>>();
         var categories = await _categoryService.GetAllCategoriesAsync();
 

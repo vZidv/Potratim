@@ -20,21 +20,26 @@ namespace Potratim.Services
         private readonly PotratimDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IGameService _gameService;
+        private readonly ILogger<CartService> _logger;
 
         public CartService(
             PotratimDbContext context,
             UserManager<User> userManager,
-            IGameService gameService)
+            IGameService gameService,
+            ILogger<CartService> logger)
         {
             _context = context;
             _userManager = userManager;
             _gameService = gameService;
+            _logger = logger;
         }
 
 
         //Authorization users
         public async Task AddToCartAsync(Guid userId, Guid gameId, int quantity = 1)
         {
+            _logger.LogInformation($"Adding game {gameId} to cart for user {userId}");
+
             var cart = await GetOrCreateDbCartAsync(userId);
 
             var cartGame = cart.Games.FirstOrDefault(g => g.Id == gameId);
@@ -48,6 +53,8 @@ namespace Potratim.Services
 
         public async Task RemoveFromCartAsync(Guid userId, Guid gameId)
         {
+            _logger.LogInformation($"Removing game {gameId} from cart for user {userId}");
+
             var cart = await GetOrCreateDbCartAsync(userId);
             var cartGame = cart.Games.FirstOrDefault(cg => cg.Id == gameId);
             if (cartGame != null)
@@ -58,6 +65,8 @@ namespace Potratim.Services
         }
         public async Task ClearCartAsync(Guid userId)
         {
+            _logger.LogInformation($"Clearing cart for user {userId}");
+
             var cart = await GetOrCreateDbCartAsync(userId);
             cart.Games.Clear();
             await _context.SaveChangesAsync();
@@ -65,18 +74,21 @@ namespace Potratim.Services
 
         public async Task<List<Game>> GetCartItemsAsync(Guid userId)
         {
+            _logger.LogDebug($"Retrieving cart items for user {userId}");
             var cart = await GetOrCreateDbCartAsync(userId);
             return cart.Games.ToList();
         }
 
         public async Task<decimal> GetCartTotalAsync(Guid userId)
         {
+            _logger.LogDebug($"Calculating cart total for user {userId}");
             var cart = await GetOrCreateDbCartAsync(userId);
             return cart.Games.Sum(g => g.Price);
         }
 
         private async Task<Cart> GetOrCreateDbCartAsync(Guid userId)
         {
+            _logger.LogDebug($"Retrieving or creating cart for user {userId}");
             if (userId == Guid.Empty)
             {
                 throw new ValidationException($"Invalid user ID {userId}")
@@ -107,6 +119,8 @@ namespace Potratim.Services
 
         public async Task<List<Game>> GetCartItemsAsync(HttpContext httpContext)
         {
+            _logger.LogDebug($"Retrieving cart items for user {httpContext.User.Identity.Name}");
+
             var sessionCart = GetSessionCart(httpContext);
             if (!sessionCart.Any())
             {
@@ -137,6 +151,8 @@ namespace Potratim.Services
 
         public async Task AddToCartAsync(HttpContext httpContext, Guid gameId, int quantity = 1)
         {
+            _logger.LogInformation($"Adding game {gameId} to cart for user {httpContext.User.Identity.Name}");
+
             var sessionCart = GetSessionCart(httpContext);
 
             if (sessionCart.ContainsKey(gameId))
@@ -153,6 +169,8 @@ namespace Potratim.Services
 
         public async Task RemoveFromCartAsync(HttpContext httpContext, Guid gameId)
         {
+            _logger.LogInformation($"Removing game {gameId} from cart for user {httpContext.User.Identity.Name}");
+
             var sessionCart = GetSessionCart(httpContext);
             if (sessionCart.ContainsKey(gameId))
             {
@@ -163,6 +181,8 @@ namespace Potratim.Services
 
         public Task ClearCartAsync(HttpContext httpContext)
         {
+            _logger.LogInformation($"Clearing cart for user {httpContext.User.Identity.Name}");
+
             var sessionCart = GetSessionCart(httpContext);
             sessionCart.Clear();
             SaveSessionCart(httpContext, sessionCart);
@@ -171,6 +191,8 @@ namespace Potratim.Services
 
         public async Task<decimal> GetCartTotalAsync(HttpContext httpContext)
         {
+            _logger.LogDebug($"Calculating cart total for user {httpContext.User.Identity.Name}");
+
             var sessionCart = GetSessionCart(httpContext);
             if (!sessionCart.Any())
             {
@@ -188,6 +210,8 @@ namespace Potratim.Services
 
         public async Task MergeCartAsync(HttpContext httpContext, Guid userId)
         {
+            _logger.LogDebug($"Merging cart for user {userId}");
+
             var sessionCart = GetSessionCart(httpContext);
             if (!sessionCart.Any())
             {
@@ -222,6 +246,8 @@ namespace Potratim.Services
 
         private Dictionary<Guid, int> GetSessionCart(HttpContext httpContext)
         {
+            _logger.LogDebug($"Retrieving session cart for user {httpContext.User.Identity.Name}");
+
             var sessionCartJson = httpContext.Session.GetString("Cart");
             if (string.IsNullOrEmpty(sessionCartJson))
             {
@@ -240,6 +266,8 @@ namespace Potratim.Services
 
         private void SaveSessionCart(HttpContext httpContext, Dictionary<Guid, int> cart)
         {
+            _logger.LogDebug($"Saving session cart for user {httpContext.User.Identity.Name}");
+            
             var sessionCartJson = JsonSerializer.Serialize(cart);
             httpContext.Session.SetString("Cart", sessionCartJson);
         }

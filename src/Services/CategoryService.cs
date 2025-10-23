@@ -12,11 +12,15 @@ namespace src.Services
     public class CategoryService : ICategoryService
     {
         private readonly PotratimDbContext _context;
+        private readonly ILogger<CategoryService> _logger;
+
         public CategoryService(
-            PotratimDbContext context
+            PotratimDbContext context,
+            ILogger<CategoryService> logger
         )
         {
             _context = context;
+            _logger = logger;
         }
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
@@ -24,6 +28,8 @@ namespace src.Services
         }
         public async Task<Category> GetCategoryAsync(int id)
         {
+            _logger.LogDebug($"Retrieving category with ID {id}");
+
             if (id == null || id <= 0)
                 throw new ValidationException("Id cannot be null and <= 0")
                 {
@@ -46,6 +52,8 @@ namespace src.Services
         }
         public async Task<bool> DeleteCategoryAsync(int id)
         {
+            _logger.LogDebug($"Deleting category with ID {id}");
+
             Category category = await GetCategoryAsync(id);
             _context.Categories.Remove(category);
             _context.SaveChanges();
@@ -54,6 +62,8 @@ namespace src.Services
 
         public async Task<List<Category>> GetSomeRandCategoriesAsync(int count)
         {
+            _logger.LogDebug($"Retrieving random categories, count: {count}");
+
             var result = new List<Category>();
             Random random = new();
 
@@ -69,6 +79,8 @@ namespace src.Services
 
         public async Task<Category> UpdateCategoryAsync(Category category)
         {
+            _logger.LogDebug($"Updating category with ID {category.Id}");
+
             if (category == null || string.IsNullOrWhiteSpace(category.Name))
                 throw new ValidationException("Category cannot be null or category's name empty")
                 {
@@ -84,6 +96,8 @@ namespace src.Services
 
         public async Task<Category> CreateCategoryAsync(string name)
         {
+            _logger.LogDebug($"Creating category with name {name}");
+            
             if (string.IsNullOrWhiteSpace(name))
                 throw new ValidationException("Name cannot be null and white space")
                 {

@@ -23,21 +23,26 @@ namespace Potratim.Controllers
         private readonly ICartService _cartService;
         private readonly PotratimDbContext _context;
         private readonly IGameService _gameService;
+        private readonly ILogger<OrderController> _logger;
 
         public OrderController(
             UserManager<User> userManager,
             ICartService cartService,
             PotratimDbContext context,
-            IGameService gameService)
+            IGameService gameService,
+            ILogger<OrderController> logger)
         {
             _userManager = userManager;
             _cartService = cartService;
             _context = context;
             _gameService = gameService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Loading order page");
+
             string? userEmail = null;
             CartViewModel? cartViewModel = null;
 
@@ -78,6 +83,9 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> OrderFinished(OrderFinishedViewModel model)
         {
+            _logger.LogInformation("Finishing order");
+            _logger.LogDebug($"Order details: {model}");
+            
             User? user = null;
             if (User.Identity.IsAuthenticated)
                 user = await _userManager.GetUserAsync(User);
