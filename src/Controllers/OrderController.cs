@@ -12,6 +12,7 @@ using Potratim.Data;
 using Potratim.Models;
 using Potratim.Services;
 using Potratim.ViewModel;
+using src.Services;
 
 namespace Potratim.Controllers
 {
@@ -21,16 +22,27 @@ namespace Potratim.Controllers
         private readonly UserManager<User> _userManager;
         private readonly ICartService _cartService;
         private readonly PotratimDbContext _context;
+        private readonly IGameService _gameService;
+        private readonly ILogger<OrderController> _logger;
 
-        public OrderController(UserManager<User> userManager, ICartService cartService, PotratimDbContext context)
+        public OrderController(
+            UserManager<User> userManager,
+            ICartService cartService,
+            PotratimDbContext context,
+            IGameService gameService,
+            ILogger<OrderController> logger)
         {
             _userManager = userManager;
             _cartService = cartService;
             _context = context;
+            _gameService = gameService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Loading order page");
+
             string? userEmail = null;
             CartViewModel? cartViewModel = null;
 
@@ -64,13 +76,16 @@ namespace Potratim.Controllers
             {
                 Email = userEmail,
                 Cart = cartViewModel,
-                SameGames = await GetSomeGamesAsync(10)
+                SameGames = await _gameService.GetSomeGamesAsync(10)
             };
             return View(model);
         }
 
         public async Task<IActionResult> OrderFinished(OrderFinishedViewModel model)
         {
+            _logger.LogInformation("Finishing order");
+            _logger.LogDebug($"Order details: {model}");
+            
             User? user = null;
             if (User.Identity.IsAuthenticated)
                 user = await _userManager.GetUserAsync(User);
@@ -108,21 +123,6 @@ namespace Potratim.Controllers
 
             ViewBag.TotalCost = model.TotalCost;
             return View();
-        }
-
-        public async Task<List<GameViewModel>> GetSomeGamesAsync(int count)
-        {
-            var someGames = await _context.Games.Take(count).ToListAsync();
-
-            return someGames.Select(g => new GameViewModel()
-            {
-                Id = g.Id,
-                Title = g.Title,
-                ReleaseDate = g.ReleaseDate,
-                Price = g.Price,
-                ImageUrl = g.ImageUrl,
-                Categories = g.Categories.ToList()
-            }).ToList();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

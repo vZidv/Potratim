@@ -1,0 +1,27 @@
+.categories-header {
+  margin-bottom: 30px;
+}
+
+.categories-content {
+  background: linear-gradient(135deg, #2c3e50, #4b6584);
+  padding: 20px 30px;
+  border-radius: 20px;
+}
+
+.categories-filter-1 {
+  display: flex;
+  gap: 40px;
+}
+.categories-filter-2 {
+  display: flex;
+  gap: 12px;
+  justify-content: end;
+  height: 70px;
+}
+
+.category-add-form {
+  background: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+}

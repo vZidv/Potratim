@@ -1,42 +1,4 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
-
-
-
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-.nav-pills .nav-link.active,
-.nav-pills .show>.nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
-}
-
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
-
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
-}
-
-
-
-
-/* .footer {
+.footer {
   padding: 20px 10%;
   color: white;
   position: absolute;
@@ -100,5 +62,39 @@ button.accept-policy {
   color: #bbb !important;
   text-decoration: none !important;
   transition: color 0.3s ease !important;
-} */
+}
 
+.footer-links a {
+  color: #bbb;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-info-social {
+  display: flex;
+  gap: 12px;
+}
+
+.social-icon {
+  color: #bbb;
+  font-size: 1.45rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  background: #313131;
+  border-radius: 20px;
+  padding: 3px;
+  text-align: center;
+  width: 40px;
+  height: auto;
+}
+
+.social-icon:hover {
+  color: #fff;
+  transform: translateY(-1px);
+  background: #363636;
+}

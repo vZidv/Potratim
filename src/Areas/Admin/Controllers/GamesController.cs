@@ -11,7 +11,10 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
+using Potratim.MyExceptions;
 using Potratim.ViewModel;
+using src.MyExceptions;
+using src.Services;
 using src.ViewModel;
 using X.PagedList.Extensions;
 
@@ -21,12 +24,17 @@ namespace Potratim.Areas.Admin.Controllers
     public class GamesController : Controller
     {
         private readonly PotratimDbContext _context;
-        private readonly IWebHostEnvironment _environment;
+        private readonly IGameService _gameService;
+        private readonly ICategoryService _categoryService;
 
-        public GamesController(PotratimDbContext context, IWebHostEnvironment environment)
+        public GamesController(
+        PotratimDbContext context,
+        IGameService gameService,
+        ICategoryService categoryService)
         {
             _context = context;
-            _environment = environment;
+            _gameService = gameService;
+            _categoryService = categoryService;
         }
 
         public IActionResult Index(
@@ -48,11 +56,11 @@ namespace Potratim.Areas.Admin.Controllers
             {
                 query = query.Where(g => g.Title.Contains(searchString));
             }
-            if(dateFrom.HasValue && dateTo.HasValue)
+            if (dateFrom.HasValue && dateTo.HasValue)
             {
                 query = query.Where(g => g.ReleaseDate >= dateFrom.Value && g.ReleaseDate <= dateTo.Value);
             }
-            if(minPrice.HasValue && maxPrice.HasValue)
+            if (minPrice.HasValue && maxPrice.HasValue)
             {
                 query = query.Where(g => g.Price >= minPrice.Value && g.Price <= maxPrice.Value);
             }
@@ -76,8 +84,15 @@ namespace Potratim.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             var model = new CreateGameViewModel();
+            try
+            {
+                model.Categories = await _categoryService.GetAllCategoriesAsync();
+            }
+            catch (Exception ex)
+            {
+                return View("Error", "Не удалось загрузить категории");
+            }
 
-            model.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
             return View(model);
         }
 
@@ -87,27 +102,19 @@ namespace Potratim.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var imageUrl = await SaveFile(model.ImageFile, FormatFileName(model.Title));
-
-                Game game = new()
+                try
                 {
-                    Title = model.Title,
-                    Description = model.Description,
-                    ReleaseDate = model.ReleaseDate,
-                    Developer = model.Developer,
-                    Publisher = model.Publisher,
-                    Price = model.Price,
-                    ImageUrl = imageUrl
-                };
-
-                if (model.SelectedCategoryIds != null && model.SelectedCategoryIds.Any())
+                    await _gameService.CreateGameAsync(model);
+                }
+                catch (ValidationException ex)
                 {
-                    var selectedCategories = await _context.Categories.Where(c => model.SelectedCategoryIds.Contains(c.Id)).ToListAsync();
-                    game.Categories = selectedCategories;
+                    return StatusCode(400, ex);
+                }
+                catch (Exception ex)
+                {
+                    return View("Error", ex);
                 }
 
-                _context.Games.Add(game);
-                _context.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(model);
@@ -115,34 +122,46 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> DeleteConfirmed(Guid Id)
         {
-            var game = await _context.Games.FindAsync(Id);
-            if (game == null)
+            try
             {
-                return NotFound();
+                await _gameService.DeleteGameAsync(Id);
             }
-
-            if (!String.IsNullOrWhiteSpace(game.ImageUrl))
+            catch (ValidationException ex)
             {
-                var imagePath = Path.Combine(_environment.WebRootPath, game.ImageUrl);
-                if (System.IO.File.Exists(imagePath))
-                {
-                    System.IO.File.Delete(imagePath);
-                }
+                return StatusCode(400, ex);
             }
-
-            _context.Games.Remove(game);
-            await _context.SaveChangesAsync();
-
+            catch (GameNotFoundException ex)
+            {
+                return StatusCode(404, ex);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Edit(Guid Id)
         {
-            var game = await _context.Games.Include(g => g.Categories).FirstOrDefaultAsync(g => g.Id == Id);
-            if (game == null)
+            var game = new Game();
+
+            try
             {
-                return NotFound();
+                game = await _gameService.GetGameAsync(Id);
             }
+            catch (ValidationException ex)
+            {
+                return StatusCode(400, ex);
+            }
+            catch (GameNotFoundException ex)
+            {
+                return StatusCode(404, ex);
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
+
             EditGameViewModel editGame = new()
             {
                 Id = game.Id,
@@ -156,7 +175,7 @@ namespace Potratim.Areas.Admin.Controllers
 
             };
 
-            editGame.AllCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+            editGame.AllCategories = await _categoryService.GetAllCategoriesAsync();
             editGame.CurrentCategoryIds = game.Categories.Select(c => c.Id).ToList();
             return View(editGame);
         }
@@ -166,46 +185,22 @@ namespace Potratim.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var game = await _context.Games.Include(g => g.Categories).FirstOrDefaultAsync(g => g.Id == model.Id);
-                if (game == null)
+                try
                 {
-                    return NotFound();
+                    await _gameService.UpdateGameAsync(model);
                 }
-
-                game.Title = model.Title;
-                game.Description = model.Description;
-                game.ReleaseDate = model.ReleaseDate;
-                game.Developer = model.Developer;
-                game.Publisher = model.Publisher;
-                game.Price = model.Price;
-
-                if (model.ImageFile != null)
+                catch (ValidationException ex)
                 {
-                    var imageUrl = await SaveFile(model.ImageFile, FormatFileName(model.Title));
-                    game.ImageUrl = imageUrl;
+                    return StatusCode(400, ex);
                 }
-
-                var selectedCategory = await _context.Categories.Where(c => model.SelectedCategoryIds.Contains(c.Id)).ToListAsync();
-                for (int i = 0; i < game.Categories.Count; i++)
+                catch (ImageSaveFailException ex)
                 {
-                    var category = game.Categories[i];
-                    if (!selectedCategory.Contains(category))
-                    {
-                        game.Categories.RemoveAt(i);
-                        i--;
-                    }
+                    return StatusCode(400, ex);
                 }
-
-                foreach (var category in selectedCategory)
+                catch (Exception ex)
                 {
-                    if (!game.Categories.Contains(category))
-                    {
-                        game.Categories.Add(category);
-                    }
+                    return View("Error", ex);
                 }
-
-                _context.Games.Update(game);
-                await _context.SaveChangesAsync();
 
                 return RedirectToAction("Index");
             }
@@ -216,39 +211,6 @@ namespace Potratim.Areas.Admin.Controllers
         public IActionResult Error()
         {
             return View("Error!");
-        }
-
-        private async Task<string?> SaveFile(IFormFile file, string fileName)
-        {
-            string fileUrl = null;
-
-            if (file != null && file.Length > 0)
-            {
-
-                string uploadDir = Path.Combine(_environment.WebRootPath, "images", "game-images");
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName + Path.GetExtension(file.FileName);
-
-                if (!Directory.Exists(uploadDir))
-                    Directory.CreateDirectory(uploadDir);
-
-                string filePath = Path.Combine(uploadDir, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(fileStream);
-                }
-                fileUrl = $"/images/game-images/{uniqueFileName}";
-            }
-
-            return fileUrl;
-        }
-
-        private string FormatFileName(string fileName)
-        {
-            fileName = fileName.Trim().ToLower();
-            fileName = fileName.Replace(" ", "_");
-            fileName = Regex.Replace(fileName, @"[^a-z0-9_-]", "");
-            return fileName;
         }
     }
 }

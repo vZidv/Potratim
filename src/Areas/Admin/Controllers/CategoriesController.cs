@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Potratim.Data;
 using Potratim.Models;
 using Potratim.ViewModel;
+using src.Services;
 using src.ViewModel;
 
 namespace Potratim.Areas.Admin.Controllers
@@ -19,10 +20,14 @@ namespace Potratim.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         private readonly PotratimDbContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public CategoriesController(PotratimDbContext context)
+        public CategoriesController(
+            PotratimDbContext context,
+            ICategoryService categoryService)
         {
             _context = context;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index(
@@ -72,8 +77,7 @@ namespace Potratim.Areas.Admin.Controllers
             {
                 try
                 {
-                    await _context.AddAsync(category);
-                    await _context.SaveChangesAsync();
+                    await _categoryService.CreateCategoryAsync(category.Name);
                     return RedirectToAction("Index");
                 }
                 catch (Exception ex)
@@ -86,11 +90,9 @@ namespace Potratim.Areas.Admin.Controllers
 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            if (!(await _categoryService.DeleteCategoryAsync(id)))
             {
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
             return RedirectToAction("Index");
         }
@@ -98,12 +100,16 @@ namespace Potratim.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            try
+            {
+                var category = await _categoryService.GetCategoryAsync(id);
+                return View(category);
+            }
+            catch (Exception ex)
             {
                 return NotFound();
             }
-            return View(category);
+
         }
 
         [HttpPost]
@@ -114,8 +120,7 @@ namespace Potratim.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    await _categoryService.UpdateCategoryAsync(category);
                 }
                 catch (Exception ex)
                 {

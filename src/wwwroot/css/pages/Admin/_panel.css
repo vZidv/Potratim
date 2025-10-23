@@ -1,0 +1,45 @@
+.user-profile {
+  background-color: #1e1e1e;
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+}
+
+.admin-panel-content {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #1e1e1e;
+  border-radius: 15px;
+  color: white;
+}
+
+.admin-but {
+  border: none;
+  margin: 20px;
+  font-size: 25px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.admin-but:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-icon {
+  margin-right: 5px;
+  font-size: 30px;
+}
+
+.admin-panel {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  min-height: 80vh;
+}

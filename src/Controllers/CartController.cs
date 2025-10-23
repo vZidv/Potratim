@@ -17,29 +17,43 @@ namespace Potratim.Controllers
     {
         private readonly ICartService _cartService;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(ICartService cartService, UserManager<User> userManager)
+        public CartController(ICartService cartService, UserManager<User> userManager, ILogger<CartController> logger)
         {
             _cartService = cartService;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public async Task<IActionResult> AddToCartAsync(string gameId)
         {
-            if(User.Identity.IsAuthenticated)
+            _logger.LogInformation($"Initiating add to cart process for game ID: {gameId}");
+            try
             {
-                var user = await _userManager.GetUserAsync(User);
-                await _cartService.AddToCartAsync(user.Id, Guid.Parse(gameId));
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    await _cartService.AddToCartAsync(user.Id, Guid.Parse(gameId));
+                }
+                else
+                {
+                    await _cartService.AddToCartAsync(HttpContext, Guid.Parse(gameId));
+                }
+
             }
-            else
+            catch (Exception ex)
             {
-                await _cartService.AddToCartAsync(HttpContext, Guid.Parse(gameId));
+                _logger.LogError(ex, $"Error adding game to cart: {gameId}");
+                return View("Error", ex);
             }
             return RedirectToAction("Index", "Game", new { id = gameId });
+
         }
         public async Task<IActionResult> RemoveFromCartAsync(string gameId)
         {
-            if(User.Identity.IsAuthenticated)
+            _logger.LogInformation($"Initiating remove from cart process for game ID: {gameId}");
+            if (User.Identity.IsAuthenticated)
             {
                 var user = await _userManager.GetUserAsync(User);
                 await _cartService.RemoveFromCartAsync(user.Id, Guid.Parse(gameId));

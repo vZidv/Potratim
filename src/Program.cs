@@ -5,6 +5,23 @@ using Potratim.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Xml.Serialization;
 using Potratim.Services;
+using src.Services;
+using Serilog;
+using Serilog.Events;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .WriteTo.Console()
+    .WriteTo.File(
+        Path.Combine("logs", "error", "error-.txt"),
+        rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Error)
+    .WriteTo.File(
+        Path.Combine("logs", "info", "info-.txt"),
+        rollingInterval: RollingInterval.Day,
+        restrictedToMinimumLevel: LogEventLevel.Information)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -14,11 +31,6 @@ builder.Services.AddControllersWithViews();
 
 //Database
 var connectionString = configuration.GetConnectionString(nameof(PotratimDbContext));
-// var dbPassword = builder.Configuration["DatabasePassword"];
-// var fullConnectionString = new NpgsqlConnectionStringBuilder(connectionString)
-// {
-//     Password = dbPassword
-// };
 
 if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
 {
@@ -34,7 +46,11 @@ if (string.IsNullOrEmpty(connectionString) || !connectionString.Contains("Passwo
     }
 }
 
+builder.Host.UseSerilog();
+
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddDbContext<PotratimDbContext>(options =>
 {

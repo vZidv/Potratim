@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Potratim.Data;
+using Potratim.Models;
+using Potratim.MyExceptions;
 using Potratim.ViewModel;
+using src.Services;
 using X.PagedList;
 using X.PagedList.Extensions;
 using X.PagedList.Mvc.Core;
@@ -17,9 +20,20 @@ namespace Potratim.Controllers
     public class CatalogController : Controller
     {
         private readonly PotratimDbContext _context;
-        public CatalogController(PotratimDbContext context)
+        private readonly IGameService _gameService;
+        private readonly ICategoryService _categoryService;
+        private readonly ILogger<CatalogController> _logger;
+
+        public CatalogController(
+            PotratimDbContext context,
+            IGameService gameService,
+            ICategoryService categoryService,
+            ILogger<CatalogController> logger)
         {
             _context = context;
+            _gameService = gameService;
+            _categoryService = categoryService;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index
@@ -30,81 +44,91 @@ namespace Potratim.Controllers
         int? maxPrice,
         string? sortOrder)
         {
-            var categories = await _context.Categories.ToListAsync();
-
-            int pageSize = 16;
-            int pageNumber = page ?? 1;
-
-            var queryAllGames = _context.Games
-            .Select(g => new GameViewModel()
+            _logger.LogInformation($"Loading catalog page");
+            _logger.LogDebug($"Search String: {searchString}, Selected Categories: {string.Join(", ", selectedCategoriesId ?? new List<int>())}, Min Price: {minPrice}, Max Price: {maxPrice}, Sort Order: {sortOrder}");
+            try
             {
-                Id = g.Id,
-                Title = g.Title,
-                ReleaseDate = g.ReleaseDate,
-                Price = g.Price,
-                ImageUrl = g.ImageUrl,
-                Categories = g.Categories
+                var categories = await _categoryService.GetAllCategoriesAsync();
 
-            });
+                int pageSize = 16;
+                int pageNumber = page ?? 1;
 
-            if (!string.IsNullOrWhiteSpace(searchString))
-            {
-                queryAllGames = queryAllGames.Where(g => EF.Functions.ILike(g.Title, $"%{searchString}%"));
+                var queryAllGames = _context.Games
+                .Select(g => new GameViewModel()
+                {
+                    Id = g.Id,
+                    Title = g.Title,
+                    ReleaseDate = g.ReleaseDate,
+                    Price = g.Price,
+                    ImageUrl = g.ImageUrl,
+                    Categories = g.Categories
+                });
+
+                if (!string.IsNullOrWhiteSpace(searchString))
+                {
+                    queryAllGames = queryAllGames.Where(g => EF.Functions.ILike(g.Title, $"%{searchString}%"));
+                }
+                if (selectedCategoriesId != null && selectedCategoriesId.Any())
+                {
+                    queryAllGames = queryAllGames.Where(g =>
+                    g.Categories.Any(c => selectedCategoriesId.Contains(c.Id)) &&
+                selectedCategoriesId.All(selectedId =>
+                    g.Categories.Any(c => c.Id == selectedId))
+                    );
+                }
+                if (minPrice.HasValue || maxPrice.HasValue)
+                {
+                    queryAllGames = queryAllGames.Where(g => (!minPrice.HasValue || g.Price >= minPrice) && (!maxPrice.HasValue || g.Price <= maxPrice));
+                }
+
+                switch (sortOrder)
+                {
+                    case "new":
+                        {
+                            queryAllGames = queryAllGames.OrderByDescending(g => g.ReleaseDate);
+                        }
+                        break;
+                    case "price_desc":
+                        {
+                            queryAllGames = queryAllGames.OrderByDescending(g => g.Price);
+                        }
+                        break;
+                    case "price_asc":
+                        {
+                            queryAllGames = queryAllGames.OrderBy(g => g.Price);
+                        }
+                        break;
+
+                }
+
+                var games = queryAllGames.ToPagedList(pageNumber, pageSize);
+
+
+                var viewModel = new CatalogIndexViewModel()
+                {
+                    Categories = categories,
+                    Games = games,
+
+                    //Filters
+                    SearchString = searchString,
+                    SelectedCategoriesId = selectedCategoriesId,
+                    MinPrice = minPrice ?? 0,
+                    MaxPrice = maxPrice ?? 15000,
+                    SortOrder = sortOrder ?? "new"
+                };
+                return View(viewModel);
             }
-            if (selectedCategoriesId != null && selectedCategoriesId.Any())
+            catch (ValidationException ex)
             {
-                queryAllGames = queryAllGames.Where(g =>
-                g.Categories.Any(c => selectedCategoriesId.Contains(c.Id)) &&
-            selectedCategoriesId.All(selectedId =>
-                g.Categories.Any(c => c.Id == selectedId))
-                );
+                _logger.LogError(ex, $"Invalid catalog filter parameters");
+                return NotFound();
             }
-            if (minPrice.HasValue || maxPrice.HasValue)
+            catch (Exception ex)
             {
-                queryAllGames = queryAllGames.Where(g => (!minPrice.HasValue || g.Price >= minPrice) && (!maxPrice.HasValue || g.Price <= maxPrice));
+                _logger.LogError(ex, $"Error loading catalog page");
+                return StatusCode(500, "Внутренняя ошибка сервера");
             }
 
-            switch (sortOrder)
-            {
-                case "new":
-                    {
-                        queryAllGames = queryAllGames.OrderByDescending(g => g.ReleaseDate);
-                    }
-                    break;
-                case "price_desc":
-                    {
-                        queryAllGames = queryAllGames.OrderByDescending(g => g.Price);
-                    }
-                    break;
-                case "price_asc":
-                    {
-                        queryAllGames = queryAllGames.OrderBy(g => g.Price);
-                    }
-                    break;
-                // case "rating":
-                //     {
-                //         queryAllGames = queryAllGames.OrderByDescending(g => g.ReleaseDate);
-                //     }
-                //     break;
-
-            }
-
-            var games = queryAllGames.ToPagedList(pageNumber, pageSize);
-
-
-            var viewModel = new CatalogIndexViewModel()
-            {
-                Categories = categories,
-                Games = games,
-
-                //Filters
-                SearchString = searchString,
-                SelectedCategoriesId = selectedCategoriesId,
-                MinPrice = minPrice ?? 0,
-                MaxPrice = maxPrice ?? 15000,
-                SortOrder = sortOrder ?? "new"
-            };
-            return View(viewModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

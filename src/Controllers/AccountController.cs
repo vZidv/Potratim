@@ -23,19 +23,28 @@ namespace Potratim.Controllers
         private readonly PotratimDbContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly ICartService _cartService;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(PotratimDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, IWebHostEnvironment environment, ICartService cartService)
+        public AccountController
+        (PotratimDbContext context,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
+        IWebHostEnvironment environment,
+        ICartService cartService,
+        ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _environment = environment;
             _cartService = cartService;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Login()
         {
+            _logger.LogInformation("Login page visited");
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
@@ -48,6 +57,7 @@ namespace Potratim.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            _logger.LogInformation("Login attempted");
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -62,6 +72,7 @@ namespace Potratim.Controllers
                 }
                 else
                 {
+                    _logger.LogWarning("Login failed");
                     ModelState.AddModelError(string.Empty, "Неверный логин или пароль.");
                 }
 
@@ -77,18 +88,19 @@ namespace Potratim.Controllers
 
 
             return View(model);
-
         }
 
 
         public async Task<IActionResult> SignOut()
         {
+            _logger.LogInformation("User initiated sign out");
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Logout()
         {
+            _logger.LogInformation("User initiated logout");
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
@@ -103,6 +115,7 @@ namespace Potratim.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            _logger.LogInformation("User registration attempted");
             if (ModelState.IsValid)
             {
                 var username = model.Email.Split('@')[0];
@@ -137,6 +150,7 @@ namespace Potratim.Controllers
         [Authorize]
         public async Task<IActionResult> Profile()
         {
+            _logger.LogInformation("User profile page visited");
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -180,6 +194,7 @@ namespace Potratim.Controllers
 
         public async Task<IActionResult> EditProfile()
         {
+            _logger.LogInformation("User profile edit page visited");
             var user = await _userManager.GetUserAsync(User);
 
             var userViewModel = new UserViewModel
@@ -199,14 +214,17 @@ namespace Potratim.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfileConfirm(UserSelfEditViewModel model)
         {
+            _logger.LogInformation("User profile edit confirmation attempted");
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("User profile edit confirmation failed");
                 return View("EditProfile", model);
             }
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
+                _logger.LogWarning("User not found");
                 return NotFound("Пользователь не найден.");
             }
 
@@ -233,6 +251,7 @@ namespace Potratim.Controllers
 
         private async Task<string?> SaveFile(IFormFile file, string fileName)
         {
+            _logger.LogInformation("File upload initiated");
             string fileUrl = null;
 
             if (file != null && file.Length > 0)

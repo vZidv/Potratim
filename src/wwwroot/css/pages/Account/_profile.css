@@ -1,0 +1,80 @@
+.user-profile-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.bg-standart {
+  background: linear-gradient(135deg, #1e1e1e, #252525);
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 4px 6px 6px rgba(0, 0, 0, 0.2);
+}
+
+.profile-picture {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin: 16px;
+}
+
+.user-info {
+  height: 450px;
+}
+
+.user-info .user-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+}
+
+.user-info .user-email {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #f0f0f0;
+  text-align: center;
+}
+
+.user-info .user-statuses {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #f0f0f0;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.user-info .user-statuses .status {
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.user-info .user-info-footer {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: #d3d3d3;
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.user-collection {
+  min-width: 80%;
+}
+
+.user-profile-container .collection-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
