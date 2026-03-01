@@ -23,7 +23,7 @@ namespace Potratim.Data
                     await context.Database.EnsureCreatedAsync();
                 }
 
-                await context.Database.MigrateAsync();
+                //await context.Database.MigrateAsync();
                 
                 if (!await context.Categories.AnyAsync())
                 {
