@@ -72,14 +72,15 @@ namespace src.Services
 
         public async Task<Game> CreateGameAsync(CreateGameViewModel model)
         {
-            _logger.LogDebug($"Creating game with title {model.Title}");
-
+            _logger.LogDebug($"Start creating game");
             if (model == null)
                 throw new ValidationException("Game model cannot be null")
                 {
                     PropertyName = nameof(model),
                     AttemptedValue = model
                 };
+
+            _logger.LogDebug($"Creating game with title {model.Title}");
 
             var imageUrl = await SaveGameImageAsync(model.ImageFile, FormatFileName(model.Title));
             Game game = new()
@@ -265,7 +266,7 @@ namespace src.Services
         public GameViewModel GameToGameViewModel(Game game)
         {
             _logger.LogDebug($"Mapping game to GameViewModel for game ID {game.Id}");
-            
+
             if (game == null)
                 throw new ValidationException($"Game cannot be null")
                 {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ using Moq;
 using Potratim.Data;
 using Potratim.Models;
 using Potratim.MyExceptions;
+using Potratim.ViewModel;
 using src.Services;
 using Xunit;
 
@@ -19,26 +21,20 @@ namespace Potratim.Tests.Services
 {
     public class GameServiceTests
     {
-        private PotratimDbContext _mockContext;
         private readonly Mock<IWebHostEnvironment> _mockEnv;
         private readonly Mock<ILogger<GameService>> _mockLogger;
 
         public GameServiceTests()
         {
-            _mockContext = CreateInMemoryDbContext();
             _mockEnv = new Mock<IWebHostEnvironment>();
+            var tempPath = Path.Combine(Path.GetTempPath(), "PotratimTestsTempFolder");
+            Directory.CreateDirectory(tempPath);
+            _mockEnv.Setup(e => e.WebRootPath).Returns(tempPath);
+
             _mockLogger = new Mock<ILogger<GameService>>();
         }
 
-        private PotratimDbContext CreateInMemoryDbContext(string dbName = null)
-        {
-            var options = new DbContextOptionsBuilder<PotratimDbContext>()
-                .UseInMemoryDatabase(dbName ?? Guid.NewGuid().ToString())
-                .Options;
-            return new PotratimDbContext(options);
-        }
-
-        #region GetGameAsync(string id) Tests
+        #region GetGameAsync Tests
 
         [Theory]
         [InlineData(null)]
@@ -46,128 +42,234 @@ namespace Potratim.Tests.Services
         [InlineData("   ")]
         public async Task GetGameAsync_NullOrWhitespaceId(string id)
         {
-            var service = new GameService(_mockContext, _mockEnv.Object, _mockLogger.Object);
+            using var db = DbContext.CreateInMemoryDbContext();
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
 
             var exception = await Assert.ThrowsAsync<MyExceptions.ValidationException>(() => service.GetGameAsync(id));
 
             Assert.Equal(nameof(id), exception.PropertyName);
+            DbContext.Dispose(db);
         }
-        //         [Fact]
-        //         public async Task GetGameAsync_InvalidGameId()
-        //         {
-        //             var mockContext = GetMockDbContext();
-        //             var mockEnv = GetMockEnvironment();
-        //             var mockLogger = GetMockLogger();
-        //             var service = new GameService(mockContext.Object, mockEnv.Object, mockLogger.Object);
-        //             string invalidId = "invalid-guid";
 
-        //             var exception = await Assert.ThrowsAsync<MyExceptions.ValidationException>(() => service.GetGameAsync(invalidId));
+        [Fact]
+        public async Task GetGameAsync_ValidId_ReturnsGame()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
 
-        //             Assert.Equal(nameof(invalidId), exception.PropertyName);
-        //             Assert.Contains(nameof(invalidId), exception.PropertyName);
-        //         }
+            var id = Guid.NewGuid().ToString();
+            var gameTitle = "Test Game";
+            db.Games.Add(new Game
+            {
+                Id = Guid.Parse(id),
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            });
+            await db.SaveChangesAsync();
 
-        //         [Fact]
-        //         public async Task GetGameAsync_GameNotFound()
-        //         {
-        //             var gameId = Guid.NewGuid();
-        //             var mockContext = GetMockDbContext();
-        //             var mockEnv = GetMockEnvironment();
-        //             var mockLogger = GetMockLogger();
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var game = await service.GetGameAsync(id);
 
-        //             var gameData = new List<Game>().AsQueryable();
-        //             var mockGameDbSet = new Mock<DbSet<Game>>();
-        //             mockGameDbSet.As<IQueryable<Game>>().Setup(m => m.Provider).Returns(gameData.Provider);
-        //             mockGameDbSet.As<IQueryable<Game>>().Setup(m => m.Expression).Returns(gameData.Expression);
-        //             mockGameDbSet.As<IQueryable<Game>>().Setup(m => m.ElementType).Returns(gameData.ElementType);
-        //             mockGameDbSet.As<IQueryable<Game>>().Setup(m => m.GetEnumerator()).Returns(gameData.GetEnumerator());
+            Assert.NotNull(game);
+            Assert.Equal(Guid.Parse(id), game.Id);
+            Assert.Equal(gameTitle, game.Title);
 
-        //             mockContext.Setup(m => m.Games).Returns(mockGameDbSet.Object);
+            DbContext.Dispose(db);
+        }
 
-        //             var service = new GameService(mockContext.Object, mockEnv.Object, mockLogger.Object);
+        [Fact]
+        public async Task GetGameAsync_InvalidGameId()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
 
-        //             var exception = await Assert.ThrowsAsync<GameNotFoundException>(
-        //     () => service.GetGameAsync(gameId.ToString())
-        // );
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            string invalidId = "invalid-guid";
+            string expectedMessage = $"Invalid game ID format: {invalidId}";
 
-        //             Assert.Equal(gameId, exception.GameId);
-        //         }
+            var exception = await Assert.ThrowsAsync<MyExceptions.ValidationException>(() => service.GetGameAsync(invalidId));
 
-        //         [Fact]
-        //         public async Task GetGameAsync_ValidId_ReturnsGame()
-        //         {
-        //             // arrange
-        //             var gameId = Guid.NewGuid();
-        //             var game = new Game
-        //             {
-        //                 Id = gameId,
-        //                 Title = "Test Game",
-        //                 Description = "Test Description",
-        //                 Price = 29.99m
-        //             };
+            Assert.Contains(expectedMessage, exception.Message);
 
-        //             var mockContext = GetMockDbContext();
-        //             var mockEnv = GetMockEnvironment();
-        //             var mockLogger = GetMockLogger();
+            DbContext.Dispose(db);
+        }
 
-        //             // mocируем DbSet для Games с нужной игрой
-        //             var gamesData = new List<Game> { game }.AsQueryable();
-        //             var mockGamesDbSet = new Mock<DbSet<Game>>();
-        //             mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.Provider).Returns(gamesData.Provider);
-        //             mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.Expression).Returns(gamesData.Expression);
-        //             mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.ElementType).Returns(gamesData.ElementType);
-        //             mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.GetEnumerator()).Returns(gamesData.GetEnumerator());
+        [Fact]
+        public async Task GetGameAsync_GameNotFound()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
 
-        //             mockContext.Setup(c => c.Games).Returns(mockGamesDbSet.Object);
+            var gameId = Guid.NewGuid();
+            var expectedMessage = $"Game with ID {gameId} not found";
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
 
-        //             var service = new GameService(mockContext.Object, mockEnv.Object, mockLogger.Object);
+            var exception = await Assert.ThrowsAsync<MyExceptions.GameNotFoundException>(() => service.GetGameAsync(gameId.ToString()));
 
+            Assert.Equal(gameId, exception.GameId);
+            Assert.Contains(expectedMessage, exception.Message);
 
-        //             var result = await service.GetGameAsync(gameId.ToString());
+            DbContext.Dispose(db);
+        }
 
+        [Fact]
+        public async Task GetGameAsync_WithGuid()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
 
-        //             Assert.NotNull(result);
-        //             Assert.Equal(gameId, result.Id);
-        //             Assert.Equal("Test Game", result.Title);
-        //         }
+            var gameId = Guid.NewGuid();
+            var gameTitle = "Test Game";
+
+            db.Games.Add(new Game
+            {
+                Id = gameId,
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            });
+            await db.SaveChangesAsync();
+
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var game = await service.GetGameAsync(gameId);
+
+            Assert.NotNull(game);
+            Assert.Equal(gameId, game.Id);
+            Assert.Equal(gameTitle, game.Title);
+
+            DbContext.Dispose(db);
+        }
         #endregion
 
+        #region CreateGameAsync Tests
+        [Fact]
+        public async Task CreateGameAsync_ValidData()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
 
-        // #region GetGameAsync(Guid id) Tests 
+            var gameTitle = "Test Game";
+            var viewModel = new CreateGameViewModel
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            };
 
-        // [Fact]
-        // public async Task GetGameAsync_WithGuid_CallsStringOverload()
-        // {
-        //     // arrange
-        //     var gameId = Guid.NewGuid();
-        //     var game = new Game
-        //     {
-        //         Id = gameId,
-        //         Title = "Test Game"
-        //     };
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var game = await service.CreateGameAsync(viewModel);
 
-        //     var mockContext = GetMockDbContext();
-        //     var mockEnv = GetMockEnvironment();
-        //     var mockLogger = GetMockLogger();
+            Assert.NotNull(game);
+            Assert.NotEmpty(game.Id.ToString());
+            Assert.Equal(gameTitle, game.Title);
 
-        //     var gamesData = new List<Game> { game }.AsQueryable();
-        //     var mockGamesDbSet = new Mock<DbSet<Game>>();
-        //     mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.Provider).Returns(gamesData.Provider);
-        //     mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.Expression).Returns(gamesData.Expression);
-        //     mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.ElementType).Returns(gamesData.ElementType);
-        //     mockGamesDbSet.As<IQueryable<Game>>().Setup(m => m.GetEnumerator()).Returns(gamesData.GetEnumerator());
+            DbContext.Dispose(db);
+        }
 
-        //     mockContext.Setup(c => c.Games).Returns(mockGamesDbSet.Object);
+        [Fact]
+        public async Task CreateGameAsync_NullData()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
 
-        //     var service = new GameService(mockContext.Object, mockEnv.Object, mockLogger.Object);
+            CreateGameViewModel? viewModel = null;
 
-        //     // act
-        //     var result = await service.GetGameAsync(gameId);
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var exception = await Assert.ThrowsAnyAsync<MyExceptions.ValidationException>(() => service.CreateGameAsync(viewModel));
 
-        //     // assert
-        //     Assert.NotNull(result);
-        //     Assert.Equal(gameId, result.Id);
-        // }
-        // #endregion
+            Assert.Contains("Game model cannot be null", exception.Message);
+
+            DbContext.Dispose(db);
+        }
+
+        [Fact]
+        public async Task CreateGameAsync_ValidData_WithCategories()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+
+            db.Categories.AddRange(
+                new Category { Id = 1, Name = "Action" },
+                new Category { Id = 2, Name = "Adventure" }
+            );
+            await db.SaveChangesAsync();
+
+            var gameTitle = "Test Game";
+            var viewModel = new CreateGameViewModel
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300,
+                SelectedCategoryIds = new List<int> { 1, 2 }
+            };
+
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var game = await service.CreateGameAsync(viewModel);
+
+            Assert.NotNull(game);
+            Assert.NotEmpty(game.Id.ToString());
+            Assert.Equal(gameTitle, game.Title);
+            Assert.NotNull(game.Categories);
+            Assert.Equal(2, game.Categories.Count);
+
+            DbContext.Dispose(db);
+        }
+
+        [Fact]
+        public async Task CreateGameAsync_ValidData_WithImage()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+
+            db.Categories.AddRange(
+                new Category { Id = 1, Name = "Action" },
+                new Category { Id = 2, Name = "Adventure" }
+            );
+            await db.SaveChangesAsync();
+
+            var gameTitle = "Test Game";
+            var imageFile = MakeTestFile();
+            var viewModel = new CreateGameViewModel
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300,
+                SelectedCategoryIds = new List<int> { 1, 2 },
+                ImageFile = imageFile
+            };
+
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var game = await service.CreateGameAsync(viewModel);
+
+            Assert.NotNull(game);
+            Assert.NotEmpty(game.Id.ToString());
+            Assert.Equal(gameTitle, game.Title);
+            Assert.NotNull(game.Categories);
+            Assert.Equal(2, game.Categories.Count);
+            Assert.NotNull(game.ImageUrl);
+
+            DbContext.Dispose(db);
+        }
+
+        private static IFormFile MakeTestFile(string fileName = "cover.png")
+        {
+            var content = new byte[] { 0x1, 0x2, 0x3 };
+            var stream = new MemoryStream(content);
+            return new FormFile(stream, 0, stream.Length, "image", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "image/png"
+            };
+        }
+        #endregion
+
     }
 }
