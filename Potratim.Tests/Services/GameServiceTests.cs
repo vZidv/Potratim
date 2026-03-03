@@ -221,8 +221,12 @@ namespace Potratim.Tests.Services
             DbContext.Dispose(db);
         }
 
-        [Fact]
-        public async Task CreateGameAsync_ValidData_WithImage()
+        [Theory]
+        [InlineData("Resident Evil Requiem", "resident_evil_requiem")]
+        [InlineData("DEATH STRANDING 2: ON THE BEACH DELUXE", "death_stranding_2_on_the_beach_deluxe")]
+        [InlineData("Special@#$Chars!", "specialchars")]
+        [InlineData("             SPACE             ", "space")]
+        public async Task CreateGameAsync_ValidData_WithImage(string? fileName, string expected)
         {
             using var db = DbContext.CreateInMemoryDbContext();
 
@@ -232,8 +236,8 @@ namespace Potratim.Tests.Services
             );
             await db.SaveChangesAsync();
 
-            var gameTitle = "Test Game";
-            var imageFile = MakeTestFile();
+            var gameTitle = fileName;
+            var imageFile = MakeTestFile(fileName);
             var viewModel = new CreateGameViewModel
             {
                 Title = gameTitle,
@@ -254,10 +258,48 @@ namespace Potratim.Tests.Services
             Assert.Equal(gameTitle, game.Title);
             Assert.NotNull(game.Categories);
             Assert.Equal(2, game.Categories.Count);
-            Assert.NotNull(game.ImageUrl);
+            Assert.Contains(expected, game.ImageUrl);
 
             DbContext.Dispose(db);
         }
+
+        [Theory]
+        [InlineData("        ")]
+        [InlineData(null)]
+        public async Task CreateGameAsync_InvalidData_WithImage(string? fileName)
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+            var expectedMessage = "fileName cannot be null or white space";
+
+            db.Categories.AddRange(
+                new Category { Id = 1, Name = "Action" },
+                new Category { Id = 2, Name = "Adventure" }
+            );
+            await db.SaveChangesAsync();
+
+            var gameTitle = fileName;
+            var imageFile = MakeTestFile(fileName);
+            var viewModel = new CreateGameViewModel
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300,
+                SelectedCategoryIds = new List<int> { 1, 2 },
+                ImageFile = imageFile
+            };
+
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var exception = await Assert.ThrowsAsync<MyExceptions.ValidationException>(() => service.CreateGameAsync(viewModel));
+
+
+            Assert.Contains(expectedMessage, exception.Message);
+
+            DbContext.Dispose(db);
+        }
+
 
         private static IFormFile MakeTestFile(string fileName = "cover.png")
         {
@@ -269,7 +311,169 @@ namespace Potratim.Tests.Services
                 ContentType = "image/png"
             };
         }
+
         #endregion
 
+        #region DeleteGameAsync Tests
+        [Fact]
+        public async Task DeleteGameAsync_ValidData_WithImage_Use_CreateGameAsync()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+
+            db.Categories.AddRange(
+                new Category { Id = 1, Name = "Action" },
+                new Category { Id = 2, Name = "Adventure" }
+            );
+            await db.SaveChangesAsync();
+
+            var gameTitle = "Test Game";
+            var imageFile = MakeTestFile(gameTitle);
+            var viewModel = new CreateGameViewModel
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300,
+                SelectedCategoryIds = new List<int> { 1, 2 },
+                ImageFile = imageFile
+            };
+
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            var game = await service.CreateGameAsync(viewModel);
+
+            await service.DeleteGameAsync(game.Id);
+            Assert.Empty(db.Games.Where(g => g.Id == game.Id));
+
+            DbContext.Dispose(db);
+        }
+        [Fact]
+        public async Task DeleteGameAsync_ValidData()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+
+
+            var gameTitle = "Test Game";
+            var game = new Game
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            };
+            db.Games.Add(game);
+            await db.SaveChangesAsync();
+
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+            await service.DeleteGameAsync(game.Id);
+
+            Assert.Empty(db.Games.Where(g => g.Id == game.Id));
+
+            DbContext.Dispose(db);
+        }
+        #endregion
+        #region UpdateGameAsync Tests
+        [Fact]
+        public async Task UpdateGameAsync_ValidData()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+
+            var gameTitle = "Test Game";
+            var game = new Game
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            };
+            db.Games.Add(game);
+            await db.SaveChangesAsync();
+
+            var gameEditModel = new EditGameViewModel
+            {
+                Id = game.Id,
+                Title = "Updated Game",
+                Description = "Updated Description",
+                ReleaseDate = DateTime.Now.AddDays(1),
+                Developer = "Updated Developer",
+                Publisher = "Updated Publisher",
+                Price = 400
+            };
+            await service.UpdateGameAsync(gameEditModel);
+            var updatedGame = await db.Games.FindAsync(game.Id);
+
+            Assert.NotNull(updatedGame);
+            Assert.Equal(gameEditModel.Title, updatedGame.Title);
+            Assert.Equal(gameEditModel.Description, updatedGame.Description);
+            Assert.Equal(gameEditModel.ReleaseDate, updatedGame.ReleaseDate);
+            Assert.Equal(gameEditModel.Developer, updatedGame.Developer);
+            Assert.Equal(gameEditModel.Publisher, updatedGame.Publisher);
+            Assert.Equal(gameEditModel.Price, updatedGame.Price);
+
+            DbContext.Dispose(db);
+        }
+        [Fact]
+        public async Task UpdateGameAsync_NullData()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+
+            var gameTitle = "Test Game";
+            var game = new Game
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            };
+            db.Games.Add(game);
+            await db.SaveChangesAsync();
+
+
+            var exception = Assert.ThrowsAsync<MyExceptions.ValidationException>(async () => await service.UpdateGameAsync(null));
+
+            Assert.Contains("Game model cannot be null", exception.Result.Message);
+
+            DbContext.Dispose(db);
+        }
+        #endregion
+
+        #region GameToGameViewModel Tests
+        [Fact]
+        public async Task GameToGameViewModel_ValidData()
+        {
+            using var db = DbContext.CreateInMemoryDbContext();
+            var service = new GameService(db, _mockEnv.Object, _mockLogger.Object);
+
+            var gameTitle = "Test Game";
+            var game = new Game
+            {
+                Title = gameTitle,
+                Description = "Test Description",
+                ReleaseDate = DateTime.Now,
+                Developer = "Test Developer",
+                Publisher = "Test Publisher",
+                Price = 300
+            };
+
+            var gameViewModel = service.GameToGameViewModel(game);
+
+            Assert.NotNull(gameViewModel);
+            Assert.Equal(typeof(GameViewModel), gameViewModel.GetType());
+            Assert.Equal(gameTitle, gameViewModel.Title);
+            Assert.Equal(game.ReleaseDate, gameViewModel.ReleaseDate);
+            Assert.Equal(game.Price, gameViewModel.Price);
+
+            DbContext.Dispose(db);
+        }
+        #endregion
     }
 }

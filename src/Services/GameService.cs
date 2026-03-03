@@ -152,14 +152,16 @@ namespace src.Services
 
         public async Task<Game> UpdateGameAsync(EditGameViewModel model)
         {
-            _logger.LogDebug($"Updating game with ID {model.Id}");
 
             if (model == null)
-                throw new ValidationException("fileName cannot be null")
+                throw new ValidationException("Game model cannot be null")
                 {
                     PropertyName = nameof(model),
                     AttemptedValue = model
                 };
+
+            _logger.LogDebug($"Updating game with ID {model.Id}");
+
 
             var game = await GetGameAsync(model.Id);
 
