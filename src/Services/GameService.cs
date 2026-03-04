@@ -229,6 +229,13 @@ namespace src.Services
 
         public async Task<List<GameViewModel>> GetSimilarGamesAsync(string id, int count)
         {
+            if (count <= 0 || count > 100)
+                throw new ValidationException($"Count cant be {count}, it must be > 0 and <= 100")
+                {
+                    PropertyName = nameof(count),
+                    AttemptedValue = count
+                };
+
             _logger.LogDebug($"Retrieving similar games for game ID {id}, count: {count}");
 
             var game = await GetGameAsync(id);
@@ -267,14 +274,14 @@ namespace src.Services
 
         public GameViewModel GameToGameViewModel(Game game)
         {
-            _logger.LogDebug($"Mapping game to GameViewModel for game ID {game.Id}");
-
             if (game == null)
                 throw new ValidationException($"Game cannot be null")
                 {
                     PropertyName = nameof(game),
                     AttemptedValue = game
                 };
+
+            _logger.LogDebug($"Mapping game to GameViewModel for game ID {game.Id}");
 
             return new GameViewModel()
             {
