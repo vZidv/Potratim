@@ -19,19 +19,34 @@ using Xunit;
 
 namespace Potratim.Tests.Services
 {
-    public class GameServiceTests
+    public class GameServiceTests : IDisposable
     {
         private readonly Mock<IWebHostEnvironment> _mockEnv;
         private readonly Mock<ILogger<GameService>> _mockLogger;
 
+        private readonly string _tempPath;
+
         public GameServiceTests()
         {
             _mockEnv = new Mock<IWebHostEnvironment>();
-            var tempPath = Path.Combine(Path.GetTempPath(), "PotratimTestsTempFolder");
-            Directory.CreateDirectory(tempPath);
-            _mockEnv.Setup(e => e.WebRootPath).Returns(tempPath);
+            _tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(_tempPath);
+            _mockEnv.Setup(e => e.WebRootPath).Returns(_tempPath);
 
             _mockLogger = new Mock<ILogger<GameService>>();
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose();
+        }
+
+        private void Dispose()
+        {
+            if (Directory.Exists(_tempPath))
+            {
+                Directory.Delete(_tempPath, true);
+            }
         }
 
         #region GetGameAsync Tests
