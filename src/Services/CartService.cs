@@ -18,18 +18,15 @@ namespace Potratim.Services
     public class CartService : ICartService
     {
         private readonly PotratimDbContext _context;
-        private readonly UserManager<User> _userManager;
         private readonly IGameService _gameService;
         private readonly ILogger<CartService> _logger;
 
         public CartService(
             PotratimDbContext context,
-            UserManager<User> userManager,
             IGameService gameService,
             ILogger<CartService> logger)
         {
             _context = context;
-            _userManager = userManager;
             _gameService = gameService;
             _logger = logger;
         }
@@ -38,9 +35,18 @@ namespace Potratim.Services
         //Authorization users
         public async Task AddToCartAsync(Guid userId, Guid gameId, int quantity = 1)
         {
-            _logger.LogInformation($"Adding game {gameId} to cart for user {userId}");
+            if (gameId == Guid.Empty)
+            {
+                throw new ValidationException($"Invalid game ID {gameId}")
+                {
+                    PropertyName = nameof(gameId),
+                    AttemptedValue = gameId
+                };
+            }
 
             var cart = await GetOrCreateDbCartAsync(userId);
+
+            _logger.LogInformation($"Adding game {gameId} to cart for user {userId}");
 
             var cartGame = cart.Games.FirstOrDefault(g => g.Id == gameId);
             if (cartGame == null)
@@ -49,46 +55,65 @@ namespace Potratim.Services
                 cart.Games.Add(game);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                _logger.LogInformation($"Game {gameId} already exists in cart for user {userId}");
+            }
         }
 
         public async Task RemoveFromCartAsync(Guid userId, Guid gameId)
         {
-            _logger.LogInformation($"Removing game {gameId} from cart for user {userId}");
+            if (gameId == Guid.Empty)
+            {
+                throw new ValidationException($"Invalid game ID {gameId}")
+                {
+                    PropertyName = nameof(gameId),
+                    AttemptedValue = gameId
+                };
+            }
 
             var cart = await GetOrCreateDbCartAsync(userId);
+
+            _logger.LogInformation($"Removing game {gameId} from cart for user {userId}");
+
             var cartGame = cart.Games.FirstOrDefault(cg => cg.Id == gameId);
             if (cartGame != null)
             {
                 cart.Games.Remove(cartGame);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                _logger.LogWarning($"Game {gameId} not found in cart for user {userId}");
+                throw new GameNotFoundException($"Game with ID {gameId} not found in cart");
+            }
         }
         public async Task ClearCartAsync(Guid userId)
         {
+            var cart = await GetOrCreateDbCartAsync(userId);
+
             _logger.LogInformation($"Clearing cart for user {userId}");
 
-            var cart = await GetOrCreateDbCartAsync(userId);
             cart.Games.Clear();
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<Game>> GetCartItemsAsync(Guid userId)
         {
-            _logger.LogDebug($"Retrieving cart items for user {userId}");
             var cart = await GetOrCreateDbCartAsync(userId);
+            _logger.LogDebug($"Retrieving cart items for user {userId}");
             return cart.Games.ToList();
         }
 
         public async Task<decimal> GetCartTotalAsync(Guid userId)
         {
-            _logger.LogDebug($"Calculating cart total for user {userId}");
             var cart = await GetOrCreateDbCartAsync(userId);
+            _logger.LogDebug($"Calculating cart total for user {userId}");
             return cart.Games.Sum(g => g.Price);
         }
 
         private async Task<Cart> GetOrCreateDbCartAsync(Guid userId)
         {
-            _logger.LogDebug($"Retrieving or creating cart for user {userId}");
             if (userId == Guid.Empty)
             {
                 throw new ValidationException($"Invalid user ID {userId}")
@@ -97,7 +122,9 @@ namespace Potratim.Services
                     AttemptedValue = userId
                 };
             }
-            
+            _logger.LogDebug($"Retrieving or creating cart for user {userId}");
+
+
             var cart = await _context.Carts.Include(c => c.Games)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
@@ -151,9 +178,9 @@ namespace Potratim.Services
 
         public async Task AddToCartAsync(HttpContext httpContext, Guid gameId, int quantity = 1)
         {
-            _logger.LogInformation($"Adding game {gameId} to cart for user {httpContext.User.Identity.Name}");
-
             var sessionCart = GetSessionCart(httpContext);
+
+            _logger.LogInformation($"Adding game {gameId} to cart for user {httpContext.User.Identity.Name}");
 
             if (sessionCart.ContainsKey(gameId))
             {
@@ -244,8 +271,17 @@ namespace Potratim.Services
             httpContext.Session.Remove("Cart");
         }
 
-        private Dictionary<Guid, int> GetSessionCart(HttpContext httpContext)
+        public Dictionary<Guid, int> GetSessionCart(HttpContext httpContext)
         {
+            if (httpContext == null)
+            {
+               throw new ValidationException($"HttpContext cannot be null")
+                {
+                    PropertyName = nameof(httpContext),
+                    AttemptedValue = null
+                };
+            }
+
             _logger.LogDebug($"Retrieving session cart for user {httpContext.User.Identity.Name}");
 
             var sessionCartJson = httpContext.Session.GetString("Cart");
@@ -267,7 +303,7 @@ namespace Potratim.Services
         private void SaveSessionCart(HttpContext httpContext, Dictionary<Guid, int> cart)
         {
             _logger.LogDebug($"Saving session cart for user {httpContext.User.Identity.Name}");
-            
+
             var sessionCartJson = JsonSerializer.Serialize(cart);
             httpContext.Session.SetString("Cart", sessionCartJson);
         }
