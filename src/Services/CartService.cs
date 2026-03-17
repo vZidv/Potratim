@@ -180,6 +180,15 @@ namespace Potratim.Services
         {
             var sessionCart = GetSessionCart(httpContext);
 
+            if (gameId == Guid.Empty)
+            {
+                throw new ValidationException($"Invalid game ID {gameId}")
+                {
+                    PropertyName = nameof(gameId),
+                    AttemptedValue = gameId
+                };
+            }
+
             _logger.LogInformation($"Adding game {gameId} to cart for user {httpContext.User.Identity.Name}");
 
             if (sessionCart.ContainsKey(gameId))
